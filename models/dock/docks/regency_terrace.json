@@ -1,0 +1,583 @@
+{
+ "id": "regency_terrace",
+ "style": "west_street",
+ "wear": 0.45,
+ "seed": 317,
+ "_doc": "Site 1 item 26a, survey row 1.15a: the Bar Harbor Regency's terrace and shore walls at the pier's root. Level metres, built by tools/assets/sites/regency_terrace.py. Outlines and heights: 2021 lidar's ground returns. That it is granite block and riprap with a paved terrace and tables: marinas.com's undated aerials, as noted on 2 Nov (not re-read for this file; not in the repo). ASSUMED until V1.1: the wall's and paving's stone, no rail along the face (no returns), the wall hidden under trees NW of the pier, the steps at b 8 (the lidar shows only a 3 m ramp in the back wall), the number of tables.",
+ "walls": [
+  {
+   "kind": "granite",
+   "water_side": "right",
+   "batter_deg": 5,
+   "cap": {
+    "h": 0.35,
+    "depth_m": 0.9,
+    "corner_m": 1.2
+   },
+   "id": "terrace_face",
+   "top_navd_m": 3.88,
+   "path": [
+    [
+     -2192.27,
+     14.09,
+     3.88,
+     1.43
+    ],
+    [
+     -2188.79,
+     16.79,
+     3.88,
+     1.4
+    ],
+    [
+     -2185.63,
+     19.24,
+     3.88,
+     1.42
+    ],
+    [
+     -2182.32,
+     21.82,
+     3.88,
+     1.42
+    ]
+   ]
+  },
+  {
+   "kind": "granite",
+   "water_side": "right",
+   "batter_deg": 5,
+   "cap": {
+    "h": 0.35,
+    "depth_m": 0.9,
+    "corner_m": 1.2
+   },
+   "id": "terrace_face_nw",
+   "top_navd_m": 3.95,
+   "path": [
+    [
+     -2212.47,
+     0.81,
+     3.65,
+     1.65
+    ],
+    [
+     -2207.34,
+     4.8,
+     3.8,
+     1.65
+    ],
+    [
+     -2202.66,
+     8.56,
+     3.95,
+     1.8
+    ],
+    [
+     -2199.5,
+     11.01,
+     3.95,
+     1.9
+    ]
+   ]
+  },
+  {
+   "kind": "granite",
+   "water_side": "right",
+   "batter_deg": 3,
+   "cap": {
+    "h": 0.2,
+    "depth_m": 0.5,
+    "corner_m": 1.0
+   },
+   "id": "terrace_back_se",
+   "block_h_m": [
+    0.3,
+    0.5
+   ],
+   "top_navd_m": 4.95,
+   "path": [
+    [
+     -2195.58,
+     24.06,
+     4.95,
+     3.92
+    ],
+    [
+     -2193.28,
+     25.84,
+     4.95,
+     3.92
+    ],
+    [
+     -2190.76,
+     27.8,
+     4.95,
+     3.92
+    ],
+    [
+     -2186.71,
+     24.86,
+     4.93,
+     3.92
+    ]
+   ]
+  },
+  {
+   "kind": "granite",
+   "water_side": "right",
+   "batter_deg": 3,
+   "cap": {
+    "h": 0.2,
+    "depth_m": 0.5,
+    "corner_m": 1.0
+   },
+   "id": "terrace_back_nw",
+   "block_h_m": [
+    0.3,
+    0.5
+   ],
+   "top_navd_m": 5.0,
+   "path": [
+    [
+     -2204.71,
+     21.14,
+     5.05,
+     4.2
+    ],
+    [
+     -2201.82,
+     19.21,
+     5.05,
+     3.93
+    ],
+    [
+     -2197.31,
+     22.71,
+     5.0,
+     3.92
+    ]
+   ]
+  },
+  {
+   "kind": "granite",
+   "water_side": "right",
+   "batter_deg": 5,
+   "cap": {
+    "h": 0.4,
+    "depth_m": 0.9,
+    "corner_m": 1.2
+   },
+   "id": "lawn_wall",
+   "top_navd_m": 7.14,
+   "path": [
+    [
+     -2180.72,
+     24.32,
+     4.5,
+     3.9
+    ],
+    [
+     -2178.98,
+     25.67,
+     5.3,
+     3.75
+    ],
+    [
+     -2176.83,
+     27.47,
+     6.67,
+     3.84
+    ],
+    [
+     -2174.46,
+     29.31,
+     6.91,
+     3.95
+    ],
+    [
+     -2171.48,
+     30.36,
+     7.14,
+     3.9
+    ],
+    [
+     -2168.55,
+     31.49,
+     7.11,
+     3.66
+    ],
+    [
+     -2166.61,
+     33.88,
+     7.11,
+     3.75
+    ],
+    [
+     -2165.59,
+     37.46,
+     7.05,
+     3.8
+    ],
+    [
+     -2163.84,
+     40.09,
+     6.85,
+     3.87
+    ],
+    [
+     -2160.8,
+     42.7,
+     6.3,
+     3.85
+    ]
+   ]
+  }
+ ],
+ "revetments": [
+  {
+   "id": "bench_riprap",
+   "slope": 1.25,
+   "stone_m": [
+    0.35,
+    1.1
+   ],
+   "top_navd_m": 3.7,
+   "path": [
+    [
+     -2181.46,
+     22.35,
+     3.85,
+     1.4
+    ],
+    [
+     -2177.91,
+     23.97,
+     3.67,
+     1.35
+    ],
+    [
+     -2175.3,
+     25.49,
+     3.65,
+     1.35
+    ],
+    [
+     -2173.17,
+     27.65,
+     3.7,
+     1.25
+    ],
+    [
+     -2170.56,
+     29.17,
+     3.4,
+     1.15
+    ],
+    [
+     -2167.57,
+     30.22,
+     3.65,
+     1.25
+    ],
+    [
+     -2165.82,
+     32.85,
+     3.75,
+     1.15
+    ],
+    [
+     -2164.92,
+     36.59,
+     3.7,
+     1.35
+    ],
+    [
+     -2163.16,
+     39.22,
+     3.7,
+     1.4
+    ],
+    [
+     -2160.0,
+     41.67,
+     3.75,
+     1.2
+    ]
+   ]
+  },
+  {
+   "id": "pier_notch_riprap",
+   "slope": 1.3,
+   "stone_m": [
+    0.3,
+    0.9
+   ],
+   "top_navd_m": 3.8,
+   "path": [
+    [
+     -2195.7,
+     13.45,
+     3.6,
+     1.65
+    ],
+    [
+     -2192.47,
+     14.19,
+     3.82,
+     1.45
+    ]
+   ]
+  },
+  {
+   "id": "nw_riprap",
+   "slope": 1.7,
+   "stone_m": [
+    0.35,
+    1.1
+   ],
+   "top_navd_m": 3.7,
+   "path": [
+    [
+     -2241.6,
+     -22.82,
+     4.2,
+     2.05
+    ],
+    [
+     -2239.67,
+     -18.78,
+     4.0,
+     2.25
+    ],
+    [
+     -2237.61,
+     -14.91,
+     3.95,
+     2.3
+    ],
+    [
+     -2233.35,
+     -13.88,
+     3.6,
+     2.2
+    ],
+    [
+     -2230.19,
+     -11.42,
+     3.4,
+     1.9
+    ],
+    [
+     -2227.03,
+     -8.97,
+     3.7,
+     2.2
+    ],
+    [
+     -2223.87,
+     -6.52,
+     3.9,
+     2.1
+    ],
+    [
+     -2221.02,
+     -3.67,
+     3.65,
+     1.85
+    ],
+    [
+     -2217.74,
+     -1.38,
+     3.6,
+     1.6
+    ],
+    [
+     -2212.9,
+     1.37,
+     3.65,
+     1.65
+    ]
+   ]
+  }
+ ],
+ "steps": [
+  {
+   "id": "terrace_steps",
+   "path": [
+    [
+     -2198.28,
+     25.75,
+     4.95
+    ],
+    [
+     -2196.32,
+     23.22,
+     3.91
+    ]
+   ],
+   "width_m": 1.9,
+   "rise_m": 0.26,
+   "cheeks": "both",
+   "top_navd_m": 4.95
+  }
+ ],
+ "dressing": {
+  "id": "regency_terrace_dress",
+  "far_m": 120,
+  "cutoff_m": 1500,
+  "items": [
+   {
+    "type": "paving",
+    "poly": [
+     [
+      -2201.18,
+      19.45
+     ],
+     [
+      -2196.33,
+      13.21
+     ],
+     [
+      -2192.88,
+      14.71
+     ],
+     [
+      -2183.4,
+      22.07
+     ],
+     [
+      -2190.79,
+      27.52
+     ]
+    ],
+    "y": 3.91,
+    "mat": "apron_concrete",
+    "uv_m": 3,
+    "tint": [
+     1.3,
+     1.3,
+     1.3
+    ]
+   },
+   {
+    "type": "paving",
+    "poly": [
+     [
+      -2206.99,
+      16.59
+     ],
+     [
+      -2202.47,
+      10.76
+     ],
+     [
+      -2197.45,
+      14.65
+     ],
+     [
+      -2201.98,
+      20.48
+     ]
+    ],
+    "y": 3.91,
+    "mat": "apron_concrete",
+    "uv_m": 3,
+    "tint": [
+     1.3,
+     1.3,
+     1.3
+    ]
+   },
+   {
+    "type": "paving",
+    "poly": [
+     [
+      -2202.47,
+      10.76
+     ],
+     [
+      -2202.03,
+      10.19
+     ],
+     [
+      -2199.93,
+      11.81
+     ],
+     [
+      -2200.37,
+      12.38
+     ]
+    ],
+    "y": 3.91,
+    "mat": "apron_concrete",
+    "uv_m": 3,
+    "tint": [
+     1.3,
+     1.3,
+     1.3
+    ]
+   },
+   {
+    "type": "cafe_table",
+    "at": [
+     -2188.55,
+     26.09
+    ],
+    "y": 3.91,
+    "yaw_deg": 142.2,
+    "umbrella": true
+   },
+   {
+    "type": "cafe_table",
+    "at": [
+     -2192.13,
+     23.69
+    ],
+    "y": 3.91,
+    "yaw_deg": 162.2,
+    "umbrella": false
+   },
+   {
+    "type": "cafe_table",
+    "at": [
+     -2192.72,
+     19.56
+    ],
+    "y": 3.91,
+    "yaw_deg": 204.2,
+    "umbrella": false
+   },
+   {
+    "type": "cafe_table",
+    "at": [
+     -2197.51,
+     18.88
+    ],
+    "y": 3.91,
+    "yaw_deg": 177.2,
+    "umbrella": true
+   },
+   {
+    "type": "life_ring",
+    "at": [
+     -2186.22,
+     20.81
+    ],
+    "y": 3.91,
+    "yaw_deg": 232.2
+   },
+   {
+    "type": "sign",
+    "sign": "no_swim",
+    "at": [
+     -2190.56,
+     17.44
+    ],
+    "y": 3.91,
+    "yaw_deg": 322.2,
+    "h_m": 1.35
+   }
+  ]
+ }
+}

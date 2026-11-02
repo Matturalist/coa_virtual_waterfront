@@ -523,5 +523,38 @@
     }
    ]
   }
+ ],
+ "locks": [
+  {
+   "id": "balance_rock",
+   "c": [
+    -0.5,
+    1238.4
+   ],
+   "r": 8.0,
+   "why": "Assets, site 1 item 24 (2 Nov): no boulder or generated ledge within 8 m of Balance Rock (shore_path_south.json); the beach round it stays at the lidar's +0.5..+1.5"
+  },
+  {
+   "id": "regency_terrace",
+   "pts": [
+    [
+     -2245.6,
+     -26.8
+    ],
+    [
+     -2156.0,
+     -26.8
+    ],
+    [
+     -2156.0,
+     46.7
+    ],
+    [
+     -2245.6,
+     46.7
+    ]
+   ],
+   "why": "no generated boulder or ledge over regency_terrace (Assets: the riprap reaches 3 m seaward of each crest). tools/site_walls.py regency_terrace"
+  }
  ]
 }

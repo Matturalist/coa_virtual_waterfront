@@ -12,8 +12,8 @@
     1.02
    ],
    "name": "Granite block",
-   "tex": "textures/terrain/seaside_rock/colour.jpg",
-   "normal": "textures/terrain/seaside_rock/normal.jpg",
+   "tex": "textures/terrain/seaside_rock/colour_height.webp",
+   "normal": "textures/terrain/seaside_rock/normal_rough.webp",
    "tile_m": 3.0,
    "tex_tint": [
     1.25,
@@ -40,8 +40,8 @@
    "name": "Stacked rock",
    "rough": 0.14,
    "batter": 0.15,
-   "tex": "textures/terrain/gray_rocks/colour.jpg",
-   "normal": "textures/terrain/gray_rocks/normal.jpg",
+   "tex": "textures/terrain/gray_rocks/colour_height.webp",
+   "normal": "textures/terrain/gray_rocks/normal_rough.webp",
    "tile_m": 2.0,
    "from": "Poly Haven gray_rocks; Matt, 19 Oct: the Shore Path wall is jagged rock, stacked"
   },
@@ -119,8 +119,8 @@
     0.58
    ],
    "name": "Granite coping",
-   "tex": "textures/terrain/seaside_rock/colour.jpg",
-   "normal": "textures/terrain/seaside_rock/normal.jpg",
+   "tex": "textures/terrain/seaside_rock/colour_height.webp",
+   "normal": "textures/terrain/seaside_rock/normal_rough.webp",
    "tile_m": 1.5,
    "from": "Poly Haven seaside_rock"
   },
@@ -132,8 +132,8 @@
     0.24
    ],
    "name": "Turf",
-   "tex": "textures/terrain/forrest_ground_01/colour.jpg",
-   "normal": "textures/terrain/forrest_ground_01/normal.jpg",
+   "tex": "textures/terrain/forrest_ground_01/colour_height.webp",
+   "normal": "textures/terrain/forrest_ground_01/normal_rough.webp",
    "tile_m": 3.0,
    "from": "Poly Haven forrest_ground_01 (grass with bare patches)"
   },
@@ -1002,6 +1002,622 @@
    "draw": false,
    "tool": "site_walls.py",
    "note": "a granite bench stands here (Assets). tools/site_walls.py shore_path_inn_walls"
+  },
+  {
+   "id": "k7_cove_wall",
+   "kind": "wall",
+   "name": "cove_wall (ground)",
+   "pts": [
+    [
+     32.4,
+     1333.7,
+     4.0
+    ],
+    [
+     36.7,
+     1337.0,
+     3.7
+    ],
+    [
+     40.9,
+     1339.9,
+     3.7
+    ],
+    [
+     45.1,
+     1342.6,
+     3.7
+    ],
+    [
+     49.3,
+     1345.3,
+     3.7
+    ],
+    [
+     53.5,
+     1348.0,
+     3.7
+    ],
+    [
+     57.8,
+     1350.6,
+     3.7
+    ],
+    [
+     62.1,
+     1353.1,
+     3.7
+    ],
+    [
+     66.6,
+     1355.6,
+     3.7
+    ],
+    [
+     71.3,
+     1357.9,
+     3.7
+    ],
+    [
+     76.0,
+     1359.9,
+     3.7
+    ],
+    [
+     80.7,
+     1361.5,
+     3.7
+    ],
+    [
+     85.5,
+     1363.0,
+     3.7
+    ],
+    [
+     90.3,
+     1364.5,
+     3.7
+    ],
+    [
+     95.1,
+     1366.0,
+     3.7
+    ],
+    [
+     100.0,
+     1367.3,
+     3.7
+    ],
+    [
+     105.0,
+     1368.2,
+     3.4
+    ],
+    [
+     109.9,
+     1369.3,
+     3.4
+    ],
+    [
+     114.7,
+     1370.8,
+     3.4
+    ],
+    [
+     119.5,
+     1372.2,
+     3.4
+    ],
+    [
+     124.3,
+     1373.3,
+     3.4
+    ],
+    [
+     129.1,
+     1374,
+     3.7
+    ]
+   ],
+   "high": "right",
+   "backfill": 4.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall cove_wall (models/dock/docks/shore_path_south.json) at its top less 0.35 for 4.0 m; pressed in and solid, not drawn. tools/site_walls.py shore_path_south"
+  },
+  {
+   "id": "k7_reef_point_wall",
+   "kind": "wall",
+   "name": "reef_point_wall (ground)",
+   "pts": [
+    [
+     145.3,
+     1381.7,
+     3.7
+    ],
+    [
+     149.7,
+     1384.4,
+     3.7
+    ],
+    [
+     153.2,
+     1388.0,
+     3.7
+    ],
+    [
+     156.6,
+     1391.7,
+     3.7
+    ],
+    [
+     160.3,
+     1395.0,
+     3.7
+    ],
+    [
+     164.2,
+     1398.1,
+     3.7
+    ],
+    [
+     168.2,
+     1401.2,
+     3.7
+    ],
+    [
+     171.8,
+     1404.6,
+     3.7
+    ],
+    [
+     175.1,
+     1408.5,
+     4.0
+    ]
+   ],
+   "high": "right",
+   "backfill": 4.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall reef_point_wall (models/dock/docks/shore_path_south.json) at its top less 0.35 for 4.0 m; pressed in and solid, not drawn. tools/site_walls.py shore_path_south"
+  },
+  {
+   "id": "k7_reef_point_wall_s",
+   "kind": "wall",
+   "name": "reef_point_wall_s (ground)",
+   "pts": [
+    [
+     202.5,
+     1461.9,
+     4.75
+    ],
+    [
+     204.5,
+     1466.5,
+     4.75
+    ],
+    [
+     205.8,
+     1471.4,
+     4.75
+    ],
+    [
+     206.2,
+     1476.4,
+     4.75
+    ],
+    [
+     206.1,
+     1481.6,
+     5.05
+    ],
+    [
+     206.3,
+     1486.7,
+     5.05
+    ],
+    [
+     207.2,
+     1491.6,
+     5.05
+    ],
+    [
+     208.3,
+     1496.5,
+     5.05
+    ],
+    [
+     209.5,
+     1501.3,
+     5.05
+    ],
+    [
+     211,
+     1506.1,
+     5.05
+    ]
+   ],
+   "high": "right",
+   "backfill": 4.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall reef_point_wall_s (models/dock/docks/shore_path_south.json) at its top less 0.35 for 4.0 m; pressed in and solid, not drawn. tools/site_walls.py shore_path_south"
+  },
+  {
+   "id": "k7_last_stretch_wall",
+   "kind": "wall",
+   "name": "last_stretch_wall (ground)",
+   "pts": [
+    [
+     220,
+     1524.6,
+     4.9
+    ],
+    [
+     222.7,
+     1529.0,
+     4.9
+    ],
+    [
+     225.6,
+     1533.2,
+     4.9
+    ],
+    [
+     228.7,
+     1537.5,
+     4.9
+    ],
+    [
+     231.4,
+     1541.8,
+     4.9
+    ],
+    [
+     233.2,
+     1546.5,
+     5.2
+    ],
+    [
+     234.8,
+     1551.2,
+     5.2
+    ],
+    [
+     236.6,
+     1555.9,
+     5.2
+    ]
+   ],
+   "high": "right",
+   "backfill": 4.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall last_stretch_wall (models/dock/docks/shore_path_south.json) at its top less 0.05 for 4.0 m; pressed in and solid, not drawn. tools/site_walls.py shore_path_south"
+  },
+  {
+   "id": "bay_view_root",
+   "kind": "fill",
+   "name": "the Bay View pier's root: the bank raised to about +6 within 3 m (the lidar under the trees has few returns, +3.3..+4.3), so its ramp does not end in the air (Assets, item 25)",
+   "pts": [
+    [
+     -1757.8,
+     323.4,
+     6.0
+    ],
+    [
+     -1758.68,
+     325.52,
+     6.0
+    ],
+    [
+     -1760.8,
+     326.4,
+     6.0
+    ],
+    [
+     -1762.92,
+     325.52,
+     6.0
+    ],
+    [
+     -1763.8,
+     323.4,
+     6.0
+    ],
+    [
+     -1762.92,
+     321.28,
+     6.0
+    ],
+    [
+     -1760.8,
+     320.4,
+     6.0
+    ],
+    [
+     -1758.68,
+     321.28,
+     6.0
+    ]
+   ],
+   "open": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "draw": false,
+   "tool": "site_walls.py",
+   "note": "the Bay View pier's root: the bank raised to about +6 within 3 m (the lidar under the trees has few returns, +3.3..+4.3), so its ramp does not end in the air (Assets, item 25). tools/site_walls.py bay_view_pier"
+  },
+  {
+   "id": "k7_terrace_face",
+   "kind": "wall",
+   "name": "terrace_face (ground)",
+   "pts": [
+    [
+     -2192.27,
+     14.09,
+     3.84
+    ],
+    [
+     -2188.79,
+     16.79,
+     3.84
+    ],
+    [
+     -2185.63,
+     19.24,
+     3.84
+    ],
+    [
+     -2182.32,
+     21.82,
+     3.84
+    ]
+   ],
+   "high": "right",
+   "backfill": 1.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall terrace_face (models/dock/docks/regency_terrace.json) at +3.84 for 1.0 m; pressed in and solid, not drawn. tools/site_walls.py regency_terrace"
+  },
+  {
+   "id": "k7_terrace_face_nw",
+   "kind": "wall",
+   "name": "terrace_face_nw (ground)",
+   "pts": [
+    [
+     -2212.47,
+     0.81,
+     3.84
+    ],
+    [
+     -2207.34,
+     4.8,
+     3.84
+    ],
+    [
+     -2202.66,
+     8.56,
+     3.84
+    ],
+    [
+     -2199.5,
+     11.01,
+     3.84
+    ]
+   ],
+   "high": "right",
+   "backfill": 1.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall terrace_face_nw (models/dock/docks/regency_terrace.json) at +3.84 for 1.0 m; pressed in and solid, not drawn. tools/site_walls.py regency_terrace"
+  },
+  {
+   "id": "k7_terrace_back_se",
+   "kind": "wall",
+   "name": "terrace_back_se (ground)",
+   "pts": [
+    [
+     -2195.58,
+     24.06,
+     4.9
+    ],
+    [
+     -2193.28,
+     25.84,
+     4.9
+    ],
+    [
+     -2190.76,
+     27.8,
+     4.9
+    ],
+    [
+     -2186.71,
+     24.86,
+     4.9
+    ]
+   ],
+   "high": "right",
+   "backfill": 4.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall terrace_back_se (models/dock/docks/regency_terrace.json) at +4.90 for 4.0 m; pressed in and solid, not drawn. tools/site_walls.py regency_terrace"
+  },
+  {
+   "id": "k7_terrace_back_nw",
+   "kind": "wall",
+   "name": "terrace_back_nw (ground)",
+   "pts": [
+    [
+     -2204.71,
+     21.14,
+     4.9
+    ],
+    [
+     -2201.82,
+     19.21,
+     4.9
+    ],
+    [
+     -2197.31,
+     22.71,
+     4.9
+    ]
+   ],
+   "high": "right",
+   "backfill": 4.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall terrace_back_nw (models/dock/docks/regency_terrace.json) at +4.90 for 4.0 m; pressed in and solid, not drawn. tools/site_walls.py regency_terrace"
+  },
+  {
+   "id": "k7_lawn_wall",
+   "kind": "wall",
+   "name": "lawn_wall (ground)",
+   "pts": [
+    [
+     -2180.72,
+     24.32,
+     4.5
+    ],
+    [
+     -2178.98,
+     25.67,
+     4.85
+    ],
+    [
+     -2176.83,
+     27.47,
+     7.05
+    ],
+    [
+     -2174.46,
+     29.31,
+     7.05
+    ],
+    [
+     -2171.48,
+     30.36,
+     7.05
+    ],
+    [
+     -2168.55,
+     31.49,
+     7.05
+    ],
+    [
+     -2166.61,
+     33.88,
+     7.05
+    ],
+    [
+     -2165.59,
+     37.46,
+     7.05
+    ],
+    [
+     -2163.84,
+     40.09,
+     7.05
+    ],
+    [
+     -2160.8,
+     42.7,
+     7.05
+    ]
+   ],
+   "high": "right",
+   "backfill": 4.0,
+   "draw": false,
+   "tool": "site_walls.py",
+   "apron": null,
+   "note": "the ground behind Assets' K7 wall lawn_wall (models/dock/docks/regency_terrace.json) at +7.05 for 4.0 m; pressed in and solid, not drawn. tools/site_walls.py regency_terrace"
+  },
+  {
+   "id": "regency_terrace_paving",
+   "kind": "fill",
+   "name": "the Regency terrace, flat at +3.84 under its paving (+3.91) (Assets, item 26a)",
+   "pts": [
+    [
+     -2201.2,
+     19.5,
+     3.84
+    ],
+    [
+     -2196.3,
+     13.2,
+     3.84
+    ],
+    [
+     -2192.9,
+     14.7,
+     3.84
+    ],
+    [
+     -2183.4,
+     22.1,
+     3.84
+    ],
+    [
+     -2190.8,
+     27.5,
+     3.84
+    ]
+   ],
+   "open": [],
+   "flat": true,
+   "draw": false,
+   "tool": "site_walls.py",
+   "note": "the Regency terrace, flat at +3.84 under its paving (+3.91) (Assets, item 26a). tools/site_walls.py regency_terrace"
+  },
+  {
+   "id": "regency_landing",
+   "kind": "fill",
+   "name": "the landing at the pier's root, flat at +3.84 (Assets, item 26a)",
+   "pts": [
+    [
+     -2207.0,
+     16.6,
+     3.84
+    ],
+    [
+     -2202.5,
+     10.8,
+     3.84
+    ],
+    [
+     -2197.5,
+     14.7,
+     3.84
+    ],
+    [
+     -2202.0,
+     20.5,
+     3.84
+    ]
+   ],
+   "open": [],
+   "flat": true,
+   "draw": false,
+   "tool": "site_walls.py",
+   "note": "the landing at the pier's root, flat at +3.84 (Assets, item 26a). tools/site_walls.py regency_terrace"
   }
  ]
 }

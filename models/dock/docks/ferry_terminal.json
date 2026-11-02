@@ -1,0 +1,617 @@
+{
+ "id": "ferry_terminal",
+ "style": "whale_watch",
+ "wear": 0.5,
+ "seed": 421,
+ "retires_osm": [
+  300718878,
+  300718875,
+  1550393526
+ ],
+ "_doc": "Site 1 item 27, rows 1.16, 1.28-1.33: the ferry terminal as it stands since 2022. Built by tools/assets/sites/ferry_terminal.py from the 2021 lidar and GEI 2021. NOT built: the two truss bridges and the ramp building (removed 2022), the thin walkway and shed between the piers at about (-1950, 10)...(-1925, 38) (in the 2021 lidar, in no document; ASSUMED gone with them until V1.3), the turning dolphin (no returns; V1.4). The linkspan and pontoon are `linkspans` (item 19). Colours are the style's until V1.x, except the ramp's.",
+ "platforms": [
+  {
+   "id": "north_pier",
+   "at": [
+    -1999.2,
+    44.45
+   ],
+   "heading_deg": 129.35,
+   "deck_navd_m": 4.86,
+   "width_m": 12.2,
+   "depth_m": 116.96,
+   "deck": "concrete",
+   "piles": "hpile",
+   "seabed_in_m": 10.31,
+   "seabed_out_m": 11.31,
+   "water_edges": [
+    "out",
+    "port",
+    "stbd"
+   ],
+   "far_m": 120,
+   "k1": {
+    "cap": "steel",
+    "deck_navd_m": 4.86,
+    "repairs": 12,
+    "curb_mat": "curb_grey",
+    "curb_stbd": {
+     "runs": [
+      [
+       42,
+       58
+      ],
+      [
+       90,
+       113
+      ]
+     ],
+     "w_m": 0.35,
+     "h_m": 0.36,
+     "block_h_m": 0.4,
+     "block_l_m": 0.9,
+     "pitch_m": 1.8
+    }
+   }
+  },
+  {
+   "id": "south_trestle",
+   "at": [
+    -1980.72,
+    112.3
+   ],
+   "heading_deg": 130.43,
+   "deck_navd_m": 4.86,
+   "width_m": 9.9,
+   "depth_m": 50.01,
+   "deck": "concrete",
+   "piles": "hpile",
+   "seabed_in_m": 5.26,
+   "seabed_out_m": 10.86,
+   "water_edges": [
+    "port",
+    "stbd"
+   ],
+   "far_m": 120,
+   "k1": {
+    "cap": "concrete",
+    "deck_navd_m": 4.86,
+    "expansion_bents": [
+     7
+    ]
+   }
+  },
+  {
+   "id": "south_apron",
+   "at": [
+    -1947.28,
+    74.61
+   ],
+   "heading_deg": 131.35,
+   "deck_navd_m": 4.86,
+   "width_m": 26.4,
+   "depth_m": 43.6,
+   "deck": "concrete",
+   "piles": "hpile",
+   "seabed_in_m": 10.86,
+   "seabed_out_m": 11.26,
+   "water_edges": [
+    "port",
+    "stbd",
+    "out"
+   ],
+   "far_m": 120,
+   "k1": {
+    "cap": "concrete",
+    "deck_navd_m": 4.86
+   }
+  },
+  {
+   "id": "curve_a",
+   "at": [
+    -1908.87,
+    52.26
+   ],
+   "heading_deg": 131.35,
+   "deck_navd_m": 4.86,
+   "width_m": 9.9,
+   "depth_m": 9.4,
+   "deck": "concrete",
+   "piles": "hpile",
+   "seabed_in_m": 11.26,
+   "seabed_out_m": 11.46,
+   "water_edges": [
+    "port",
+    "stbd"
+   ],
+   "far_m": 120,
+   "k1": {
+    "cap": "concrete",
+    "deck_navd_m": 4.86
+   }
+  },
+  {
+   "id": "curve_b0",
+   "at": [
+    -1901.81,
+    46.05
+   ],
+   "heading_deg": 146.35,
+   "deck_navd_m": 4.865,
+   "width_m": 9.9,
+   "depth_m": 6.32,
+   "deck": "concrete",
+   "piles": "hpile",
+   "seabed_in_m": 11.46,
+   "seabed_out_m": 11.77,
+   "water_edges": [
+    "port",
+    "stbd"
+   ],
+   "far_m": 120,
+   "k1": {
+    "cap": "concrete",
+    "deck_navd_m": 4.865
+   }
+  },
+  {
+   "id": "curve_b1",
+   "at": [
+    -1898.31,
+    40.8
+   ],
+   "heading_deg": 176.35,
+   "deck_navd_m": 4.87,
+   "width_m": 9.9,
+   "depth_m": 6.32,
+   "deck": "concrete",
+   "piles": "hpile",
+   "seabed_in_m": 11.47,
+   "seabed_out_m": 11.77,
+   "water_edges": [
+    "port",
+    "stbd"
+   ],
+   "far_m": 120,
+   "k1": {
+    "cap": "concrete",
+    "deck_navd_m": 4.87
+   }
+  },
+  {
+   "id": "curve_b2",
+   "at": [
+    -1897.91,
+    34.49
+   ],
+   "heading_deg": -153.65,
+   "deck_navd_m": 4.865,
+   "width_m": 9.9,
+   "depth_m": 6.32,
+   "deck": "concrete",
+   "piles": "hpile",
+   "seabed_in_m": 11.46,
+   "seabed_out_m": 11.77,
+   "water_edges": [
+    "port",
+    "stbd"
+   ],
+   "far_m": 120,
+   "k1": {
+    "cap": "concrete",
+    "deck_navd_m": 4.865
+   }
+  },
+  {
+   "id": "curve_c",
+   "at": [
+    -1900.71,
+    28.84
+   ],
+   "heading_deg": -143.23,
+   "deck_navd_m": 4.86,
+   "width_m": 7.5,
+   "depth_m": 10.03,
+   "deck": "concrete",
+   "piles": "hpile",
+   "seabed_in_m": 11.76,
+   "seabed_out_m": 11.96,
+   "water_edges": [
+    "port",
+    "stbd",
+    "out"
+   ],
+   "far_m": 120,
+   "k1": {
+    "cap": "concrete",
+    "deck_navd_m": 4.86
+   }
+  }
+ ],
+ "berths": [
+  {
+   "id": "cat_berth",
+   "at": [
+    -2003.07,
+    39.74
+   ],
+   "heading_deg": 129.35,
+   "deck_navd_m": 4.86,
+   "length_m": 116.96,
+   "seabed_navd_m": [
+    -5.45,
+    -6.45
+   ],
+   "runs": [
+    [
+     33,
+     87.9
+    ],
+    [
+     91,
+     116.5
+    ]
+   ],
+   "pipes": {
+    "z0": 2,
+    "n": 3,
+    "pitch_m": 7.32
+   },
+   "bollards": [
+    {
+     "z": 8
+    },
+    {
+     "z": 28
+    },
+    {
+     "z": 48
+    },
+    {
+     "z": 66
+    },
+    {
+     "z": 88
+    },
+    {
+     "z": 106
+    }
+   ],
+   "pneumatics": [
+    {
+     "z": 40
+    },
+    {
+     "z": 58
+    },
+    {
+     "z": 86
+    },
+    {
+     "z": 98
+    }
+   ],
+   "bollard_mat": "paint_yellow",
+   "face": "strips",
+   "strip_w_m": 0.16,
+   "strip_pitch_m": 0.7,
+   "end_wall": {
+    "mat": "weathered_timber",
+    "x0": -4.8,
+    "x1": 0.2,
+    "z0": 116.8,
+    "z": 118.6,
+    "top_navd": 5.35,
+    "wire_navd": 3.8,
+    "waler_navd": 4.65,
+    "apron_navd": 4.72,
+    "pitch_m": 0.37,
+    "r_m": 0.17,
+    "tones": [
+     [
+      "#141a1a",
+      "#8fa394"
+     ],
+     [
+      "#141a1a",
+      "#343f3b"
+     ],
+     [
+      "#a8a69e",
+      "#a8a69e"
+     ],
+     [
+      "#5f7f70",
+      "#8fa394"
+     ],
+     [
+      "#141a1a",
+      "#8fa394"
+     ],
+     [
+      "#141a1a",
+      "#6a8074"
+     ],
+     [
+      "#141a1a",
+      "#8fa394"
+     ],
+     [
+      "#141a1a",
+      "#141a1a"
+     ],
+     [
+      "#141a1a",
+      "#343f3b"
+     ],
+     [
+      "#141a1a",
+      "#6a8074"
+     ],
+     [
+      "#141a1a",
+      "#141a1a"
+     ],
+     [
+      "#141a1a",
+      "#343f3b"
+     ],
+     [
+      "#141a1a",
+      "#141a1a"
+     ]
+    ]
+   }
+  }
+ ],
+ "linkspans": [
+  {
+   "id": "cat_ramp",
+   "at": [
+    -2011.33,
+    29.64
+   ],
+   "heading_deg": 129.35,
+   "tide0_navd": -1.33,
+   "width_m": 8,
+   "abut_z": -44,
+   "abut_navd": 4.2,
+   "hinge_z": -16.5,
+   "hinge_navd": 3.95,
+   "ramp_end_z": -0.5,
+   "ramp_end_navd": 1.7,
+   "toe_z": 2.2,
+   "toe_navd": 0.9,
+   "bed_navd": -5.5
+  }
+ ],
+ "revetments": [
+  {
+   "id": "north_causeway",
+   "both": true,
+   "width_m": 9,
+   "slope": 1.7,
+   "stone_m": [
+    0.5,
+    1.3
+   ],
+   "top_navd_m": 7.2,
+   "far_m": 70,
+   "path": [
+    [
+     -2093.4,
+     98.0,
+     7.2,
+     1.0
+    ],
+    [
+     -2087.6,
+     92.4,
+     6.6,
+     0.5
+    ],
+    [
+     -2081.9,
+     86.9,
+     6.1,
+     -0.3
+    ],
+    [
+     -2076.1,
+     81.4,
+     5.6,
+     -0.8
+    ],
+    [
+     -2070.3,
+     75.9,
+     5.05,
+     -1.2
+    ],
+    [
+     -2064.5,
+     70.3,
+     4.55,
+     -1.2
+    ],
+    [
+     -2058.0,
+     65.5,
+     4.0,
+     -1.2
+    ],
+    [
+     -2055.1,
+     62.8,
+     4.0,
+     -1.3
+    ],
+    [
+     -2046.5,
+     57.3,
+     4.1,
+     -1.3
+    ]
+   ]
+  },
+  {
+   "id": "south_causeway",
+   "both": true,
+   "width_m": 12,
+   "slope": 1.7,
+   "stone_m": [
+    0.5,
+    1.3
+   ],
+   "top_navd_m": 6.6,
+   "far_m": 70,
+   "path": [
+    [
+     -2040.0,
+     160.6,
+     6.6,
+     -1.0
+    ],
+    [
+     -2031.9,
+     154.3,
+     6.3,
+     -1.2
+    ],
+    [
+     -2023.9,
+     148.0,
+     6.05,
+     -1.3
+    ],
+    [
+     -2016.6,
+     141.1,
+     5.8,
+     -1.3
+    ],
+    [
+     -2009.4,
+     134.1,
+     5.5,
+     -1.3
+    ],
+    [
+     -2002.1,
+     127.2,
+     5.25,
+     -1.3
+    ],
+    [
+     -1993.3,
+     121.6,
+     5.05,
+     -1.3
+    ],
+    [
+     -1985.3,
+     115.3,
+     4.95,
+     -1.3
+    ],
+    [
+     -1981.5,
+     111.9,
+     4.9,
+     -1.3
+    ]
+   ]
+  }
+ ],
+ "dressing": {
+  "id": "terminal_dress",
+  "far_m": 400,
+  "cutoff_m": 3000,
+  "items": [
+   {
+    "type": "paving",
+    "poly": [
+     [
+      -1901.81,
+      46.05
+     ],
+     [
+      -1898.54,
+      49.77
+     ],
+     [
+      -1897.69,
+      48.8
+     ]
+    ],
+    "y": 4.872,
+    "mat": "wharf_asphalt",
+    "uv_m": 3,
+    "far": true
+   },
+   {
+    "type": "paving",
+    "poly": [
+     [
+      -1898.31,
+      40.8
+     ],
+     [
+      -1894.19,
+      43.54
+     ],
+     [
+      -1893.37,
+      41.11
+     ]
+    ],
+    "y": 4.872,
+    "mat": "wharf_asphalt",
+    "uv_m": 3,
+    "far": true
+   },
+   {
+    "type": "paving",
+    "poly": [
+     [
+      -1897.91,
+      34.49
+     ],
+     [
+      -1892.97,
+      34.81
+     ],
+     [
+      -1893.47,
+      32.3
+     ]
+    ],
+    "y": 4.872,
+    "mat": "wharf_asphalt",
+    "uv_m": 3,
+    "far": true
+   },
+   {
+    "type": "paving",
+    "poly": [
+     [
+      -1900.71,
+      28.84
+     ],
+     [
+      -1896.27,
+      26.64
+     ],
+     [
+      -1896.99,
+      25.57
+     ]
+    ],
+    "y": 4.872,
+    "mat": "wharf_asphalt",
+    "uv_m": 3,
+    "far": true
+   }
+  ]
+ }
+}

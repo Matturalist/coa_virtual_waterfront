@@ -1,0 +1,308 @@
+{
+ "id": "regency_marina",
+ "style": "regency_marina",
+ "wear": 0.5,
+ "seed": 311,
+ "retires_osm": [
+  693638911,
+  693638909
+ ],
+ "_doc": "Site 1 item 26, stretch 1, survey 1.07-1.14: the Bar Harbor Regency's pier and floats. Level metres. Pier: traced on the raw lidar (ME_MidCoast 2021, tide -1.33): deck +3.92, rails +5.05, lamps +6.6, 48 x 3.6 m, its line 37.8 deg, not the +5.0 the survey first said (that was the rail). Built of: from marinas.com's undated aerials (before 2022: the truss bridges still stand), read as a small bridge on concrete portal bents, ASSUMED concrete and steel girders; bents at 10, 20.5, 31.6, 42 m from the top-down photo, scaled on the lidar's 48 m (11.2 px/m). Floats: absent from the lidar, so summer only. Gangway 9.5 m; stem 74 m with the photo's joints (21.4, 12.5, 40.2), the T head from chart SLCONS 544 and OSM 693638909 and the resort's own page ('T-shaped floating dock 200 feet in length and 140 feet across the top'): the T head is NOT in the aerials, so it came later. The comb and the small float at the stem's root are in the aerials; the small float is on the chart, the comb is not, so the comb is ASSUMED still there until V1.1.",
+ "pier": {
+  "variant": "bent",
+  "at": [
+   -2184.15,
+   -5.49
+  ],
+  "heading_deg": 142.2,
+  "length_m": 48.0,
+  "width_m": 3.6,
+  "deck_navd_m": 3.92,
+  "sill_navd_m": 1.75,
+  "rail_navd_m": 5.05,
+  "lamp_navd_m": 6.62,
+  "gangway": "end",
+  "gangway_w_m": 1.9,
+  "bents": [
+   {
+    "z_m": 10,
+    "bed_navd": 0.5
+   },
+   {
+    "z_m": 20.5,
+    "bed_navd": -0.6
+   },
+   {
+    "z_m": 31.6,
+    "bed_navd": -1.7
+   },
+   {
+    "z_m": 42,
+    "bed_navd": -3.0
+   }
+  ],
+  "lamps": [
+   {
+    "z_m": 6.4,
+    "side": -1
+   },
+   {
+    "z_m": 18.7,
+    "side": -1
+   },
+   {
+    "z_m": 30.7,
+    "side": -1
+   }
+  ],
+  "cable": {
+   "sag_m": 0.7
+  },
+  "end_frame": {
+   "bed_navd": -3.3,
+   "batter_m": 1.8
+  }
+ },
+ "ramps": [
+  {
+   "id": "gangway",
+   "from": "pier:ramp_hinge[end]",
+   "to": "stem",
+   "length_m": 9.5,
+   "width_m": 1.8,
+   "truss": "pratt",
+   "summer_only": true
+  }
+ ],
+ "floats": [
+  {
+   "id": "stem",
+   "deck_y": 0.75,
+   "freeboard_m": 0.6,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_4x21.4"
+    },
+    {
+     "type": "float_4x12.5",
+     "join": "end"
+    },
+    {
+     "type": "float_4x40.2",
+     "join": "end"
+    }
+   ],
+   "landing": {
+    "ramp": "gangway",
+    "mode": "inline"
+   }
+  },
+  {
+   "id": "t_head",
+   "at": [
+    -2131.57,
+    -102.66
+   ],
+   "heading_deg": 52.2,
+   "deck_y": 0.75,
+   "freeboard_m": 0.6,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_5x12"
+    },
+    {
+     "type": "float_5x12",
+     "join": "end"
+    },
+    {
+     "type": "float_5x12",
+     "join": "end"
+    },
+    {
+     "type": "float_5x12",
+     "join": "end"
+    }
+   ]
+  },
+  {
+   "id": "tender",
+   "at": [
+    -2152.72,
+    -39.33
+   ],
+   "heading_deg": 52.2,
+   "deck_y": 0.75,
+   "freeboard_m": 0.6,
+   "cleat_pitch_m": 2.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_7.6x4"
+    }
+   ]
+  },
+  {
+   "id": "finger0",
+   "at": [
+    -2162.06,
+    -42.78
+   ],
+   "heading_deg": 232.2,
+   "deck_y": 0.75,
+   "freeboard_m": 0.6,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_1.1x6.7"
+    }
+   ]
+  },
+  {
+   "id": "finger1",
+   "at": [
+    -2161.14,
+    -43.97
+   ],
+   "heading_deg": 232.2,
+   "deck_y": 0.75,
+   "freeboard_m": 0.6,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_1.1x6.7"
+    }
+   ]
+  },
+  {
+   "id": "finger2",
+   "at": [
+    -2160.22,
+    -45.15
+   ],
+   "heading_deg": 232.2,
+   "deck_y": 0.75,
+   "freeboard_m": 0.6,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_1.1x6.7"
+    }
+   ]
+  },
+  {
+   "id": "finger3",
+   "at": [
+    -2159.3,
+    -46.34
+   ],
+   "heading_deg": 232.2,
+   "deck_y": 0.75,
+   "freeboard_m": 0.6,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_1.1x6.7"
+    }
+   ]
+  },
+  {
+   "id": "finger4",
+   "at": [
+    -2158.38,
+    -47.52
+   ],
+   "heading_deg": 232.2,
+   "deck_y": 0.75,
+   "freeboard_m": 0.6,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_1.1x6.7"
+    }
+   ]
+  }
+ ],
+ "fittings": [
+  {
+   "model": "dock_box",
+   "at": [
+    -2156.98,
+    -42.64
+   ],
+   "yaw_deg": 52.2
+  }
+ ],
+ "dressing": {
+  "items": [
+   {
+    "type": "life_ring",
+    "at": [
+     -2168.82,
+     -22.46
+    ],
+    "y": 3.92,
+    "yaw_deg": 52.2
+   },
+   {
+    "type": "sign",
+    "sign": "marina",
+    "h_m": 1.7,
+    "at": [
+     -2200.06,
+     10.77
+    ],
+    "y": 3.92,
+    "yaw_deg": 142.2
+   },
+   {
+    "type": "sign",
+    "sign": "gangway",
+    "h_m": 1.45,
+    "at": [
+     -2171.53,
+     -24.57
+    ],
+    "y": 3.92,
+    "yaw_deg": 322.2
+   },
+   {
+    "type": "ladder",
+    "from": [
+     -2171.43,
+     -0.6,
+     -19.04
+    ],
+    "to": [
+     -2171.43,
+     3.7,
+     -19.04
+    ]
+   },
+   {
+    "type": "chain",
+    "path": [
+     [
+      -2174.75,
+      2.2,
+      -20.23
+     ],
+     [
+      -2176.4,
+      0.2,
+      -19.73
+     ]
+    ]
+   }
+  ]
+ },
+ "overrides": {}
+}

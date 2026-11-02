@@ -4,49 +4,6 @@
   {
    "name": "Shore Path",
    "from": [
-    15.0,
-    1313.0
-   ],
-   "to": [
-    126.0,
-    1376.0
-   ],
-   "onto_wall": [
-    [
-     19,
-     1312
-    ],
-    [
-     31,
-     1328
-    ],
-    [
-     38,
-     1335
-    ],
-    [
-     69,
-     1355
-    ],
-    [
-     98,
-     1365
-    ],
-    [
-     125,
-     1371
-    ],
-    [
-     143,
-     1378
-    ]
-   ],
-   "landward_m": 1.0,
-   "why": "Assets' stretch 5 survey (1 Nov; docs/sites/bar-harbor-waterfront.md): OSM ran the path across the cove south of the Balance Rock Inn, on lidar ground +0.5..+1.8 (awash at high water); it runs on the wall at the back of the cove (top +3.4..+4.2), so the line goes 1 m landward of the wall's top"
-  },
-  {
-   "name": "Shore Path",
-   "from": [
     -152.8,
     1018.4
    ],
@@ -230,6 +187,136 @@
    ],
    "why": "Assets, site 1 item 23 (2 Nov): the Inn's and Grant Park's walls were rebuilt in concrete in 2024-25 (Bar Harbor Story's photos); the path is gravel directly behind the parapet, 1.5 m landward of the wall's station line",
    "by": "shore_path_inn_walls"
+  },
+  {
+   "name": "Shore Path",
+   "from": [
+    15.0,
+    1313.0
+   ],
+   "to": [
+    126.0,
+    1376.0
+   ],
+   "line": [
+    [
+     31.49,
+     1334.89
+    ],
+    [
+     35.82,
+     1338.21
+    ],
+    [
+     40.07,
+     1341.15
+    ],
+    [
+     44.29,
+     1343.86
+    ],
+    [
+     48.49,
+     1346.56
+    ],
+    [
+     52.71,
+     1349.27
+    ],
+    [
+     57.03,
+     1351.89
+    ],
+    [
+     61.36,
+     1354.4
+    ],
+    [
+     65.91,
+     1356.93
+    ],
+    [
+     70.68,
+     1359.26
+    ],
+    [
+     75.46,
+     1361.3
+    ],
+    [
+     80.23,
+     1362.93
+    ],
+    [
+     85.05,
+     1364.43
+    ],
+    [
+     89.85,
+     1365.93
+    ],
+    [
+     94.68,
+     1367.44
+    ],
+    [
+     99.67,
+     1368.76
+    ],
+    [
+     104.7,
+     1369.67
+    ],
+    [
+     109.51,
+     1370.75
+    ],
+    [
+     114.27,
+     1372.24
+    ],
+    [
+     119.12,
+     1373.65
+    ],
+    [
+     124.02,
+     1374.77
+    ],
+    [
+     128.88,
+     1375.48
+    ]
+   ],
+   "why": "Assets, site 1 item 24 (2 Nov): off the beach onto the cove wall's back, 1.5 m landward of its stations (the 2024-25 concrete wall)",
+   "by": "shore_path_south"
+  },
+  {
+   "name": "Shore Path",
+   "from": [
+    238.0,
+    1586.0
+   ],
+   "to": [
+    246.0,
+    1630.0
+   ],
+   "line": [
+    [
+     239.0,
+     1590.2
+    ],
+    [
+     242.0,
+     1615.2
+    ],
+    [
+     245.0,
+     1640.2
+    ]
+   ],
+   "why": "Assets, site 1 item 24: 2 m landward of (241, 1590) -> (247, 1640), so the stacked stones lie along its seaward edge",
+   "by": "shore_path_south"
   }
  ],
  "spans": [
@@ -276,6 +363,66 @@
    "preset": "picket_behind_wall",
    "why": "Assets, site 1 item 23: Grant Park's 2024-25 concrete wall is drawn by the dock file; the picket fence stays",
    "by": "shore_path_inn_walls"
+  },
+  {
+   "line": "shore_path",
+   "split_preset": "shore_wall_picket",
+   "from": [
+    32.0,
+    1334.0
+   ],
+   "to": [
+    126.54,
+    1375.64
+   ],
+   "preset": "picket_behind_wall",
+   "why": "Assets, site 1 item 24: the cove wall (2024-25 concrete) is the dock file's; the picket fence goes along it",
+   "by": "shore_path_south"
+  },
+  {
+   "line": "shore_path",
+   "split_preset": "shore_wall_picket",
+   "from": [
+    152.49,
+    1389.86
+   ],
+   "to": [
+    173.88,
+    1412.43
+   ],
+   "preset": "picket_behind_wall",
+   "why": "Assets, site 1 item 24: the Reef Point wall is the dock file's; the picket fence goes along it",
+   "by": "shore_path_south"
+  },
+  {
+   "line": "shore_path",
+   "split_preset": "shore_wall_picket",
+   "from": [
+    199.39,
+    1459.07
+   ],
+   "to": [
+    203.0,
+    1465.0
+   ],
+   "preset": "picket_behind_wall",
+   "why": "Assets, site 1 item 24: the Reef Point south wall is the dock file's; the picket fence goes along it",
+   "by": "shore_path_south"
+  },
+  {
+   "line": "shore_path",
+   "split_preset": "shore_wall_picket",
+   "from": [
+    220.0,
+    1525.0
+   ],
+   "to": [
+    237.0,
+    1556.0
+   ],
+   "preset": "picket_behind_wall",
+   "why": "Assets, site 1 item 24: the last stretch wall (granite) is the dock file's; the picket fence goes along it",
+   "by": "shore_path_south"
   }
  ],
  "buildings": [

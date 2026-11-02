@@ -754,6 +754,27 @@
     }
    }
   },
+  "ls_girder": {
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "metric": true,
+   "tile_m": 1.0,
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "roughness": 1.0,
+   "paint_target": "#827070",
+   "color_lin": [
+    0.6621,
+    0.4874,
+    0.5014
+   ],
+   "colour_note": "the CAT ramp's plate girder, faded red paint: #827070, median of (2898,2728)-(2998,2768) in the Bar Harbor Story's photo of the CAT, 22 Apr 2026, telephoto through her tunnel, so hazy; the photo is not in the repo"
+  },
   "lamp_cream": {
    "orm": "textures/dock/paint_chipped_orm.jpg",
    "diff": "textures/dock/paint_chipped_diff.jpg",
@@ -794,6 +815,73 @@
     1.764,
     2.641
    ]
+  },
+  "fender_plate": {
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "metric": true,
+   "tile_m": 1.0,
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "roughness": 1.0,
+   "paint_target": "#657d87",
+   "color_lin": [
+    0.386,
+    0.6169,
+    0.7498
+   ],
+   "roughness_target": 0.6,
+   "colour_note": "the K2 panels' pale paint: raw (76,111,143), median of (1125,2720)-(1175,2770) in the Bar Harbor Story's photo of the CAT, 22 Apr 2026 (not in the repo), in the ship's shade, with the blue cast taken off against her white hull in the same light (160,186,209 at (1900,1400)-(2100,1480), black point (3,9,35))"
+  },
+  "uhmw_strip": {
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness": 1.0,
+   "orm": "textures/dock/hdpe_black_orm.jpg",
+   "diff": "textures/dock/hdpe_black_diff.jpg",
+   "nor": "textures/dock/hdpe_black_nor.jpg",
+   "credit": "ambientCG Plastic012B CC0",
+   "mean": [
+    42,
+    41,
+    39
+   ],
+   "paint_target": "#1a2226",
+   "color_lin": [
+    0.4461,
+    0.7214,
+    0.9553
+   ],
+   "stain_k": 0.3,
+   "roughness_target": 0.5,
+   "colour_note": "K2's rubbing strips: raw (11,37,75), median of (1205,2750)-(1218,3000) in the Bar Harbor Story's photo of the CAT, 22 Apr 2026 (not in the repo), neutralised as fender_plate and rounded up off black"
+  },
+  "curb_grey": {
+   "diff": "textures/dock/weathered_plank_siding_diff.jpg",
+   "nor": "textures/dock/weathered_plank_siding_nor.jpg",
+   "orm": "textures/dock/weathered_plank_siding_orm.jpg",
+   "roughness": 1.0,
+   "credit": "Poly Haven weathered_plank_siding CC0",
+   "rows": 8,
+   "span_m": 2.0,
+   "mean": [
+    76,
+    62,
+    51
+   ],
+   "paint_target": "#7c7f78",
+   "color_lin": [
+    2.7889,
+    4.4057,
+    5.6735
+   ],
+   "roughness_target": 0.9,
+   "colour_note": "the North Pier's north curb in sun: #7c7f78, median of (810,2560)-(880,2600) in the Bar Harbor Story's photo of the CAT, 22 Apr 2026 (not in the repo)"
   }
  },
  "town_pier": {
@@ -1257,5 +1345,66 @@
    "far_m": 60,
    "cutoff_m": 1500
   }
+ },
+ "regency_marina": {
+  "_ref": "K6b, the Bar Harbor Regency's walkway pier and concrete floats (site 1 item 26). Bent colour sampled from marinas.com gallery photo daaa3f\u2026 px (1736,1487) #ceab6a, in low sun; deck from the same photo px (1754,1431) #d6d2cb. Reference only: the photo is not in the repo.",
+  "pier": {
+   "variant": "bent",
+   "concrete_mat": "apron_concrete",
+   "steel_mat": "steel_dark",
+   "rail_mat": "galv_pipe",
+   "post_pitch_m": 2.6,
+   "bent_tint": [
+    1.5,
+    1.15,
+    0.62
+   ],
+   "deck_tint": [
+    1.3,
+    1.3,
+    1.3
+   ],
+   "far_m": 150,
+   "cutoff_m": 2500
+  },
+  "ramp": {
+   "deck_mat": "alu",
+   "rail_mat": "alu",
+   "tread_mat": "rubber",
+   "rail_r_m": 0.02,
+   "post_pitch_m": 1.6,
+   "hoops": false,
+   "camber_m": 0.0,
+   "truss": "pratt",
+   "_truss": "Matt's slip photo: the aluminium gangway to ww_e2 has welded lattice sides (verticals and a diagonal per panel); a ramp entry may set truss 'x' and rail_mat 'steel_dark' (the dark steel gangway to ww_e)"
+  },
+  "float": {
+   "deck": {
+    "new": "float_nonskid",
+    "weathered": "float_nonskid"
+   },
+   "pontoon": "concrete",
+   "bumper": true,
+   "plates": {
+    "n": 2,
+    "d_m": 0.5,
+    "mat": "paint_yellow"
+   },
+   "concrete": {
+    "_doc": "docs/harbor-place.md item 2: precast concrete float modules (src/docks.js concreteFloat)",
+    "draft_m": 0.6,
+    "chamfer_m": 0.05,
+    "gap_m": 0.025,
+    "waler_h_m": 0.25,
+    "waler_t_m": 0.075,
+    "fender_pitch_m": 2.0,
+    "line_inset_m": 0.3,
+    "line_w_m": 0,
+    "waler_mat": "float_concrete",
+    "fender_mat": "fender_white",
+    "rod_pitch_m": 0.6
+   }
+  },
+  "dressing": {}
  }
 }
