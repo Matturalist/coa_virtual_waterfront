@@ -2909,7 +2909,7 @@ const MODELS = (() => {
           transparent: !!m.transparent && !(m.alphaTest > 0), opacity: m.opacity, alphaTest: m.alphaTest || 0,
           side: e.single_sided && e.single_sided.includes(m.name) ? THREE.FrontSide : THREE.DoubleSide });   /* single_sided: the entry's materials drawn from their front only (a windscreen dark from outside, clear from the helm) */
         if (m.normalScale && n.normalScale) n.normalScale.copy(m.normalScale); n.name = m.name; remade.set(m, n); return M.patch(n); };
-      scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.material = Array.isArray(o.material) ? o.material.map(remake) : remake(o.material);
+      scene.traverse(o => { if (o.isMesh) { o.castShadow = !(e.no_cast && !Array.isArray(o.material) && e.no_cast.includes(o.material.name)); /* no_cast: the entry's decals and printed faces, millimetres off what they sit on */ o.receiveShadow = true; o.material = Array.isArray(o.material) ? o.material.map(remake) : remake(o.material);
         /* baked ambient occlusion (tools/assets/vessels/ao.py, COLOR_0): drawn only where the manifest says the file carries it */
         if (e.vertex_ao && o.geometry.attributes.color) for (const m of (Array.isArray(o.material) ? o.material : [o.material])) if (m && !m.vertexColors) { m.vertexColors = true; m.needsUpdate = true; } } });
       root.updateMatrixWorld(true);
@@ -3306,7 +3306,7 @@ const MODELS = (() => {
         vec2 uv = vec2(al, ac); float rr = length(vec2(max(abs(al) - uA.y, 0.0), ac)) / r, m = smoothstep(1.0, 0.45, rr + (Ns(uv * 6.0) - 0.5) * 0.7); if (m <= 0.0) discard; gl_FragColor = vec4(0.0, 0.0, 0.0, 0.6 * m * s); return; }
       if (uK > 2.5) { gl_FragColor = vec4(uA.x, uA.z, 0.25, 1.0); return; }   /* a torn edge */
       vec3 q = vP - uP; float nd = dot(q, uN), al = dot(q, uD), ac = dot(q, cross(uN, uD)), r = uA.x, tol = max(0.6 * r, 0.3), s = uA.z * smoothstep(tol, tol * 0.7, abs(nd)); if (s <= 0.0) discard;   /* only the plate it touched, not the far side of the hull */
-      float rr = length(vec2(max(abs(al) - uA.y, 0.0), ac)) / r, m = smoothstep(1.0, 0.6, rr + (Ns(vec2(al, ac) * 5.0) - 0.5) * 0.45 + (uK > 1.5 && uK < 2.5 ? (Ns(vec2(al, ac) * 19.0) - 0.5) * 0.5 : 0.0)); if (m <= 0.0) discard; vec3 o;
+      float rr = length(vec2(max(abs(al) - uA.y, 0.0), ac)) / r; al += uA.w; float m = smoothstep(1.0, 0.6, rr + (Ns(vec2(al, ac) * 5.0) - 0.5) * 0.45 + (uK > 1.5 && uK < 2.5 ? (Ns(vec2(al, ac) * 19.0) - 0.5) * 0.5 : 0.0)); if (m <= 0.0) discard; vec3 o;   /* uA.w: how far along a track this splat lies, so its streaks run on from the last one's */
       if (uK < 0.5) { float a = Ns(vec2(ac * 75.0, al * 1.1)), b = Ns(vec2(ac * 21.0, al * 0.5 + 9.0)), v = smoothstep(0.34, 0.68, a * 0.55 + b * 0.55);   /* a scrape: streaks along its line */
         o = vec3(m * v * s, m * a * a * s * 0.7, m * (1.0 - v) * b * 0.75 * s); }
       else if (uK < 1.5) { float c = clamp(1.0 - abs(ac) / r, 0.0, 1.0), rag = Ns(vec2(al * 9.0, ac * 40.0)); o = vec3(m * smoothstep(0.1, 0.45, c + rag * 0.2 - 0.1) * s, m * c * c * s, m * (1.0 - c) * 0.5 * s); }   /* a gouge: a cut with relief, smeared at its sides */
@@ -3423,11 +3423,18 @@ const MODELS = (() => {
       const own = new Map(); walk(id, (e, a, b) => { const c = own.get(e); if (c) c.n++; else own.set(e, { n: 1, a, b }); });
       for (const c of own.values()) if (c.n === 1) out.push(c.a, c.b); if (ownOnly) return; const s = shard.get(id); if (s) for (const [nb] of s.nb || []) walk(nb, (e, a, b) => { const c = own.get(e); if (c && c.n === 1) out.push(a, b); }); };
     sb.splat = function (s) { queue.push(s); };
-    const drawSplat = (renderer, s) => { const r = s.r || 0.3, len = s.len || 0, reach = r + len + 1, n = new THREE.Vector3(...(s.n || [0, 1, 0])).normalize(), d = s.dir ? new THREE.Vector3(...s.dir) : new THREE.Vector3(n.y, n.z, n.x).cross(n); d.addScaledVector(n, -d.dot(n)).normalize();
+    /* a mark from a contact: the collider isn't her plate, so find the plate. The nearest triangle within SNAP_R that faces the way the contact does, taking its face as the mark's; none, and there's nothing there to mark */
+    const SNAP_R = 1.2, snapTo = (s) => { const { ps, ix, cell, key } = P, p = s.p, N = s.n; let best = 1e9, q = null, tn = null; const eval1 = t => { const a = 3 * ix[3 * t], b = 3 * ix[3 * t + 1], c = 3 * ix[3 * t + 2], ax = ps[a], ay = ps[a + 1], az = ps[a + 2]; { const ox = ax - p[0], oy = ay - p[1], oz = az - p[2], lx = ps[b] - p[0], ly = ps[b + 1] - p[1], lz = ps[b + 2] - p[2], mx = ps[c] - p[0], my = ps[c + 1] - p[1], mz = ps[c + 2] - p[2], R = SNAP_R; if ((ox > R && lx > R && mx > R) || (ox < -R && lx < -R && mx < -R) || (oy > R && ly > R && my > R) || (oy < -R && ly < -R && my < -R) || (oz > R && lz > R && mz > R) || (oz < -R && lz < -R && mz < -R)) return; } const ux = ps[b] - ax, uy = ps[b + 1] - ay, uz = ps[b + 2] - az, vx = ps[c] - ax, vy = ps[c + 1] - ay, vz = ps[c + 2] - az; let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; const nl = Math.sqrt(nx * nx + ny * ny + nz * nz); if (nl < 1e-9) return; nx /= nl; ny /= nl; nz /= nl; let f = nx * N[0] + ny * N[1] + nz * N[2]; if (Math.abs(f) < 0.2) return; if (f < 0) { nx = -nx; ny = -ny; nz = -nz; f = -f; }
+        const wx = p[0] - ax, wy = p[1] - ay, wz = p[2] - az, uu = ux * ux + uy * uy + uz * uz, uv = ux * vx + uy * vy + uz * vz, vv = vx * vx + vy * vy + vz * vz, wu = wx * ux + wy * uy + wz * uz, wv = wx * vx + wy * vy + wz * vz, D = uu * vv - uv * uv; if (D < 1e-12) return; let e = (vv * wu - uv * wv) / D, g = (uu * wv - uv * wu) / D; if (e < 0) e = 0; if (g < 0) g = 0; if (e + g > 1) { const h = e + g; e /= h; g /= h; }
+        const cx = ax + e * ux + g * vx, cy = ay + e * uy + g * vy, cz = az + e * uz + g * vz, dx = cx - p[0], dy = cy - p[1], dz = cz - p[2], score = Math.sqrt(dx * dx + dy * dy + dz * dz) - 0.5 * (dx * N[0] + dy * N[1] + dz * N[2]);   /* out along the contact's normal first: the outside of her, not a deck or frame behind it */
+        if (score < best) { best = score; q = [cx, cy, cz]; tn = [nx, ny, nz]; } };
+      for (let i = Math.floor(p[0] - SNAP_R); i <= Math.floor(p[0] + SNAP_R); i++) for (let j = Math.floor(p[1] - SNAP_R); j <= Math.floor(p[1] + SNAP_R); j++) for (let k = Math.floor(p[2] - SNAP_R); k <= Math.floor(p[2] + SNAP_R); k++) { const l = cell.get(key(i, j, k)); if (l) for (const t of l) eval1(t); }
+      if (!q || Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]) > SNAP_R) return false; s.p = q; s.n = tn; return true; };
+    const drawSplat = (renderer, s) => { if (s.snap) { const a = performance.now(), ok = snapTo(s); const e = performance.now() - a; sb.snap_ms = Math.max(sb.snap_ms || 0, e); sb.snap_sum = (sb.snap_sum || 0) + e; sb.snap_n = (sb.snap_n || 0) + 1; if (!ok) sb.snap_miss = (sb.snap_miss || 0) + 1; if (!ok) return; } const r = s.r || 0.3, len = s.len || 0, reach = r + len + 1, n = new THREE.Vector3(...(s.n || [0, 1, 0])).normalize(), d = s.dir ? new THREE.Vector3(...s.dir) : new THREE.Vector3(n.y, n.z, n.x).cross(n); d.addScaledVector(n, -d.dot(n)).normalize();
       const a = P.idx.array, cap = a.length / 3; let m = 0;
       for (let i = Math.floor(s.p[0] - reach); i <= Math.floor(s.p[0] + reach) && m < cap; i++) for (let j = Math.floor(s.p[1] - reach); j <= Math.floor(s.p[1] + reach) && m < cap; j++) for (let k = Math.floor(s.p[2] - reach); k <= Math.floor(s.p[2] + reach) && m < cap; k++) { const l = P.cell.get(P.key(i, j, k)); if (l) for (const t of l) { if (m >= cap) break; a[3 * m] = P.ix[3 * t]; a[3 * m + 1] = P.ix[3 * t + 1]; a[3 * m + 2] = P.ix[3 * t + 2]; m++; } }
       if (!m) return; P.idx.updateRange.offset = 0; P.idx.updateRange.count = 3 * m; P.idx.needsUpdate = true; P.geo.setDrawRange(0, 3 * m); P.mesh.visible = true; P.line.visible = false;
-      const U = P.uni; U.uP.value.set(...s.p); U.uN.value.copy(n); U.uD.value.copy(d); U.uA.value.set(r, len / 2, s.strength != null ? s.strength : 1, 0); U.uK.value = { scrape: 0, gouge: 1, flake: 2, craze: 4 }[s.kind || 'scrape'] || 0; U.uOff.value.set(0, 0); renderer.render(P.scene, P.cam); };
+      const U = P.uni; U.uP.value.set(...s.p); U.uN.value.copy(n); U.uD.value.copy(d); U.uA.value.set(r, len / 2, s.strength != null ? s.strength : 1, s.al || 0); U.uK.value = { scrape: 0, gouge: 1, flake: 2, craze: 4 }[s.kind || 'scrape'] || 0; U.uOff.value.set(0, 0); renderer.render(P.scene, P.cam); };
     /* glass (S11): one draw per torn shard, its triangles and its neighbours', its rim as segments in a uniform, so the band is a true distance in the boat: no gaps between offset lines, no bleeding across the atlas's 3 cm between charts */
     const TEAR_R = 0.16;
     const drawTears = (renderer) => { const a = P.idx.array, cap = a.length / 3, U = P.uni; P.mesh.visible = true; P.line.visible = false; U.uK.value = 5; U.uA.value.x = TEAR_R; U.uOff.value.set(0, 0);
@@ -4990,7 +4997,9 @@ const LOD = (() => {
       sc.traverse(o => { if (!o.visible) return; if (o.isDirectionalLight && (!sunL || o.intensity > sunL.intensity)) sunL = o; else if (o.isHemisphereLight && !hemiL) hemiL = o; else if (o.isAmbientLight) ambL.push(o); }); }
     if (sunL) { const d = lightU.uSunDir.value; sunL.updateMatrixWorld(); sunL.target.updateMatrixWorld(); d.setFromMatrixPosition(sunL.matrixWorld).sub(new THREE.Vector3().setFromMatrixPosition(sunL.target.matrixWorld)).normalize();
       lightU.uSunCol.value.copy(sunL.color).multiplyScalar(sunL.visible ? sunL.intensity : 0); }
-    if (hemiL) { lightU.uSkyCol.value.copy(hemiL.color).multiplyScalar(hemiL.intensity); lightU.uGndCol.value.copy(hemiL.groundColor).multiplyScalar(hemiL.intensity); }
+    const at = typeof window !== 'undefined' && window.__atmos, amb = at && at.envLit && at.uni && at.uni.atmAmb && at.uni.atmAmb.value;
+    if (amb) { lightU.uSkyCol.value.setRGB(amb.x, amb.y, amb.z); lightU.uGndCol.value.setRGB(amb.x * 0.25, amb.y * 0.25, amb.z * 0.25); }   /* the sky map lights the scene: the hemisphere is only the sea's bounce (Lighting, 2 Nov) */
+    else if (hemiL) { lightU.uSkyCol.value.copy(hemiL.color).multiplyScalar(hemiL.intensity); lightU.uGndCol.value.copy(hemiL.groundColor).multiplyScalar(hemiL.intensity); }
     for (const a of ambL) { lightU.uSkyCol.value.r += a.color.r * a.intensity; lightU.uSkyCol.value.g += a.color.g * a.intensity; lightU.uSkyCol.value.b += a.color.b * a.intensity;
       lightU.uGndCol.value.r += a.color.r * a.intensity; lightU.uGndCol.value.g += a.color.g * a.intensity; lightU.uGndCol.value.b += a.color.b * a.intensity; } };
 
@@ -5016,21 +5025,28 @@ const LOD = (() => {
   }
   /* the card fragment: two views blended, coverage kept through the mips, colour and normal un-premultiplied, lit by the sun
      and sky, then fog / tone mapping / output encoding like any lit material (so atmos.patch can take it over) */
-  const CARD_FRAG_PARS = `uniform sampler2D tAtlas, tNorm; uniform vec3 uLight, uSunDir, uSunCol, uSkyCol, uGndCol; uniform vec2 uAtlasPx;
+  /* built when a card material is made (after every module has loaded), so atmos.js's crown rule is on the page if it is going to be:
+     atmFoliage (Lighting, 2 Nov: wrapped diffuse, light through the crown's edge against the sun, the hotspot with the sun behind,
+     the crown shading its own interior and skirt). Without it, the old wrap + hemisphere. F = wrap, transmission, hotspot, occlusion. */
+  const FOLIAGE_F = 'vec4(0.35, 0.5, 0.35, 0.5)';
+  const cardFragPars = () => { const fol = typeof atmFoliageGLSL === 'function';
+    return `uniform sampler2D tAtlas, tNorm; uniform vec3 uLight, uSunDir, uSunCol, uSkyCol, uGndCol; uniform vec2 uAtlasPx;
     varying vec3 vR, vU, vF;
     #include <common>
     #include <fog_pars_fragment>
     /* the mip level the colour atlas is read at; alpha scaled by 1 + 0.25 per level keeps a twig's coverage (Castano 2010,
        as Ben Golus 2017 sets out for foliage) */
     float cardMip(vec2 uv) { vec2 dx = dFdx(uv * uAtlasPx), dy = dFdy(uv * uAtlasPx); return max(0.0, 0.5 * log2(max(dot(dx, dx), dot(dy, dy)))); }
+    ${fol ? atmFoliageGLSL() : ''}
     vec4 cardShade(vec2 uvA, vec2 uvB, float mixAB) {
       vec4 c = mix(texture2D(tAtlas, uvA), texture2D(tAtlas, uvB), mixAB), nn = mix(texture2D(tNorm, uvA), texture2D(tNorm, uvB), mixAB);
       float a = c.a * (1.0 + 0.25 * cardMip(uvA)); if (a < 0.5) return vec4(-1.0);
       vec3 alb = c.rgb / max(c.a, 1e-3), nv = nn.rgb / max(nn.a, 1e-3) * 2.0 - 1.0;
       vec3 n = normalize(vR * nv.x + vU * nv.y + vF * nv.z + vec3(0.0, 1e-4, 0.0));
+      ${fol ? `return vec4(atmFoliage(alb, n, normalize(vF), uSunDir, uSunCol, uSkyCol, uGndCol, 1.0, ${FOLIAGE_F}) * uLight, 1.0); }` : `
       float wrap = max(0.0, (dot(n, uSunDir) + 0.2) / 1.2);   /* a little wrap: leaves pass some light, and a card's normals are an average */
       vec3 hemi = mix(uGndCol, uSkyCol, n.y * 0.5 + 0.5);
-      return vec4(alb * (uSunCol * wrap + hemi) * uLight, 1.0); }`;
+      return vec4(alb * (uSunCol * wrap + hemi) * uLight, 1.0); }`}`; };
   const CARD_FRAG_END = `
     #include <tonemapping_fragment>
     #include <encodings_fragment>
@@ -5076,7 +5092,7 @@ const LOD = (() => {
           vec4 mvPosition = viewMatrix * vec4(wp, 1.0); gl_Position = projectionMatrix * mvPosition;
           #include <fog_vertex>
         }`,
-      `uniform float uLodFlip; varying vec2 vUv, vUv2, vLodMS; varying float vLodFade, vMix; ${CARD_FRAG_PARS} ${DITHER_GLSL}
+      `uniform float uLodFlip; varying vec2 vUv, vUv2, vLodMS; varying float vLodFade, vMix; ${cardFragPars()} ${DITHER_GLSL}
         void main() { vec4 c = cardShade(vUv, vUv2, vMix); if (c.a < 0.0) discard;
           float th = lodNoise(gl_FragCoord.xy, vLodMS.y); float f = vLodFade; if (f < -0.5 || vLodMS.x > 0.5) { if (f < -0.5) f = -1.0 - f; th = 1.0 - th; } if (f < th) discard;
           gl_FragColor = c; ${CARD_FRAG_END} }`);
@@ -5125,7 +5141,7 @@ const LOD = (() => {
           vec4 mvPosition = viewMatrix * modelMatrix * vec4(wp, 1.0); gl_Position = projectionMatrix * mvPosition;
           #include <fog_vertex>
         }`,
-      `varying vec2 vUv, vUv2, vLodMS; varying float vLodFade, vMix, vKind, vElev; ${CARD_FRAG_PARS} ${DITHER_GLSL}
+      `varying vec2 vUv, vUv2, vLodMS; varying float vLodFade, vMix, vKind, vElev; ${cardFragPars()} ${DITHER_GLSL}
         void main() { float wTop = smoothstep(0.35, 0.7, vElev), n2 = lodNoise(gl_FragCoord.yx + 13.0, 0.37);   /* which of the two quads owns this pixel */
           if (vKind > 0.5 ? n2 >= wTop : n2 < wTop) discard;
           vec4 c = cardShade(vUv, vUv2, vMix); if (c.a < 0.0) discard;
@@ -19023,6 +19039,7 @@ if (typeof module !== 'undefined') module.exports = { makePhysics, TUNE_DEFAULTS
      SOFTBODY.fitout(b, root)            the inside, when it loads later than she does (it may be near-only). Tied on now if she is already crumpled.
      SOFTBODY.contact(c)                 every record P.contactHook gets. Costs a Map lookup. A hard blow (c.hit, energy over hardJ) on an attached boat
                                          fetches her lattice and sidecar once (10.6 MB), starts her worker, and crushes her in it.
+     SOFTBODY.scrape                     a slide over anything hard takes her paint off along the way (S10); past scrapeJ of friction work that wires her, as a hard blow does. Off: blows and rakes only.
      SOFTBODY.rake                       a boat with cut_N in her entry, pressed on rock and sliding, is opened along the way (S10). Off: blows only.
      SOFTBODY.tick(renderer, camera)     once a frame, after physics. Returns at once while no boat has been hit.
      SOFTBODY.repair(b), SOFTBODY.detach(b)  she is whole again / gone: worker stopped, meshes and memory back.
@@ -20041,8 +20058,9 @@ function sbCore() {
 /* ---------- the door ---------- */
 const SOFTBODY = (() => {
   const core = sbCore(), recs = new Map();
-  const S = { on: true, paint: true, rake: true, rakeV: 1, rakeDt: 0.1, rakeDepth: [0.15, 1, 3], hardJ: 20e3, ms: 0, maxFree: 16, create: core.SOFTBODY.create, DRIVER: core.DRIVER, ROTFIT: core.ROTFIT, workerSrc: () => '(' + sbCore.toString() + ')().workerMain(self);', onDebris: null };
+  const S = { on: true, paint: true, rake: true, scrape: true, scrapeV: 0.5, scrapeN: 5e3, scrapeJ: 100e3, scrapeStep: 0.3, scrapeRate: 20, rakeV: 1, rakeDt: 0.1, rakeDepth: [0.15, 1, 3], hardJ: 20e3, ms: 0, maxFree: 16, create: core.SOFTBODY.create, DRIVER: core.DRIVER, ROTFIT: core.ROTFIT, workerSrc: () => '(' + sbCore.toString() + ')().workerMain(self);', onDebris: null };
   /* hardJ: below this a blow only marks her (damage.js does that) and nothing is fetched. 20 kJ is 75 t's bow at about 1 m/s on her effective mass: past a hard docking, about where 8 mm plate starts to dish between frames. ASSUMED */
+  /* scrape: a slide marks her (below). scrapeV m/s and scrapeN newtons: less than this leaves paint alone. scrapeJ: friction work that wires a boat that has had no hard blow; below it damage.js's marks do. scrapeStep m and scrapeRate a second: the most marks one contact lays. All ASSUMED, by eye */
   let hit = 0, rate = 0, src = null;   /* hit: boats wired; the frame returns at once while it is 0 */
   const qrot = (q, v) => { const x = q.x, y = q.y, z = q.z, w = q.w, tx = 2 * (y * v[2] - z * v[1]), ty = 2 * (z * v[0] - x * v[2]), tz = 2 * (x * v[1] - y * v[0]); return [v[0] + w * tx + y * tz - z * ty, v[1] + w * ty + z * tx - x * tz, v[2] + w * tz + x * ty - y * tx]; };
   const inv = q => ({ x: -q.x, y: -q.y, z: -q.z, w: q.w }), arr = v => [v.x, v.y, v.z];
@@ -20073,7 +20091,27 @@ const SOFTBODY = (() => {
     let vw = arr(b._v0 || b.rb.linvel()); const ww = arr(b._w0 || b.rb.angvel()); if (c.otherBoat) { const u = arr(c.otherBoat._v0 || c.otherBoat.rb.linvel()); vw = [vw[0] - u[0], vw[1] - u[1], vw[2] - u[2]]; }
     const V = qrot(qi, vw).map(v => v * Math.sqrt(share)), W = qrot(qi, ww), m = { type: 'impact', tg: c.t, V, W, solids: [solidFor(rec, c, P, N, up)] };
     rec.blows++; rec.t0 = rec.t0 || performance.now();
+    mark(rec, { p: P, n: N, dir: slideDir(b, c, p, N), r: 0.22, len: 0.35, kind: 'scrape', strength: 1, snap: true });   /* whatever the lattice makes of it, what she hit took paint off where it touched: a blow she shrugged off left nothing to see */
     if (rec.state === 'ready') rec.w.postMessage(m); else { rec.pending.push(m); if (rec.state === 'idle') wire(rec); } }
+
+  /* a slide over anything hard takes her paint off along the way, from Rapier's records and on the main thread: no plastic work, no worker, no lattice. A bow running up a shore has the contact stay at a point of her collider as the ground goes by under it, or walk along her as a rock does; either way the mark is on her plate, where drawSplat snaps it to */
+  function slideDir(b, c, p, N) { const q = b.rb.rotation(), qi = inv(q), w = qrot(qi, arr(b._w0 || b.rb.angvel())), v = qrot(qi, arr(b._v0 || b.rb.linvel())); if (c.otherBoat) { const u = qrot(qi, arr(c.otherBoat._v0 || c.otherBoat.rb.linvel())); v[0] -= u[0]; v[1] -= u[1]; v[2] -= u[2]; }
+    const rr = [p.x, p.y, p.z], o = cross(w, rr), u = [v[0] + o[0], v[1] + o[1], v[2] + o[2]], d = dot(u, N); u[0] -= d * N[0]; u[1] -= d * N[1]; u[2] -= d * N[2]; const l = Math.hypot(u[0], u[1], u[2]); return l > 1e-3 ? [u[0] / l, u[1] / l, u[2] / l] : [0, 0, 1]; }
+  function mark(rec, s) { if (!S.paint) return; const Q = rec.q.splats; Q.push(s); if (Q.length > 256) Q.shift(); }
+  function scrape(b, c, p, n) {
+    const rec = recs.get(b); if (!rec || rec.state === 'failed' || !S.scrape || !S.paint || !(c.vt >= S.scrapeV)) return; const what = c.other && c.other.what; if (what === 'float' || what === 'debris') return;
+    const sc = rec.sc || (rec.sc = { W: 0, t: -9, hit: -9, tr: [], n: 0 }); if (c.t - sc.t > 5) { sc.W = 0; sc.tr.length = 0; if (rec.state === 'idle') rec.q.splats.length = 0; } sc.t = c.t; if (c.hit) { sc.hit = c.t; return; } if (c.t - sc.hit < 0.1) return;
+    const F = Math.min(Math.max(0, c.Fn || 0), 4 * 9.81 * b.rb.mass()); if (F < S.scrapeN) return; const d = c.vt * (c.dt || 0), org = rec.org, P = [p.x + org[0], p.y + org[1], p.z + org[2]];
+    sc.W += 0.4 * F * d; if (rec.state === 'idle' && sc.W >= S.scrapeJ) wire(rec);   /* mu 0.4, as the rake */
+    let t = null; for (const u of sc.tr) if (c.t - u.t < 0.4 && Math.hypot(u.q[0] - P[0], u.q[1] - P[1], u.q[2] - P[2]) < 1.5) { t = u; break; }
+    if (!t) { t = { q: P, t: c.t, slid: 0, al: 0, F: 0 }; sc.tr.push(t); if (sc.tr.length > 6) sc.tr.shift(); }
+    t.t = c.t; t.slid += d; t.F = Math.max(t.F, F); const step = Math.max(S.scrapeStep, c.vt / S.scrapeRate), gap = Math.hypot(t.q[0] - P[0], t.q[1] - P[1], t.q[2] - P[2]), walked = gap >= step; if (!walked && t.slid < Math.max(step, 0.8)) return;
+    /* how hard: a gouge from about 300 kN on a keel or a rock's point (ASSUMED); the patch, at a bearing of 2 MPa over 0.25 m of keel or chine (ASSUMED) */
+    const N = norm([n.x, n.y, n.z]), press = Math.min(1, t.F / 6e5), hard = what !== 'pile' || (c.other && c.other.material === 'steel'), wob = 0.75 + 0.25 * Math.sin(t.al * 1.3 + sc.n * 0.1) * Math.sin(t.al * 0.47 + 1), s = { n: N, kind: 'scrape', r: (0.07 + 0.2 * press) * wob, strength: (hard ? 0.6 : 0.45) + 0.4 * press, snap: true, al: t.al };   /* a rub comes and goes as the plate's waviness and the rock do: an even band reads as a line drawn on her */
+    if (walked) { s.p = [(t.q[0] + P[0]) / 2, (t.q[1] + P[1]) / 2, (t.q[2] + P[2]) / 2]; s.dir = [P[0] - t.q[0], P[1] - t.q[1], P[2] - t.q[2]]; s.len = gap + 0.15; t.al += gap; t.q = P; }
+    else { s.p = P; s.dir = slideDir(b, c, p, N); s.len = Math.min(3, 0.3 + (t.F / 2e6) / 0.25); s.al = (sc.n * 0.37) % 7; }
+    const gouge = press > 0.5 && hard && sc.n % 3 === 0 ? { p: s.p, n: N, kind: 'gouge', r: 0.03 + 0.05 * press, strength: 0.6 + 0.4 * press, snap: true, dir: s.dir, len: s.len, al: s.al + 3 } : null;   /* now and then the rock's point digs in: narrow, with relief */
+    t.slid = 0; t.F = 0; sc.n++; mark(rec, s); if (gouge) mark(rec, gouge); }
 
   /* a long rake (S10): she slides along rock pressed hard enough to go through her plate. A blow is over when it lands, a rake isn't, so this reads every record of the contact, not just its first. Only for a boat whose entry gives `cut_N`, the force to punch her shell (damage.js's: 0.58 of the flow stress over the rock's bearing, 0.3 m radius ASSUMED). Fn as Boats take it: past the first tenth of a second of a blow, no more than 4 of her weights. It starts, and fetches her, once the friction work (mu 0.4, ASSUMED) passes hardJ, as a blow must */
   function rake(b, c, p, n) {
@@ -20118,8 +20156,8 @@ const SOFTBODY = (() => {
     const rec = { b, id, root, mid: o.mid || null, fitout: o.fitout || null, P: o.P || (typeof DAMAGE !== 'undefined' && DAMAGE.P) || null, wind: o.wind || null, entry, org: entry.physics_origin_m || [0, 0, 0], state: 'idle', pending: [], blows: 0, sb: null, w: null, draw: null, rot: null, q: { states: [], broken: [], debris: [], splats: [] }, free: [], freeN: 0, t: 0, behind: 0, active: 0, plastic: 0, nBroken: 0, asleep: true, drv: null, rest: null, inside: false, shown: true, windT: 0 };
     recs.set(b, rec); return rec; };
   S.contact = function (c) { if (!S.on || !recs.size) return; const sh = c.share || 1;
-    if (recs.has(c.b)) { blow(c.b, c, c.p, c.n, sh); rake(c.b, c, c.p, c.n); }
-    const ob = c.otherBoat; if (ob && recs.has(ob)) { const q = ob.rb.rotation(), t = ob.rb.translation(), qi = inv(q), p = qrot(qi, [c.pw.x - t.x, c.pw.y - t.y, c.pw.z - t.z]), n = qrot(qi, [-c.nw.x, -c.nw.y, -c.nw.z]); blow(ob, Object.assign({}, c, { b: ob, otherBoat: c.b, other: { what: 'boat' } }), { x: p[0], y: p[1], z: p[2] }, { x: n[0], y: n[1], z: n[2] }, sh); } };
+    if (recs.has(c.b)) { blow(c.b, c, c.p, c.n, sh); rake(c.b, c, c.p, c.n); scrape(c.b, c, c.p, c.n); }
+    const ob = c.otherBoat; if (ob && recs.has(ob)) { const q = ob.rb.rotation(), t = ob.rb.translation(), qi = inv(q), p = qrot(qi, [c.pw.x - t.x, c.pw.y - t.y, c.pw.z - t.z]), n = qrot(qi, [-c.nw.x, -c.nw.y, -c.nw.z]), c2 = Object.assign({}, c, { b: ob, otherBoat: c.b, other: { what: 'boat' } }), pp = { x: p[0], y: p[1], z: p[2] }, nn = { x: n[0], y: n[1], z: n[2] }; blow(ob, c2, pp, nn, sh); scrape(ob, c2, pp, nn); } };
   S.tick = function (renderer, camera) { if (!hit) { S.ms = 0; return; } const a = performance.now();
     for (const rec of recs.values()) { const sb = rec.sb; if (!sb) continue;
       if (rec.shown !== S.on) { rec.shown = S.on; sb.enabled(S.on); } if (!S.on) continue;
@@ -20128,14 +20166,14 @@ const SOFTBODY = (() => {
       if (Q.states.length) { sb.plates(Q.states); if (!rec.inside && rec.entry.inside && Q.states.some(s => s.state !== 'attached')) { rec.inside = true; sb.inside().catch(e => console.warn('softbody inside', e)); } Q.states.length = 0; }
       if (Q.broken.length) { sb.broken(Q.broken); Q.broken.length = 0; }
       if (Q.debris.length) { for (const d of Q.debris) letGo(rec, d); Q.debris.length = 0; }
-      if (Q.splats.length) { if (S.paint) for (const s of Q.splats) sb.splat(s); Q.splats.length = 0; }
+      if (Q.splats.length) { if (S.paint) { const kK = (sb.S.solver || {}).scrapeK || 1; for (const s of Q.splats) { if (s.snap) s.strength = Math.min(1, s.strength * kK); sb.splat(s); } } Q.splats.length = 0; }
       if (rec.free.length) { const q = rec.b.rb.rotation(), t = rec.b.rb.translation(), qi = inv(q), st = []; for (let i = rec.free.length - 1; i >= 0; i--) { const f = rec.free[i], e = f.e; if (e.removed) { st.push({ id: f.id, state: 'gone' }); rec.free.splice(i, 1); continue; } const et = e.rb.translation(), l = qrot(qi, [et.x - t.x, et.y - t.y, et.z - t.z]), rq = mulq(qi, mulq(e.rb.rotation(), mulq(inv(f.q0), q))); st.push({ id: f.id, state: 'free', at: [l[0] + rec.org[0], l[1] + rec.org[1], l[2] + rec.org[2]], q: [rq.x, rq.y, rq.z, rq.w] }); } sb.plates(st); }
       if (rec.wind && rec.w && rec.drv && rec.drv.loose > 0 && a - rec.windT > 1000) { rec.windT = a; const u = rec.wind(), qi = inv(rec.b.rb.rotation()), v = rec.b.rb.linvel(); rec.w.postMessage({ type: 'wind', v: qrot(qi, [u.x - v.x, (u.y || 0) - v.y, u.z - v.z]) }); }
       sb.tick(renderer, 8, camera); }
     S.ms = performance.now() - a; };
   S.report = function (b) { const r = recs.get(b); if (!r) return null; const d = r.drv || {}; return { state: r.state === 'failed' ? 'idle' : r.state, failed: r.state === 'failed', blows: r.blows, t: r.t, behind: r.behind, active: r.active, atRest: r.asleep, plastic_J: r.plastic, broken: r.nBroken, loose: d.loose || 0, gone: d.gone || 0, off: d.fitGone || 0, cpu_ms: r.rest ? r.rest.cpu_ms : 0 }; };
   S.fitout = function (b, root) { const r = recs.get(b); if (!r || r.fitout === root) return; r.fitout = root; if (r.sb) r.sb.bind(root, 'fitout'); };
-  S.repair = function (b) { const r = recs.get(b); if (!r) return; if (r.w) r.w.terminate(); if (r.sb) { r.sb.dispose(); hit = Math.max(0, hit - 1); } for (const f of r.free) if (r.P && r.P.removeDebris && !f.e.removed) r.P.removeDebris(f.e); Object.assign(r, { state: 'idle', sb: null, w: null, draw: null, rot: null, pending: [], blows: 0, free: [], freeN: 0, t: 0, behind: 0, active: 0, plastic: 0, nBroken: 0, asleep: true, drv: null, rest: null, inside: false, rk: null, q: { states: [], broken: [], debris: [], splats: [] } }); };
+  S.repair = function (b) { const r = recs.get(b); if (!r) return; if (r.w) r.w.terminate(); if (r.sb) { r.sb.dispose(); hit = Math.max(0, hit - 1); } for (const f of r.free) if (r.P && r.P.removeDebris && !f.e.removed) r.P.removeDebris(f.e); Object.assign(r, { state: 'idle', sb: null, w: null, draw: null, rot: null, pending: [], blows: 0, free: [], freeN: 0, t: 0, behind: 0, active: 0, plastic: 0, nBroken: 0, asleep: true, drv: null, rest: null, inside: false, rk: null, sc: null, q: { states: [], broken: [], debris: [], splats: [] } }); };
   S.detach = function (b) { S.repair(b); recs.delete(b); };
   S.record = b => recs.get(b) || null;
   return S;
@@ -21413,6 +21451,8 @@ function buildOsprey() {
       const fe = MODELS.entry('osprey_wheelhouse'), ft = fe ? await MODELS.get('osprey_wheelhouse', 'hd') : null;
       if (ft) { const fl = new THREE.LOD(); fl.name = 'osprey fit-out'; fl.addLevel(MODELS.instance(ft, { units: U }), 0); fl.addLevel(new THREE.Object3D(), ((fe.fars_m && fe.fars_m.hd) || fe.cutoff_m || 25) * U); MD.fit = fl; root.add(fl);
         fl.children[0].updateMatrixWorld(true); fl.children[0].traverse(x => { if (x.name && MD.nodes && !MD.nodes[x.name]) MD.nodes[x.name] = x; }); }
+      /* the tender: not aboard by default (Matt, 2 Nov 12:36); shown when one is hauled aboard (O.tenderAboard) */
+      MD.tenders = []; lod.traverse(x => { if (/^tender(_\d+)?$/.test(x.name)) MD.tenders.push(x); });
       MD.hand = e.hand || {}; MD.state = 'ready';
     } catch (err) { console.warn('osprey model', err); MD.state = 'failed'; } }
   /* show the model or the code boat; move what we keep to the model's mounts, and the helm eye and exhaust with it */
@@ -21430,7 +21470,24 @@ function buildOsprey() {
   function modelStep() {
     const want = typeof OSPREY_DRAW === 'undefined' || OSPREY_DRAW.model;
     if (want && MD.state === 'idle' && typeof MODELS !== 'undefined' && MODELS.entry && MODELS.entry('osprey')) loadModel();
-    showModel(!!(want && MD.state === 'ready')); }
+    showModel(!!(want && MD.state === 'ready'));
+    if (MD.tenders) for (const t of MD.tenders) t.visible = !!O.tenderAboard; }
+  /* the helm moving with her (Matt, 2 Nov 12:36: "the wheel should move when you turn her, and the throttle should go up and down"):
+     the destroyer wheel (node 'wheel', spins about its local z) turns as the code wheel did, 2.2 turns for her 35 deg of rudder each
+     way; the Twin Disc QuickShift (node 'quickshift_lever', pivot at its foot, measured: the lever stands 0.165 m up from its origin)
+     is one lever for gear and throttle: upright neutral, forward into ahead at the detent (15 deg) and on to full throttle (45 deg),
+     back for astern. It shows the command (where the hand put it), easing there at about a hand's speed. ctl: the engine's state
+     (diesel.js S: thr 0..1, gearCmd 'F' | 'N' | 'R'); without it, gear is read from the prop's turning and the throttle from its speed */
+  let lev = 0;
+  function helmStep(dt, propRadS, rudderDeg, ctl) {
+    const N = MD.nodes; if (!N || !MD.shown) return;
+    if (N.wheel) N.wheel.rotation.z = -rudderDeg / 35 * Math.PI * 2.2;
+    const L = N.quickshift_lever; if (!L) return;
+    let gear = 0, thr = 0;
+    if (ctl && ctl.gearCmd) { gear = ctl.gearCmd === 'F' ? 1 : ctl.gearCmd === 'R' ? -1 : 0; thr = Math.max(0, Math.min(1, ctl.thr || 0)); }
+    else { const w = propRadS || 0; gear = Math.abs(w) > 2 ? Math.sign(w) : 0; thr = gear ? Math.max(0, Math.min(1, (Math.abs(w) - 34) / (127 - 34))) : 0; }   /* prop rad/s at her idle and rated, through 2:1 (DIESEL) */
+    const tgt = gear * (15 + 30 * thr) * Math.PI / 180, st = 3 * (dt || 0);
+    lev += Math.max(-st, Math.min(st, tgt - lev)); L.rotation.x = lev; }
   const O = {
     root, spec: S, hullMeshes: [hull, keel], model: MD, modelStep,
     whips,
@@ -21464,7 +21521,8 @@ function buildOsprey() {
           P.needsUpdate = true; }
       }
     },
-    update(dt, propRadS, rudderDeg) { modelStep(); prop.rotation.z += propRadS * dt; rudder.rotation.y = rudderDeg * Math.PI / 180; if (S.wheel) S.wheel.rotation.z = -rudderDeg / 35 * Math.PI * 2.2; },
+    tenderAboard: false,
+    update(dt, propRadS, rudderDeg, ctl) { modelStep(); helmStep(dt, propRadS, rudderDeg, ctl); prop.rotation.z += propRadS * dt; rudder.rotation.y = rudderDeg * Math.PI / 180; if (S.wheel) S.wheel.rotation.z = -rudderDeg / 35 * Math.PI * 2.2; },
     helm: new THREE.Vector3(-7.5, 22.6, (hF - 1.6) * 10), helmPitch: -0.04,
     chaseDist: 230
   };
@@ -27101,6 +27159,64 @@ function atmMicroGLSL() { return `
         float edge = smoothstep(0.0, 0.03 + sz * 0.04, v.y); hh = mix(-Q.x * 0.5, hh, edge);
         if (hh > h) { h = hh; tone = stH2(id + 61.3); crack = 1.0 - edge; } }
       lgTone = tone; lgCrack = crack * 0.6; return h; }
+    /* granite as blocks, not lines (Matt, 2 Nov, with his photo of the Acadia shore: "the lines as they currently stand are still not
+       natural"). On real granite the joints are not seen as lines: they cut the rock into slabs, each slab faces its own way and
+       stands at its own height, so one catches the sun and the next does not; its edges are rounded off; the higher one shades the
+       lower. So nothing here draws a line. Master joints run one way (rows, spacing Q.y with jitter), cross joints break each row at
+       its own spacing and slant (they end at the masters, staggered row to row, as cross joints do); every block gets a tilt of up to
+       ~10 degrees, a height (step Q.x), a tone; its edges roll off over a radius that grows with the block; the gap between blocks
+       (Q.z) is a dark seam only where it is wider than a pixel and a darkening by its share where narrower; a block higher than its
+       neighbour casts a shadow across the joint as long as the step over the sun's elevation. All analytic: the slope is per block,
+       not differenced, so nothing aliases at distance, and no height calls are repeated. Q.w rotates the joint sets.
+       p: the point in the surface's plane (m); Lp: the sun's direction in that plane, Ln: its component along the surface normal.
+       Returns (dh/dp.x, dh/dp.y, crack, lit); ao and tone out. */
+    float gbB(float k, float S, float seed) { return k * S + S * 0.45 * (stH2(vec2(k, seed)) - 0.5); }
+    /* the cell of x between jittered boundaries; a boundary is missing with probability skip (a joint that does not run through),
+       so blocks come in one, two and three spacings and the pattern is not a grid. Returns the cell's id (its lowest boundary) */
+    float gbCell(float x, float S, float seed, float skip, out float lo, out float hi) {
+      float k = floor(x / S), b0 = gbB(k, S, seed), b1 = gbB(k + 1.0, S, seed);
+      if (x < b0) { hi = b0; k -= 1.0; lo = gbB(k, S, seed); } else if (x >= b1) { lo = b1; k += 1.0; hi = gbB(k + 1.0, S, seed); } else { lo = b0; hi = b1; }
+      float kh = k + 1.0;
+      for (int t = 0; t < 2; t++) { if (stH2(vec2(k, seed + 0.5)) < skip) { k -= 1.0; lo = gbB(k, S, seed); } }
+      for (int t = 0; t < 2; t++) { if (stH2(vec2(kh, seed + 0.5)) < skip) { kh += 1.0; hi = gbB(kh, S, seed); } }
+      return k; }
+    /* the cross joints of row i: their own spacing, slant and offset; u is along the row */
+    float gbRowU(float i, vec2 w, float S, out float sl, out float S2) {
+      S2 = S * (0.8 + 1.4 * stH2(vec2(i, 3.1))); sl = (stH2(vec2(i, 5.3)) - 0.5) * 0.7; return w.x + w.y * sl + stH2(vec2(i, 7.7)) * S2; }
+    float gbRowJ(float i, vec2 w, float S, out float lo, out float hi, out float sl, out float S2) {
+      float u = gbRowU(i, w, S, sl, S2); return gbCell(u, S2, i * 17.0 + 1.0, 0.3, lo, hi); }
+    /* a block's height: a sheet-scale swell shared by neighbours (blocks step in groups, as sheeting does) plus its own */
+    float gbH(vec2 id, vec2 ctr, float step_, float S) { return step_ * (0.45 * stH2(id + 11.0) + 0.9 * stNoise(ctr / (S * 3.5) + 4.0)); }
+    vec4 atmGraniteBlocks(vec2 p, vec4 Q, vec2 Lp, float Ln, out float ao, out float tone) {
+      float fp = sqrt(length(dFdx(p)) * length(dFdy(p))), S = Q.y, gap = Q.z;
+      float c = cos(Q.w), s = sin(Q.w); vec2 q = vec2(c * p.x + s * p.y, -s * p.x + c * p.y), lq = vec2(c * Lp.x + s * Lp.y, -s * Lp.x + c * Lp.y);
+      /* the joints wander over several blocks: fractures, not ruled lines */
+      vec2 w = q + S * 0.5 * (vec2(stNoise(q / (S * 4.0)), stNoise(q / (S * 4.0) + 5.3)) - 0.5) * 2.0;
+      float v0, v1; float i = gbCell(w.y, S * 0.85, 2.0, 0.35, v0, v1);
+      float u0, u1, sl, S2; float j = gbRowJ(i, w, S, u0, u1, sl, S2);
+      float uw = gbRowU(i, w, S, sl, S2), cs = 1.0 / sqrt(1.0 + sl * sl);
+      vec2 id = vec2(i, j), ctr = vec2(0.5 * (u0 + u1), 0.5 * (v0 + v1)); float hb = gbH(id, ctr, Q.x, S);
+      float dE[4]; vec2 oE[4]; float hN[4];
+      dE[0] = w.y - v0; oE[0] = vec2(0.0, -1.0); dE[1] = v1 - w.y; oE[1] = vec2(0.0, 1.0);
+      dE[2] = (uw - u0) * cs; oE[2] = -normalize(vec2(1.0, sl)); dE[3] = (u1 - uw) * cs; oE[3] = normalize(vec2(1.0, sl));
+      { float a, b, x, y, ia, ib, ja, jb, jl, jr;
+        ia = gbCell(v0 - 0.01, S * 0.85, 2.0, 0.35, a, b); ja = gbRowJ(ia, vec2(w.x, v0 - 0.01), S, a, b, x, y); hN[0] = gbH(vec2(ia, ja), vec2(0.5 * (a + b), v0 - 0.3 * S), Q.x, S);
+        ib = gbCell(v1 + 0.01, S * 0.85, 2.0, 0.35, a, b); jb = gbRowJ(ib, vec2(w.x, v1 + 0.01), S, a, b, x, y); hN[1] = gbH(vec2(ib, jb), vec2(0.5 * (a + b), v1 + 0.3 * S), Q.x, S);
+        jl = gbCell(u0 - 0.01, S2, i * 17.0 + 1.0, 0.3, a, b); hN[2] = gbH(vec2(i, jl), vec2(0.5 * (a + b), ctr.y), Q.x, S);
+        jr = gbCell(u1 + 0.01, S2, i * 17.0 + 1.0, 0.3, a, b); hN[3] = gbH(vec2(i, jr), vec2(0.5 * (a + b), ctr.y), Q.x, S); }
+      vec2 g = (vec2(stH2(id + 2.1), stH2(id + 4.7)) - 0.5) * 0.3;
+      float size = min(v1 - v0, (u1 - u0) * cs), r = clamp(0.18 * size, 0.05, 0.45), fr = smoothstep(fp * 1.5, fp * 4.0, r);
+      float crack = 0.0, lit = 1.0, ce = 0.0, te = Ln / max(length(lq), 1e-3); vec2 ld = lq / max(length(lq), 1e-4);
+      for (int k = 0; k < 4; k++) { float dh = hb - hN[k];
+        float d = max(dE[k] - gap * 0.5, 0.0), roll = smoothstep(r, 0.0, d); roll *= roll * (0.5 + 0.8 * smoothstep(-0.02, 0.1, dh));
+        g -= oE[k] * 1.2 * roll * fr; ce = max(ce, roll * (1.0 - fr));
+        float cov = min(1.0, gap / max(gap, fp)); crack = max(crack, cov * (1.0 - smoothstep(gap * 0.5, gap * 0.5 + max(fp, 0.004), dE[k])));
+        float sd = dot(ld, oE[k]); if (dh < 0.0 && sd > 0.05) { float wS = (-dh + gap * 0.5) * sd / max(te, 0.08);
+          lit = min(lit, smoothstep(wS - fp - 0.01, wS + fp + 0.01, dE[k])); } }
+      ao = 1.0 - 0.55 * crack - 0.15 * ce;
+      tone = 0.5 + 0.28 * (stH2(id + 61.3) - 0.5) + 0.2 * (stNoise(q / (S * 5.0) + 9.0) - 0.5);
+      g = vec2(c * g.x - s * g.y, s * g.x + c * g.y);
+      return vec4(g, crack, lit); }
     vec4 atmLedge(vec3 P, int style, vec4 Q, vec3 L, out float res, out float ao, out float tone) {
       float fp = sqrt(length(dFdx(P.xz)) * length(dFdy(P.xz))), scale = style == 1 ? Q.y : style == 2 ? min(Q.y, Q.z) : style == 4 ? Q.y * 0.3 : style == 6 ? Q.y * 0.5 : style == 7 ? Q.y * 0.35 : style == 8 ? Q.y * 1.5 : style == 9 ? 3.0 : style == 10 ? Q.x * Q.y * 2.0 : style == 11 ? Q.y * 0.6 : style == 12 ? Q.y * 0.42 : style == 13 ? 1.2 : style == 14 ? max(Q.y, 0.6) : style == 15 ? Q.y : style == 16 || style == 17 ? Q.y * 1.5 : style == 18 ? Q.y * 0.6 : Q.y;
       res = smoothstep(fp * 1.0, fp * 2.5, scale); ao = 1.0; tone = 0.5;
@@ -27111,13 +27227,19 @@ function atmMicroGLSL() { return `
          height calls a pixel (Matt, 1 Nov: "I need this to be as fast as possible") */
       vec2 g;
       if (fp > lgNearFp) { vec2 dx = dFdx(P.xz), dy = dFdy(P.xz); float hX = dFdx(h0), hY = dFdy(h0), det = dx.x * dy.y - dx.y * dy.x;
-        g = abs(det) > 1e-10 ? vec2(hX * dy.y - hY * dx.y, hY * dx.x - hX * dy.x) / det : vec2(0.0); }
+        g = abs(det) > 1e-10 ? vec2(hX * dy.y - hY * dx.y, hY * dx.x - hX * dy.x) / det : vec2(0.0);
+        /* a joint narrower than a few pixels is a cliff in h0 between two pixels of one 2 x 2 block: its difference is a spike, which
+           drew a bright and a dark dash along every joint at distance (Matt, 2 Nov: "why does the light look so pixelated"). Fade the
+           difference out as the joint's valley shrinks toward a pixel (its darkening is the crack term's, filtered) and cap what is left */
+        float Wj = style == 18 ? Q.z * 3.0 + 0.02 : 0.05 * scale;
+        g *= 1.0 - smoothstep(0.12 * Wj, 0.45 * Wj, fp); float gl = length(g); if (gl > 1.2) g *= 1.2 / gl; }
       else { float hx = lgH(P.xz + vec2(e, 0.0), style, Q), hz = lgH(P.xz + vec2(0.0, e), style, Q); g = vec2(hx - h0, hz - h0) / e; }
       vec3 n = normalize(vec3(-g.x * res, 1.0, -g.y * res));
       ao = mix(1.0, 0.3, crack * res);
       float lit = 1.0; vec2 ld = L.xz / max(length(L.xz), 1e-4); float te = L.y / max(length(L.xz), 1e-3);
       if (lgCliff > 0.5) te = max(te, 0.25);   /* sun grazing a cliff: centimetre relief must not black out metres of face */
-      float shK = style == 8 ? 1.0 - smoothstep(Q.y * 0.1, Q.y * 0.2, fp) : style == 9 ? 1.0 - smoothstep(0.2, 0.4, fp) : style == 10 ? 1.0 - smoothstep(0.15, 0.3, fp) : style == 11 ? 1.0 - smoothstep(0.2, 0.4, fp) : style == 12 ? 1.0 - smoothstep(0.15, 0.3, fp) : style == 13 ? 1.0 - smoothstep(0.1, 0.2, fp) : style == 14 ? 1.0 - smoothstep(0.15, 0.3, fp) : style == 15 ? 1.0 - smoothstep(0.25, 0.5, fp) : style == 16 || style == 17 || style == 18 ? 1.0 - smoothstep(0.25, 0.5, fp) : 1.0;   /* granite: cast shadows only in the near band (3 of its 6 height calls) */
+      float shK = style == 8 ? 1.0 - smoothstep(Q.y * 0.1, Q.y * 0.2, fp) : style == 9 ? 1.0 - smoothstep(0.2, 0.4, fp) : style == 10 ? 1.0 - smoothstep(0.15, 0.3, fp) : style == 11 ? 1.0 - smoothstep(0.2, 0.4, fp) : style == 12 ? 1.0 - smoothstep(0.15, 0.3, fp) : style == 13 ? 1.0 - smoothstep(0.1, 0.2, fp) : style == 14 ? 1.0 - smoothstep(0.15, 0.3, fp) : style == 15 ? 1.0 - smoothstep(0.25, 0.5, fp) : style == 16 || style == 17 ? 1.0 - smoothstep(0.25, 0.5, fp) : style == 18 ? 1.0 - smoothstep(0.3 * (Q.z * 3.0 + 0.02), (Q.z * 3.0 + 0.02), fp) : 1.0;   /* granite: cast shadows only in the near band (3 of its 6 height calls); style 18's only while a joint's valley is wider than about
+         three pixels, since a shadow tap narrower than a pixel lands on or off the groove and draws dashes */
       float W18 = Q.z * 3.0 + 0.02;   /* style 18: a joint's valley width; its shadow falls within about that */
       if (shK > 0.0) for (int t = 0; t < 3; t++) { float dd = style == 18 ? (t == 0 ? 0.35 * W18 : t == 1 ? W18 : 0.4 * scale) : scale * (t == 0 ? 0.1 : t == 1 ? 0.3 : 0.8);
         float h = lgH(P.xz + ld * dd, style, Q);
@@ -27260,12 +27382,28 @@ function atmMicroGLSL() { return `
        species scale (Caloplaca 0.6, Xanthoria 1.0, Rhizocarpon 1.3, Physcia 0.5). Far off, where a colony is under ~4 px, each species
        is its mean colour x its coverage x the density instead (the same average the atlas would mip to, without the atlas bleeding).
        slots: (first, count) per species in the atlas, as lichens.json says; mean: each species' sampled mean colour (linear); W:
-       strengths per species. */
-    vec3 atmLichens(vec3 col, vec2 P2, float hM, float top, sampler2D atlas, vec4 slotsA, vec4 slotsB, vec3 mC, vec3 mX, vec3 mR, vec3 mP, vec4 cov, vec4 W, float fp) {
+       strengths per species.
+       site (Matt, 2 Nov: "apply naturally based on their natural history ... south-facing slopes, certain types of rock"): where on the
+       rock this point is, each 0..1: x sun (how much sun the face gets over a year: south-facing and open tops high, north faces and
+       undersides low), y perch (nutrients: bird perches and droppings, i.e. high points and the tops of boulders, and salt spray low on
+       the shore), z silica (the rock: granite and the other acid rocks 1, the basic gabbro and diorite and the dikes lower), w wet
+       (seeps, runoff lines and hollows that hold water). What each wants, from the North American lichen floras (Brodo, Sharnoff and
+       Sharnoff, Lichens of North America, 2001) and the Maine shore's zonation:
+       - Caloplaca (orange, maritime): sun and nutrients, the salt-sprayed rock above the black zone; scarce on north faces;
+       - Xanthoria (yellow-orange): the bird-perch lichen: nutrient-rich, sunny tops; almost absent off the perches;
+       - Rhizocarpon geographicum (yellow-green map lichen): acid, hard, siliceous rock (granite above all), nutrient-poor, open but
+         tolerant of cool aspects; avoids the perches; scarce on basic rock;
+       - Physcia (grey rosettes): nutrients again, tolerates shade, on the less sunny sides of perches;
+       - none of them on rock that stays wet (seeps and runoff lines are left to the dark algae), and fewer in the hollows. */
+    vec3 atmLichens(vec3 col, vec2 P2, float hM, float top, sampler2D atlas, vec4 slotsA, vec4 slotsB, vec3 mC, vec3 mX, vec3 mR, vec3 mP, vec4 cov, vec4 W, float fp, vec4 site) {
       vec4 zw = vec4(smoothstep(0.8, 1.5, hM) * (1.0 - smoothstep(3.5, 5.5, hM)) * (0.55 + 0.45 * top),
                      smoothstep(1.5, 2.5, hM) * (1.0 - smoothstep(6.0, 9.0, hM)) * (0.35 + 0.65 * top),
                      smoothstep(3.0, 5.0, hM) * (0.25 + 0.75 * top),
                      smoothstep(2.5, 4.0, hM) * (0.5 + 0.5 * top)) * W;
+      zw *= vec4(mix(0.25, 1.35, site.x) * mix(0.6, 1.4, site.y),
+                 mix(0.4, 1.2, site.x) * mix(0.15, 1.8, site.y),
+                 mix(0.15, 1.1, site.z) * mix(1.4, 0.35, site.y) * mix(0.8, 1.1, site.x),
+                 mix(1.2, 0.8, site.x) * mix(0.5, 1.4, site.y)) * (1.0 - 0.9 * smoothstep(0.3, 0.7, site.w));
       float tot = zw.x + zw.y + zw.z + zw.w; if (tot <= 0.001) return col;
       float dens = smoothstep(0.25, 0.6, stNoise(P2 / 2.2) * 0.6 + stNoise(P2 / 0.6 + 7.0) * 0.4);   /* clumps: colonies grow where others are, merging into patches */
       vec2 dqx = dFdx(P2), dqy = dFdy(P2);
@@ -27318,6 +27456,32 @@ function atmMicroGLSL() { return `
         float rise = (textureLod(tex, vec3(uvl.xy + dir * t, uvl.z), lod).a - h0) * relief - t * tanE;
         s = min(s, 1.0 - smoothstep(0.0, 0.002 + t * 0.05, rise)); }
       return s;
+    }`; }
+/* foliage seen as a card (lod.js impostors, World's far field, the canopy layer): the light on a whole crown of needles, from the
+   card's albedo and baked normal alone, so the near models, the cards and the far canopy are lit by one rule (Matt, 2 Nov:
+   "lightmap the cards ... so from a distance we can procedurally build realistic forests"). Self-contained GLSL, no atmosphere
+   uniforms: the caller passes its own sun, sky and ground light. What a conifer crown does to light, as seen in Matt's kayak
+   photos of the MDI shore (1 Nov) and as foliage renderers model it:
+   - diffuse with wrap: a crown's normal is an average over thousands of needles at every angle, so light reaches past the
+     terminator (wrap F.x, ~0.35);
+   - transmission: looking toward the sun, the thin outer needles glow yellow-green at the crown's edges (the gold rim), strongest
+     where the card's normal is edge-on to the view, the crown's body staying dark (F.y, ~0.5; conifers less than broadleaves);
+   - the hotspot: with the sun behind you, a canopy brightens sharply because you see no shadows between the needles (opposition
+     effect; F.z, ~0.35);
+   - crown occlusion of the sky: the outer and upper needles see the sky, the inner and lower ones see the crown above them
+     (F.w, ~0.5), which gives the dark interiors and the shaded skirts.
+   n: world normal, V: toward the eye, L: toward the sun, shadow: the caller's sun shadow (cloud or cast; 1 if none). Returns
+   the lit colour, linear. Cost: ~25 ALU a pixel, no texture reads. */
+function atmFoliageGLSL() { return `
+    vec3 atmFoliage(vec3 alb, vec3 n, vec3 V, vec3 L, vec3 sunCol, vec3 sky, vec3 gnd, float shadow, vec4 F) {
+      float nl = dot(n, L), dif = max(0.0, (nl + F.x) / (1.0 + F.x));
+      float rim = 1.0 - abs(dot(n, V));
+      float back = pow(max(dot(-V, L), 0.0), 5.0);
+      vec3 trans = alb * vec3(1.15, 1.3, 0.55) * back * (0.12 + 0.88 * rim * rim) * F.y;
+      float hot = 1.0 + F.z * pow(max(dot(V, L), 0.0), 16.0);
+      float occ = mix(1.0, 0.45 + 0.55 * clamp(n.y * 0.5 + 0.5, 0.0, 1.0), F.w) * mix(1.0 - 0.35 * F.w, 1.0, rim);
+      vec3 amb = mix(gnd, sky, clamp(n.y * 0.5 + 0.5, 0.0, 1.0)) * occ;
+      return alb * (sunCol * dif * hot * shadow + amb) + sunCol * trans * shadow;
     }`; }
 function makeAtmos(scene, refs) {
   const R = 13000, U = 10, renderer = refs.renderer, LAMPS_N = 12;   /* lamps a shader sees at once (the nearest / brightest) */
@@ -29777,13 +29941,13 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     if (!force && Math.hypot(p.x - fetchCk.x, p.z - fetchCk.z) < 150 && fetchCk.dir === P.T.windDir) return;
     const dirChanged = fetchCk.dir !== P.T.windDir; fetchCk = { x: p.x, z: p.z, dir: P.T.windDir }; WIND.dir = P.T.windDir;
     const f = Math.min(300, Math.max(0.5, WIND.fetchAt(p.x, p.z, dryAt, LD ? 300000 : 2500) / 1000));
-    if (force || dirChanged || Math.abs(f - P.T.fetchKm) / P.T.fetchKm > 0.15) { P.T.fetchKm = +f.toFixed(1); if (!force) { applySea(); try { if (tuneInputs.fetchKm) tuneInputs.fetchKm(); } catch (e) {} } }
+    if (force || dirChanged || Math.abs(f - P.T.fetchKm) / P.T.fetchKm > 0.15) { P.T.fetchKm = +f.toFixed(1); if (!force) { applySea({ light: !dirChanged }); try { if (tuneInputs.fetchKm) tuneInputs.fetchKm(); } catch (e) {} } }
   }
-  function applySea() { const T = P.T; WIND.set(T.windU, T.windDir, T.gust); autoFetch(true);
+  function applySea(o) { const T = P.T; const light = !!(o && o.light);   /* light: the walk-about fetch change (Water, 2 Nov): keep the near-shore wave field drawing, no shelter rebuild */ WIND.set(T.windU, T.windDir, T.gust); autoFetch(true);
     Object.assign(SEA, { windU: T.windU, fetchKm: T.fetchKm, seaFromWind: T.seaFromWind, windHs: T.windHs, windTp: T.windTp, windDir: T.windDir, windSpread: T.windSpread, gamma: T.gamma, chop: T.seaChop, sAH: T.sAH, sAT: T.sAT, sADir: T.sADir, sASpread: T.sASpread, sASet: T.sASet, sASetK: T.sASetK,
       sBH: T.sBH, sBT: T.sBT, sBDir: T.sBDir, sBSpread: T.sBSpread, sBSet: T.sBSet, sBSetK: T.sBSetK, shoal: T.shoal, shelter: T.shelter });
     if (SEA.tank.on) { SEA.shoal = 0; SEA.shelter = 1; }
-    SEA.rebuild(); buildShelter(); wlSpectrum(); ospAtt = SEA.attFor(OSP_D); zodAtt = SEA.attFor(ZOD_D); if (BIGV) for (const e of BIGV) if (e.V) e.att = SEA.attFor(e.V.seaDepth);
+    SEA.rebuild(); if (!light) { buildShelter(); wlSpectrum(); } ospAtt = SEA.attFor(OSP_D); zodAtt = SEA.attFor(ZOD_D); if (BIGV) for (const e of BIGV) if (e.V) e.att = SEA.attFor(e.V.seaDepth);
     FFT.configure({ fromWind: !!T.seaFromWind && T.windU > 0, U: T.windU, fetch: T.fetchKm * 1000, Hs: T.windHs, Tp: T.windTp, dir: T.windDir * Math.PI / 180, gamma: T.gamma, chop: 1.35 * T.seaChop, spreadK: Math.max(0.3, T.windSpread / 30), seed: 20261013 }); }
   function applyProp() { const pr = PROPS['4']; pr.KT0 = P.T.propKT0; pr.KQ0 = P.T.propKQ0; pr.D = P.T.propD; pr.P = P.T.propP; Object.assign(DIESEL.prop, { KT0: OT.propKT0, KQ0: OT.propKQ0, D: OT.propD, P: OT.propP }); O.cfg.prop.D = OT.propD; }
   function applySky() { atmos.apply({ moon: P.T.moon, tod: P.T.tod, sunAz: P.T.sunAz, cloud: P.T.cloud, haze: P.T.haze, sunK: P.T.sunK, fog: P.T.seaFog, fogTop: P.T.fogTop, fogA: P.T.fogA });
@@ -30552,7 +30716,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
   const tuneTips = () => attachTips($('tuneGroups'), row => { const i = row.querySelector('input[id^="tu-"]'); return i ? i.id.slice(3) : null; }, (k, row) => (row.querySelector('output') || {}).textContent || '');
   /* settings are split three ways: the boat you are driving, the world (wind, sea, sky), and how it is drawn */
   const VESSEL_GROUPS = new Set(['Boat', 'Hydrostatics', 'Hydrodynamics', 'Lower unit & steering', 'Propeller', 'Contacts']);
-  const DISP_DEF = { instDock: 1, damage: 1, damageMarks: 1, softbody: 1, sbPaint: 1, ospModel: 1, jetWash: 1, reflections: 1, farLod: 1, lodPerceptual: 0, distCull: 1, farLight: 1, groundStones: 1, horizonShade: 1, shake: 1, buffet: 1, shadows: 2, clouds: 1, foamMap: 1, birds: 1, mammals: 1, traffic: 1, fps: 0, forest: 1, buildings: 1, roads: 1, shoreFx: 1, granite: 1, treeModels: 1, lamps: 1, currents: 1, build: typeof EDITOR_PAGE !== 'undefined' ? 1 : 0, docks: 1, fixtures: 1, weed: 1, windMotion: 1, stones: 0, ledges: 1, volSun: 0, shafts: 0, catspaws: 1, windShadow: 1, swash: 1, plants: 1, edges: 1, stain: 1, nightSky: 1, cloudShadows: 1, aurora: 0, buoys: 1, droppings: 1, cars: 1, curve: 1, loom: 0 };
+  const DISP_DEF = { instDock: 1, damage: 1, damageMarks: 1, softbody: 1, sbPaint: 1, sbScrape: 1, ospModel: 1, jetWash: 1, reflections: 1, farLod: 1, lodPerceptual: 0, distCull: 1, farLight: 1, groundStones: 1, horizonShade: 1, shake: 1, buffet: 1, shadows: 2, clouds: 1, foamMap: 1, birds: 1, mammals: 1, traffic: 1, fps: 0, forest: 1, buildings: 1, roads: 1, shoreFx: 1, granite: 1, treeModels: 1, lamps: 1, currents: 1, build: typeof EDITOR_PAGE !== 'undefined' ? 1 : 0, docks: 1, fixtures: 1, weed: 1, windMotion: 1, stones: 0, ledges: 1, volSun: 0, shafts: 0, catspaws: 1, windShadow: 1, swash: 1, plants: 1, edges: 1, stain: 1, nightSky: 1, cloudShadows: 1, aurora: 0, buoys: 1, droppings: 1, cars: 1, curve: 1, loom: 0 };
   const DISP = Object.assign({}, DISP_DEF); try { Object.assign(DISP, JSON.parse(localStorage.getItem('zodiac-display') || '{}')); } catch (e) {}
   /* 19 Oct: the editor froze building painted cobbles; Stones starts off once on every machine (editor_page.js has the why) */
   try { if (!localStorage.getItem('zp-stones-off-1019')) { DISP.stones = 0; localStorage.setItem('zp-stones-off-1019', '1'); localStorage.setItem('zodiac-display', JSON.stringify(DISP)); } } catch (e) {}
@@ -30562,7 +30726,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     ['Lighting', [['shadows', 'Shadows', ['Off', 'Medium (1024)', 'High (2048)', 'Ultra (4096)']]]],
     ['Effects', [['clouds', 'Cloud detail', ['Low (half rate)', 'Full']], ['foamMap', 'Wind foam and windrows (foam that drifts and lasts)', 'sw'], ['birds', 'Seabirds and shorebirds', 'sw'], ['mammals', 'Seals, porpoises, dolphins and whales', 'sw']]],
     ['Scenery', [['forest', 'Forest detail (how far each tier of tree detail reaches; 1 = as designed)', { lo: 0.25, hi: 3, step: 0.05 }],
-      ['treeModels', 'Modelled trees near the camera (off: simple trees everywhere)', 'sw'], ['buildings', 'Towns: buildings and façades', 'sw'], ['roads', 'Roads, poles and lamps', 'sw'], ['farLod', 'Far boats and buoys simplified (off: full physics everywhere, much slower)', 'sw'], ['instDock', 'Instruments docked along the bottom (off: free windows)', 'sw'], ['damage', 'Crash damage: hulls dent, crack and leak (off: they bounce)', 'sw'], ['damageMarks', 'Damage marks on the hull', 'sw'], ['softbody', 'Structural damage: plates fold and tear, fittings break off (a hit boat only)', 'sw'], ['ospModel', 'Osprey: Assets\' model (off: the old code-built boat)', 'sw'], ['sbPaint', 'Scraped paint on a crushed hull', 'sw'], ['jetWash', 'Jet wash behind the jets', 'sw'], ['reflections', 'Reflections of boats, docks and shore in the sea', ['Off', 'Low', 'Medium', 'High', 'Ultra']], ['lodPerceptual', 'Detail by screen size, changed while the camera swings (Assets, trial)', 'sw'], ['distCull', 'Small things near the camera only (poles, lamps, shore rubble, piles)', 'sw'], ['farLight', 'Ground lit by its own roughness from afar', 'sw'], ['groundStones', 'Stones and blocks drawn into beaches and granite', 'sw'], ['horizonShade', 'Hills shade the land behind them', 'sw'], ['cars', 'Cars driving the roads', 'sw'], ['docks', 'Piers and floating docks', 'sw'], ['fixtures', 'Dock hardware: bolts, hinges, hoops, rub rails (within 60 m)', 'sw'], ['weed', 'Seaweed on the shore (within 120 m)', 'sw'], ['stones', 'Stones: painted cobble and boulder fill (within 120 m; off until it is cheaper. In the editor, turning it on freezes the page for a while as it builds)', 'sw'], ['ledges', 'Ledges: painted rock ledge (the editor\'s Ledge brush)', 'sw'], ['windMotion', 'Wind motion: trees, grass, flags and loose gear sway in the wind', 'sw'], ['lamps', 'Lamps at night: street lamps, windows, nav lights lighting the water and fog', 'sw'], ['catspaws', 'Catspaws: ripples follow the gusts, glassy between them in light air', 'sw'], ['windShadow', 'Wind shadow: a slick in the lee of floats and boats', 'sw'], ['swash', 'Swash sheet: the thin sheet of water running up the shore', 'sw'], ['plants', 'Shrubs and marsh grass painted with the editor', 'sw'], ['buoys', 'Lobster buoys', 'sw'], ['droppings', 'Gull droppings and pavement wear', 'sw'], ['curve', "Earth's curve: boats go hull-down past the horizon", 'sw'], ['loom', 'Looming / mirage (0 normal air)', { lo: 0, hi: 1, step: 0.05 }], ['stain', 'Intertidal staining on docks, piles and seawalls', 'sw'], ['nightSky', 'Night sky: real stars, the Milky Way, meteors', 'sw'], ['cloudShadows', 'Cloud shadows on land and sea', 'sw'], ['aurora', 'Aurora', ['Now and then', 'Never', 'Tonight, strong']], ['edges', 'Path edges: walls, railings, fences, edging stones along the Shore Path', 'sw'], ['volSun', 'Volumetric sunlight near you (off until measured on the F readout)', 'sw'], ['shafts', 'Light shafts from clouds', 'sw'], ['granite', 'Granite veneer (rock textures, dikes, sills, lichen)', 'sw'], ['shoreFx', 'Seas on the shore: graded splashes, wet rock, foam deposits', 'sw'], ['currents', 'Tidal stream (boats drift with the tide)', 'sw']]],
+      ['treeModels', 'Modelled trees near the camera (off: simple trees everywhere)', 'sw'], ['buildings', 'Towns: buildings and façades', 'sw'], ['roads', 'Roads, poles and lamps', 'sw'], ['farLod', 'Far boats and buoys simplified (off: full physics everywhere, much slower)', 'sw'], ['instDock', 'Instruments docked along the bottom (off: free windows)', 'sw'], ['damage', 'Crash damage: hulls dent, crack and leak (off: they bounce)', 'sw'], ['damageMarks', 'Damage marks on the hull', 'sw'], ['softbody', 'Structural damage: plates fold and tear, fittings break off (a hit boat only)', 'sw'], ['ospModel', 'Osprey: Assets\' model (off: the old code-built boat)', 'sw'], ['sbPaint', 'Scraped paint on a crushed hull', 'sw'], ['sbScrape', 'Damage: slides scrape paint (a grounding or a hard rub)', 'sw'], ['jetWash', 'Jet wash behind the jets', 'sw'], ['reflections', 'Reflections of boats, docks and shore in the sea', ['Off', 'Low', 'Medium', 'High', 'Ultra']], ['lodPerceptual', 'Detail by screen size, changed while the camera swings (Assets, trial)', 'sw'], ['distCull', 'Small things near the camera only (poles, lamps, shore rubble, piles)', 'sw'], ['farLight', 'Ground lit by its own roughness from afar', 'sw'], ['groundStones', 'Stones and blocks drawn into beaches and granite', 'sw'], ['horizonShade', 'Hills shade the land behind them', 'sw'], ['cars', 'Cars driving the roads', 'sw'], ['docks', 'Piers and floating docks', 'sw'], ['fixtures', 'Dock hardware: bolts, hinges, hoops, rub rails (within 60 m)', 'sw'], ['weed', 'Seaweed on the shore (within 120 m)', 'sw'], ['stones', 'Stones: painted cobble and boulder fill (within 120 m; off until it is cheaper. In the editor, turning it on freezes the page for a while as it builds)', 'sw'], ['ledges', 'Ledges: painted rock ledge (the editor\'s Ledge brush)', 'sw'], ['windMotion', 'Wind motion: trees, grass, flags and loose gear sway in the wind', 'sw'], ['lamps', 'Lamps at night: street lamps, windows, nav lights lighting the water and fog', 'sw'], ['catspaws', 'Catspaws: ripples follow the gusts, glassy between them in light air', 'sw'], ['windShadow', 'Wind shadow: a slick in the lee of floats and boats', 'sw'], ['swash', 'Swash sheet: the thin sheet of water running up the shore', 'sw'], ['plants', 'Shrubs and marsh grass painted with the editor', 'sw'], ['buoys', 'Lobster buoys', 'sw'], ['droppings', 'Gull droppings and pavement wear', 'sw'], ['curve', "Earth's curve: boats go hull-down past the horizon", 'sw'], ['loom', 'Looming / mirage (0 normal air)', { lo: 0, hi: 1, step: 0.05 }], ['stain', 'Intertidal staining on docks, piles and seawalls', 'sw'], ['nightSky', 'Night sky: real stars, the Milky Way, meteors', 'sw'], ['cloudShadows', 'Cloud shadows on land and sea', 'sw'], ['aurora', 'Aurora', ['Now and then', 'Never', 'Tonight, strong']], ['edges', 'Path edges: walls, railings, fences, edging stones along the Shore Path', 'sw'], ['volSun', 'Volumetric sunlight near you (off until measured on the F readout)', 'sw'], ['shafts', 'Light shafts from clouds', 'sw'], ['granite', 'Granite veneer (rock textures, dikes, sills, lichen)', 'sw'], ['shoreFx', 'Seas on the shore: graded splashes, wet rock, foam deposits', 'sw'], ['currents', 'Tidal stream (boats drift with the tide)', 'sw']]],
     ...(typeof EDITOR !== 'undefined' ? [['Build', [['build', 'Build mode: free camera, layers, place and paint (` key)', 'sw']]]] : []),   /* the editor is its own page (editor.html); the game has no build mode */
     ['Readouts', [['fps', 'Frame rate and timing readout (F)', 'sw']]]];
   st.sec = 'vessel';
@@ -30940,7 +31104,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     if (typeof DCULL !== 'undefined') DCULL.on = !!DISP.distCull;   /* World, 31 Oct: 1,433 -> 983 draw calls at Friendship V's slip */
     if (W.terrain) { W.terrain.farLight = !!DISP.farLight; W.terrain.stones = !!DISP.groundStones; W.terrain.horizon = !!DISP.horizonShade; }
     if (NAV && NAV.dock && dockWanted !== !!DISP.instDock) { dockWanted = !!DISP.instDock; if (NAV.dock.on() !== dockWanted || !NAV.open) NAV.toggle(dockWanted); resize(); dockCluster(); }
-    if (HAS_DMG) { DAMAGE.on = !!DISP.damage; DAMAGE.visual = !!DISP.damageMarks; } if (typeof SOFTBODY !== 'undefined') { SOFTBODY.on = !!DISP.softbody; SOFTBODY.paint = !!DISP.sbPaint; } if (typeof OSPREY_DRAW !== 'undefined') OSPREY_DRAW.model = !!DISP.ospModel; if (typeof JETWASH !== 'undefined') JETWASH.on = !!DISP.jetWash;
+    if (HAS_DMG) { DAMAGE.on = !!DISP.damage; DAMAGE.visual = !!DISP.damageMarks; } if (typeof SOFTBODY !== 'undefined') { SOFTBODY.on = !!DISP.softbody; SOFTBODY.paint = !!DISP.sbPaint; if ('scrape' in SOFTBODY) SOFTBODY.scrape = !!DISP.sbScrape; } if (typeof OSPREY_DRAW !== 'undefined') OSPREY_DRAW.model = !!DISP.ospModel; if (typeof JETWASH !== 'undefined') JETWASH.on = !!DISP.jetWash;
     if (typeof WFX !== 'undefined' && WFX.ocean && WFX.ocean.refl) { const r = WFX.ocean.refl, lv = +DISP.reflections || 0; r.on = lv > 0; if (r.on && r.setLevel) r.setLevel(['', 'low', 'medium', 'high', 'ultra'][Math.min(4, lv)]); }   /* Water, 1 Nov: a quality list, Low by default */
     if (P.lod) P.lod.on = !!DISP.farLod; if (typeof LOD !== 'undefined') LOD.perceptual = !!DISP.lodPerceptual;
     if (typeof CARS !== 'undefined') CARS.on = !!DISP.cars && !lite; if (typeof BUOYS !== 'undefined') BUOYS.on = !!DISP.buoys && !lite; if (typeof DECALS !== 'undefined') DECALS.on = !!DISP.droppings && !lite;   /* Assets */
@@ -31213,7 +31377,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     ocean.update(camera, field); mk('ocean'); wlUploadProfiles(); mk('wave upload');
     if (W.terrain) { W.terrain.update(camera, LEVEL.tide); W.forest.update(camera); syncScenery(); if (W.buildings) W.buildings.update(camera, rdt, atmos.sunDir ? atmos.sunDir.y : 1, P.T.tod); if (typeof DOCKS !== 'undefined' && W.dockGroups) DOCKS.update(W.dockGroups, camera.position);
       if (typeof WEED !== 'undefined' && W.weedGroup) WEED.update(W.weedGroup, SEA.t, { tide: waterY() }, camera.position);   /* seaweed (weed.js): World fills W.weedGroup from weed.json; Water will add the wave terms */   /* the docks' switch and their hardware's range (docks.js); World fills W.dockGroups */   /* the town's windows come on at dusk */ W.chart.update(SEA.t); } atmos.sky.position.copy(camera.position); atmos.update(SEA.t, camera, SEA.level / U, rdt, P.wind);
-    mk('land+trees+town'); LIGHT.follow(act.root.position, atmos.sunDir || W.sun.position); LIGHT.update(rdt); LIGHT.shadowFor(ocean.uniforms);
+    mk('land+trees+town'); LIGHT.follow(act.root.position, atmos.sunDir || W.sun.position); if (LIGHT.setInside) LIGHT.setInside(st.cam === 1 && (act.big || act.id === 'osprey') ? 1 : 0); /* at the helm of a boat with a wheelhouse or bridge the eye adapts to the room (Lighting's setInside; Matt, 2 Nov: the Osprey's cabin reads dark, it's bright in daylight) */ LIGHT.update(rdt); LIGHT.shadowFor(ocean.uniforms);
     if ((st.markT = (st.markT || 0) - rdt) <= 0) { st.markT = 3; for (const v of VES) if (v && v.root) LIGHT.mark(v.root, true); }
     /* the eye under the surface: the sea's own green-blue closes in at a few metres, whatever the weather above */
     { const cp = camera.position, wy = SEA.height(cp.x, cp.z) + field.height(cp.x / U, cp.z / U) * U, uw = atmos.uni.atmUW.value, under = cp.y < wy - 0.3;
@@ -31381,7 +31545,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     wmk('crests+shore'); spray.step(dt, seaYm, RAPIER, P.world, sprayLand);
     sfx.update(SEA.t, Math.sin(SEA.windDir * Math.PI / 180) * windMS * 0.5, Math.cos(SEA.windDir * Math.PI / 180) * windMS * 0.5);
     /* one patch to the GPU each frame, alternating: each refreshes at half the frame rate */
-    wmk('spray+sound'); if ((st.f2 = !st.f2)) fieldF.upload(); else field.upload(); wmk('upload');
+    wmk('spray+sound'); fieldF.upload(); field.upload(); wmk('upload');   /* both every frame (Water, 2 Nov: alternating made the bow wave step at low fps); ~0.15 ms */
     if (wake) { try { const c = act.b.rb.translation(); wake.update(field, dt, c.x, c.z); } catch (e) { reportErr(e, 'wake'); wake = null; ocean.wake = null; } }
     if (kelvin) { try { const kb = P.boats.slice(0, 3), ab = act.b.rb.translation(), tw = traffic && traffic.on ? traffic.wakeBoat(ab.x, ab.z) : null; if (tw && kb.length < 3) kb.push(tw); for (const b of kb) kelvin.addBoat(b); for (const e of kelvin.boats.slice()) if (!kb.includes(e.b)) kelvin.removeBoat(e.b); kelvin.record(SEA.t); kelvin.update(SEA.t); } catch (e) { reportErr(e, 'far wake'); kelvin = null; ocean.kelvin = null; } }
     if (boil) { try { const bl = P.boats.slice(0, 3).map(b => { const v = VES.find(q => q && q.b === b); const T = b.T || P.T; return { b, L: (b.cfg && b.cfg.LWL) || 4, B: ((b.cfg && b.cfg.dims && b.cfg.dims.B) || 1.6) * 0.8, thrust: v ? (b.thrust || 0) / v.thrMax : 0, sx: T.wkSternX, gain: T.wkBoil, len: T.wkBoilLen }; });
