@@ -1,0 +1,56 @@
+{
+ "id": "barharbor_town_pier",
+ "style": "town_pier",
+ "wear": 0.6,
+ "seed": 7,
+ "_doc": "The opening scenario's float (claude/opening-scenario.md). Coordinates are in the DOCK's own frame (pier centre at 0,0, heading 0 = +z). The float has no `at`: it sits at the ramp's foot, parallel to the pier (landing.mode side), the ramp square off the pier face (skew_deg 0). World translates/rotates the whole dock to the real town pier in the level and sets pier.height_m from the bathymetry. deck_navd_m: pier deck above NAVD 88; float deck_y is the float's deck at mid tide (freeboard above the water).",
+ "pier": {
+  "at": [
+   0,
+   0
+  ],
+  "heading_deg": 0,
+  "length_m": 40,
+  "width_m": 6,
+  "deck_navd_m": 4.5,
+  "height_m": 7
+ },
+ "ramps": [
+  {
+   "id": "ramp",
+   "from": "pier:ramp_hinge[1]",
+   "to": "F1",
+   "length_m": 12,
+   "width_m": 1.2,
+   "camber_m": 0.3,
+   "skew_deg": 0
+  }
+ ],
+ "floats": [
+  {
+   "id": "F1",
+   "deck_y": 0.5,
+   "freeboard_m": 0.5,
+   "modules": [
+    {
+     "type": "float_3x12"
+    },
+    {
+     "type": "float_3x12",
+     "join": "end"
+    }
+   ],
+   "hoops": [
+    0.25,
+    0.75
+   ],
+   "cleat_pitch_m": 3.0,
+   "dress": "working",
+   "landing": {
+    "ramp": "ramp",
+    "mode": "side"
+   }
+  }
+ ],
+ "overrides": {}
+}

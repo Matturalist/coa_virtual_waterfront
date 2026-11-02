@@ -1,0 +1,67 @@
+{
+ "id": "bay_view_pier",
+ "style": "private_pier",
+ "wear": 0.6,
+ "seed": 227,
+ "_doc": "Site 1 item 25, stretch 2, survey row (no data): a private pier below the Bay View, in no chart, OSM or footprint data, found only in the lidar (ME_MidCoast 2021, tide -1.34). Level metres. 24.5 m x 2 m: 8 m falling at 1:4 from the bank (+6.1 to +4.1; a stair or cleated ramp, ASSUMED cleated ramp), then 16.5 m level at +4.1, rails +5.1; at the outer end something 3 m wide reaches +6.5 (a gallows for the gangway, ASSUMED: hoist); a gangway of about 15 m to a float, deck -0.8 at that tide (freeboard 0.55), about 5 m across the gangway's foot; its length along the shore is not in the returns (3 x 6 ASSUMED). All of it waits on photo V2.1.",
+ "pier": {
+  "at": [
+   -1758.15,
+   311.45
+  ],
+  "heading_deg": 166.9,
+  "length_m": 24.5,
+  "width_m": 2.0,
+  "deck_navd_m": 4.1,
+  "height_m": 5.5,
+  "height_root_m": 5.0,
+  "profile": [
+   [
+    0,
+    6.1
+   ],
+   [
+    8,
+    4.1
+   ],
+   [
+    24.5,
+    4.1
+   ]
+  ],
+  "gangway": "end",
+  "hoist": {
+   "z_from_end_m": 0.4,
+   "top_navd_m": 6.5
+  }
+ },
+ "ramps": [
+  {
+   "id": "gangway",
+   "from": "pier:ramp_hinge[end]",
+   "to": "F1",
+   "length_m": 14.8,
+   "width_m": 0.9,
+   "summer_only": true
+  }
+ ],
+ "floats": [
+  {
+   "id": "F1",
+   "deck_y": 0.7,
+   "freeboard_m": 0.55,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_3x6"
+    }
+   ],
+   "landing": {
+    "ramp": "gangway",
+    "mode": "side"
+   }
+  }
+ ],
+ "overrides": {}
+}

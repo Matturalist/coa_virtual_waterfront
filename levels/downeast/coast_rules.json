@@ -1,0 +1,527 @@
+{
+ "_doc": "The coast generator's engine settings for this level (src/coastgen.js; docs/coast-generator.md). The rules themselves are the editor's generator rules (rules/index.json, rules/README.md), with Matt's Rules-panel edits (authored.json rules) over them; this file adds, per rule id, what the rule files do not say and the engine needs: spacing_m (the lattice), min (the suitability below which nothing is laid), also (extra strokes at the same points: the habitat class a ledge or a beach is, which the ground shader reads), limit (hard bounds the engine keeps while the drafts mature: a condition range [min, max) outside which nothing is laid, whatever the rule says), applied (whether the sim draws that kind yet: habitat, density and trees are World's and draw; ledge, weed, fill and paint wait for Assets' tiled builders and stay in LEVEL.generated), and 'where' curves with their sources, which win per condition over the rule files' placeholder curves until the Editor copies them into rules/ (Matt's own edits win over both). Units as rules/README.md: slope as derive.py stores it (0..1 = tan/2), height_mllw_m above mean lower low water at Bar Harbor (MHW 3.34, MHHW 3.47), fetch_m, salt/sun/wet 0..1, habitat class ids (manifest habitat.classes).",
+ "version": 2,
+ "box": [
+  -1300,
+  250,
+  100,
+  1300
+ ],
+ "box_doc": "the prototype (docs/coast-generator.md): the Bar Harbor shore from the Bar Island bar to the Inn pier, and Bar Island's south shore",
+ "rules": [
+  {
+   "id": "ledge",
+   "paints": "ledge",
+   "spacing_m": 8,
+   "min": 0.4,
+   "applied": false,
+   "where": {
+    "habitat": {
+     "1": 1.0,
+     "2": 0.35,
+     "20": 0.8,
+     "0": 0.6,
+     "8": 0.3,
+     "16": 0.3,
+     "14": 0.3
+    },
+    "slope": [
+     [
+      0,
+      0.55
+     ],
+     [
+      0.09,
+      0.75
+     ],
+     [
+      0.23,
+      1.0
+     ]
+    ],
+    "height_mllw_m": [
+     [
+      -4,
+      0.0
+     ],
+     [
+      -1.5,
+      1.0
+     ],
+     [
+      8,
+      1.0
+     ],
+     [
+      14,
+      0.0
+     ]
+    ],
+    "substrate": {
+     "bare rock": 1.0,
+     "fractured rock / cobble": 0.6,
+     "till / soil": 0.25,
+     "water": 1.0,
+     "other": 0.0
+    }
+   },
+   "where_doc": "habitat_detail's ledge (1) and barren (20) say where the survey maps rock; a flat ledge is still ledge, slope lifts it where the survey says boulder or forest",
+   "also": [
+    {
+     "paints": "habitat",
+     "value": 1,
+     "r": 6,
+     "falloff": 2,
+     "applied": true,
+     "when": {
+      "height_mllw_m": [
+       -4,
+       3.6
+      ]
+     }
+    },
+    {
+     "paints": "habitat",
+     "value": 20,
+     "r": 6,
+     "falloff": 2,
+     "applied": true,
+     "when": {
+      "height_mllw_m": [
+       3.6,
+       14
+      ]
+     }
+    }
+   ],
+   "sources": [
+    {
+     "cite": "Maine Geological Survey, Coastal Marine Geologic Environments (habitat_detail classes 1, 2)",
+     "note": "where the survey maps ledge"
+    },
+    {
+     "cite": "levels/downeast/rock_rules.json",
+     "note": "jointing, strike and block size per formation: the ledge builder's 'auto' rule (Matt's corrections pending)"
+    }
+   ]
+  },
+  {
+   "id": "beach_stones",
+   "paints": "fill",
+   "spacing_m": 5,
+   "min": 0.4,
+   "applied": false,
+   "raster_m": 1,
+   "depth_x_d50": 2.0,
+   "where": {
+    "habitat": {
+     "2": 1.0,
+     "3": 1.0,
+     "4": 0.8,
+     "5": 0.3,
+     "6": 0.55,
+     "8": 0.6,
+     "12": 0.25,
+     "1": 0.25,
+     "13": 0.7,
+     "21": 0.7,
+     "0": 0.5
+    },
+    "slope": [
+     [
+      0,
+      0.3
+     ],
+     [
+      0.017,
+      1.0
+     ],
+     [
+      0.14,
+      1.0
+     ],
+     [
+      0.29,
+      0.1
+     ]
+    ],
+    "height_mllw_m": [
+     [
+      -0.6,
+      0.0
+     ],
+     [
+      0.4,
+      1.0
+     ],
+     [
+      3.6,
+      1.0
+     ],
+     [
+      5.2,
+      0.0
+     ]
+    ]
+   },
+   "where_doc": "habitat 13/21 (developed) counts on the shore: the 30 m land cover runs over the beaches in town (the beach below Agamont Park is 'developed, dense'); the height curve keeps the rule on the shore",
+   "params": {
+    "d50_m": {
+     "field": "fetch_m",
+     "curve": [
+      [
+       300,
+       0.07
+      ],
+      [
+       1500,
+       0.16
+      ],
+      [
+       3000,
+       0.35
+      ],
+      [
+       4000,
+       0.55
+      ]
+     ]
+    },
+    "sorting": {
+     "field": "fetch_m",
+     "curve": [
+      [
+       300,
+       1.0
+      ],
+      [
+       1500,
+       0.7
+      ],
+      [
+       4000,
+       0.35
+      ]
+     ]
+    },
+    "roundedness": {
+     "field": "fetch_m",
+     "curve": [
+      [
+       300,
+       0.35
+      ],
+      [
+       1500,
+       0.6
+      ],
+      [
+       4000,
+       0.85
+      ]
+     ]
+    }
+   },
+   "also": [
+    {
+     "paints": "habitat",
+     "value": 3,
+     "r": 4,
+     "falloff": 1.5,
+     "applied": true,
+     "when": {
+      "param": {
+       "d50_m": [
+        null,
+        0.3
+       ]
+      }
+     }
+    },
+    {
+     "paints": "habitat",
+     "value": 2,
+     "r": 4,
+     "falloff": 1.5,
+     "applied": true,
+     "when": {
+      "param": {
+       "d50_m": [
+        0.3,
+        null
+       ]
+      }
+     }
+    }
+   ],
+   "sources": [
+    {
+     "cite": "Bird, E.C.F. (2008) Coastal Geomorphology: An Introduction, 2nd ed. Wiley.",
+     "note": "shingle and boulder beaches coarsen, sort and round with wave energy; a storm berm at the top of exposed ones"
+    },
+    {
+     "cite": "Kelley, J.T. et al. (1989) The Maine coastal zone: an atlas (Maine Geological Survey)",
+     "note": "Maine pocket beaches: boulder and cobble on exposed headlands, cobble over mud in sheltered coves"
+    }
+   ]
+  },
+  {
+   "id": "rockweed",
+   "paints": "weed",
+   "spacing_m": 6,
+   "min": 0.35,
+   "applied": false,
+   "where": {
+    "habitat": {
+     "1": 1.0,
+     "2": 0.9,
+     "3": 0.3,
+     "4": 0.2,
+     "12": 0.7,
+     "8": 0.8,
+     "0": 0.5,
+     "6": 0.15
+    },
+    "height_mllw_m": [
+     [
+      0.2,
+      0.0
+     ],
+     [
+      0.7,
+      1.0
+     ],
+     [
+      2.5,
+      1.0
+     ],
+     [
+      3.0,
+      0.0
+     ]
+    ]
+   },
+   "where_doc": "mobile cobble and gravel beaches carry little rockweed (below the Inn: weed on the ledges, bare cobble between)",
+   "params": {
+    "mix": {
+     "ascophyllum": {
+      "field": "fetch_m",
+      "curve": [
+       [
+        0,
+        0.9
+       ],
+       [
+        1800,
+        0.5
+       ],
+       [
+        4000,
+        0.1
+       ]
+      ]
+     },
+     "fucus": {
+      "field": "fetch_m",
+      "curve": [
+       [
+        0,
+        0.1
+       ],
+       [
+        1800,
+        0.5
+       ],
+       [
+        4000,
+        0.9
+       ]
+      ]
+     }
+    },
+    "density": {
+     "field": "fetch_m",
+     "curve": [
+      [
+       300,
+       1.0
+      ],
+      [
+       2500,
+       0.8
+      ],
+      [
+       4000,
+       0.55
+      ]
+     ]
+    }
+   },
+   "sources": [
+    {
+     "cite": "Stephenson, T.A. & Stephenson, A. (1949) The universal features of zonation between tide-marks on rocky coasts. J. Ecol. 37: 289-305.",
+     "note": "the fucoid belt in the mid-intertidal"
+    },
+    {
+     "cite": "Bertness, M.D. (1999) The Ecology of Atlantic Shorelines. Sinauer.",
+     "note": "Ascophyllum dominates sheltered Gulf of Maine shores; Fucus and barnacles take over with exposure"
+    }
+   ]
+  },
+  {
+   "id": "kelp",
+   "paints": "weed",
+   "spacing_m": 10,
+   "min": 0.4,
+   "applied": false,
+   "where": {
+    "habitat": {
+     "1": 1.0,
+     "2": 0.8,
+     "0": 0.6,
+     "8": 0.4
+    },
+    "height_mllw_m": [
+     [
+      -14,
+      0.0
+     ],
+     [
+      -9,
+      0.5
+     ],
+     [
+      -1.5,
+      1.0
+     ],
+     [
+      0.2,
+      0.0
+     ]
+    ],
+    "fetch_m": [
+     [
+      200,
+      0.3
+     ],
+     [
+      1200,
+      1.0
+     ]
+    ],
+    "substrate": {
+     "water": 1.0,
+     "bare rock": 1.0,
+     "fractured rock / cobble": 0.8,
+     "other": 0.2
+    }
+   },
+   "params": {
+    "mix": {
+     "saccharina": 1.0
+    }
+   },
+   "sources": [
+    {
+     "cite": "Steneck, R.S. et al. (2002) Kelp forest ecosystems: biodiversity, stability, resilience and future. Environ. Conserv. 29: 436-459.",
+     "note": "Saccharina and Laminaria on Gulf of Maine subtidal rock to ~10-15 m, densest where waves keep urchins and silt off"
+    }
+   ]
+  },
+  {
+   "id": "black_lichen",
+   "paints": "paint",
+   "spacing_m": 5,
+   "min": 0.4,
+   "applied": false,
+   "where": {
+    "habitat": {
+     "1": 1.0,
+     "2": 0.7,
+     "20": 1.0,
+     "12": 0.6,
+     "0": 0.6
+    },
+    "height_mllw_m": [
+     [
+      3.1,
+      0.0
+     ],
+     [
+      3.5,
+      1.0
+     ],
+     [
+      4.8,
+      1.0
+     ],
+     [
+      5.6,
+      0.0
+     ]
+    ]
+   },
+   "params": {
+    "cover": "verrucaria"
+   },
+   "sources": [
+    {
+     "cite": "Stephenson & Stephenson (1949), as above",
+     "note": "the black Verrucaria zone at and just above high water, below the orange belt; grey crustose and foliose lichens above it"
+    },
+    {
+     "cite": "rules/xanthoria.json",
+     "note": "the orange belt between them"
+    }
+   ]
+  },
+  {
+   "id": "spruce_fringe",
+   "paints": "trees",
+   "spacing_m": 10,
+   "min": 0.45,
+   "applied": true,
+   "where": {
+    "habitat": {
+     "14": 1.0,
+     "16": 0.9,
+     "18": 0.6,
+     "15": 0.4,
+     "20": 0.5,
+     "1": 0.3
+    },
+    "height_mllw_m": [
+     [
+      4.5,
+      0.0
+     ],
+     [
+      6.0,
+      1.0
+     ],
+     [
+      12,
+      1.0
+     ],
+     [
+      18,
+      0.0
+     ]
+    ]
+   },
+   "limit": {
+    "height_mllw_m": [
+     4.5,
+     18
+    ]
+   },
+   "limit_doc": "the fringe is the forest's edge on the rock, not the whole forest: from just above high water to ~14 m above it (derive.py's salt field reaches only a few metres inland, so height stands in for distance; the forest spawner and the canopy cover the rest)",
+   "sources": [
+    {
+     "cite": "Davis, R.B. (1966) Spruce-fir forests of the coast of Maine. Ecol. Monogr. 36: 79-94.",
+     "note": "red and white spruce with balsam fir to the edge of the rock on the outer coast"
+    }
+   ]
+  }
+ ]
+}

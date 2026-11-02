@@ -1,0 +1,716 @@
+{
+ "_doc": "docs/edges.md. Edge treatments along lines (a named road or path, inside a box, from the end nearest `start`): spans of presets from levels/edge_library.json, each from the point nearest `from` to the point nearest `to` along the line, `sea` the side the sea is on walking it. tools/structures.py writes the shore_path line; the editor overrides a line by id in authored.json `edges` (its whole span list).",
+ "frame": "level metres, x east, z south",
+ "lines": [
+  {
+   "id": "shore_path",
+   "name": "Shore Path",
+   "road": "Shore Path",
+   "box": [
+    -330,
+    950,
+    260,
+    1700
+   ],
+   "start": [
+    -322.0,
+    958.0
+   ],
+   "spans": [
+    {
+     "from": [
+      -322.0,
+      958.0
+     ],
+     "to": [
+      -219.28,
+      1013.15
+     ],
+     "preset": "agamont_promenade",
+     "sea": "left",
+     "why": "Matt, 19 Oct: Agamont Park (photo 2)"
+    },
+    {
+     "from": [
+      -219.28,
+      1013.15
+     ],
+     "to": [
+      -194.37,
+      1007.96
+     ],
+     "preset": "inn_corner",
+     "sea": "left",
+     "why": "Matt, 19 Oct: the Inn corner (photo 5)"
+    },
+    {
+     "from": [
+      -194.37,
+      1007.96
+     ],
+     "to": [
+      -37.35,
+      1187.14
+     ],
+     "preset": "shrubs_behind_wall",
+     "sea": "left",
+     "why": "Assets, site 1 item 23: the Inn's 2024-25 concrete wall and its rail are drawn by the dock file (shore_path_inn_walls); the land-side shrubs stay",
+     "fix": "site:bar_harbor_waterfront"
+    },
+    {
+     "from": [
+      -37.35,
+      1187.14
+     ],
+     "to": [
+      -22.31,
+      1243.87
+     ],
+     "preset": "ledge_edging",
+     "sea": "left",
+     "why": "lidar: the ground drops less than 1 m seaward (photo 4)"
+    },
+    {
+     "from": [
+      -22.31,
+      1243.87
+     ],
+     "to": [
+      -15.77,
+      1258.82
+     ],
+     "preset": "picket_behind_wall",
+     "sea": "left",
+     "why": "Assets, site 1 item 23: Grant Park's 2024-25 concrete wall is drawn by the dock file; the picket fence stays",
+     "fix": "site:bar_harbor_waterfront"
+    },
+    {
+     "from": [
+      -15.77,
+      1258.82
+     ],
+     "to": [
+      -12.47,
+      1266.33
+     ],
+     "preset": "ledge_edging",
+     "sea": "left",
+     "why": "lidar: the ground drops less than 1 m seaward (photo 4)"
+    },
+    {
+     "from": [
+      -12.47,
+      1266.33
+     ],
+     "to": [
+      -1.51,
+      1290.64
+     ],
+     "preset": "shore_wall_picket",
+     "sea": "left",
+     "why": "lidar: the ground drops 1 m or more seaward (photo 3)"
+    },
+    {
+     "from": [
+      -1.51,
+      1290.64
+     ],
+     "to": [
+      15.07,
+      1312.57
+     ],
+     "preset": "ledge_edging",
+     "sea": "left",
+     "why": "lidar: the ground drops less than 1 m seaward (photo 4)"
+    },
+    {
+     "from": [
+      15.07,
+      1312.57
+     ],
+     "to": [
+      126.54,
+      1375.64
+     ],
+     "preset": "shore_wall_picket",
+     "sea": "left",
+     "why": "lidar: the ground drops 1 m or more seaward (photo 3)"
+    },
+    {
+     "from": [
+      126.54,
+      1375.64
+     ],
+     "to": [
+      152.49,
+      1389.86
+     ],
+     "preset": "ledge_edging",
+     "sea": "left",
+     "why": "lidar: the ground drops less than 1 m seaward (photo 4)"
+    },
+    {
+     "from": [
+      152.49,
+      1389.86
+     ],
+     "to": [
+      173.88,
+      1412.43
+     ],
+     "preset": "shore_wall_picket",
+     "sea": "left",
+     "why": "lidar: the ground drops 1 m or more seaward (photo 3)"
+    },
+    {
+     "from": [
+      173.88,
+      1412.43
+     ],
+     "to": [
+      177.12,
+      1420.48
+     ],
+     "preset": "ledge_edging",
+     "sea": "left",
+     "why": "lidar: the ground drops less than 1 m seaward (photo 4)"
+    },
+    {
+     "from": [
+      177.12,
+      1420.48
+     ],
+     "to": [
+      193.32,
+      1446.01
+     ],
+     "preset": "shore_wall_picket",
+     "sea": "left",
+     "why": "lidar: the ground drops 1 m or more seaward (photo 3)"
+    },
+    {
+     "from": [
+      193.32,
+      1446.01
+     ],
+     "to": [
+      199.39,
+      1459.07
+     ],
+     "preset": "ledge_edging",
+     "sea": "left",
+     "why": "lidar: the ground drops less than 1 m seaward (photo 4)"
+    },
+    {
+     "from": [
+      199.39,
+      1459.07
+     ],
+     "to": [
+      203.0,
+      1465.0
+     ],
+     "preset": "shore_wall_picket",
+     "sea": "left",
+     "why": "lidar: the ground drops 1 m or more seaward (photo 3)"
+    },
+    {
+     "from": [
+      203.0,
+      1465.0
+     ],
+     "to": [
+      212.0,
+      1508.0
+     ],
+     "preset": "plain_verge",
+     "sea": "left",
+     "why": "Assets' stretch 5 survey: a gully (ground dips to +1.6 between +5.0 and +4.9); steps, a bridge or a causeway are unknown until there is a photo, so no wall is laid along the dip",
+     "fix": "site:bar_harbor_waterfront"
+    },
+    {
+     "from": [
+      212.0,
+      1508.0
+     ],
+     "to": [
+      237.67,
+      1581.84
+     ],
+     "preset": "shore_wall_picket",
+     "sea": "left",
+     "why": "lidar: the ground drops 1 m or more seaward (photo 3)"
+    },
+    {
+     "from": [
+      237.67,
+      1581.84
+     ],
+     "to": [
+      243.81,
+      1616.76
+     ],
+     "preset": "ledge_edging",
+     "sea": "left",
+     "why": "lidar: the ground drops less than 1 m seaward (photo 4)"
+    },
+    {
+     "from": [
+      243.81,
+      1616.76
+     ],
+     "to": [
+      245.42,
+      1627.53
+     ],
+     "preset": "shore_wall_picket",
+     "sea": "left",
+     "why": "lidar: the ground drops 1 m or more seaward (photo 3)"
+    },
+    {
+     "from": [
+      245.42,
+      1627.53
+     ],
+     "to": [
+      50.24,
+      1674.24
+     ],
+     "preset": "ledge_edging",
+     "sea": "left",
+     "why": "lidar: the ground drops less than 1 m seaward (photo 4)"
+    }
+   ],
+   "source": "OSM Shore Path way 164089143 + USGS 3DEP lidar; presets from Matt's photographs (19 Oct)"
+  }
+ ],
+ "library": {
+  "_doc": "docs/edges.md. The edge library, shared by every level: parts (one kind of thing that runs along an edge: a wall, a cap, a railing, a fence, edging stones, boulders, a shrub row, a feature boulder) and presets (a named mix of parts for the sea side and the land side of a line, from a photograph). A new part is one entry here; it appears in every preset picker. Parts are drawn by EDGES (src/roads.js) (build: wall | blocks | rail | scatter | single); a part with `model` uses the manifest model of that id when Assets has one, and its `build` until then. Materials name textures already in the repo (Matt, 19 Oct).",
+  "materials": {
+   "concrete": {
+    "tex": "textures/dock/concrete_pavement_diff.jpg",
+    "normal": "textures/dock/concrete_pavement_nor.jpg",
+    "tile_m": 2.0,
+    "tint": [
+     1.05,
+     1.03,
+     0.98
+    ],
+    "from": "Poly Haven concrete_pavement"
+   },
+   "granite_cap": {
+    "tex": "textures/terrain/seaside_rock/colour.jpg",
+    "normal": "textures/terrain/seaside_rock/normal.jpg",
+    "tile_m": 1.2,
+    "tint": [
+     1.45,
+     1.43,
+     1.38
+    ],
+    "from": "Poly Haven seaside_rock, lifted to the pale cut granite of the Shore Path's cap (photos 1, 3)"
+   },
+   "granite_edge": {
+    "tex": "textures/terrain/seaside_rock/colour.jpg",
+    "normal": "textures/terrain/seaside_rock/normal.jpg",
+    "tile_m": 1.0,
+    "tint": [
+     1.25,
+     1.24,
+     1.2
+    ],
+    "from": "Poly Haven seaside_rock: the grey edging stones (photo 4)"
+   },
+   "rubble": {
+    "tex": "textures/terrain/gray_rocks/colour.jpg",
+    "normal": "textures/terrain/gray_rocks/normal.jpg",
+    "tile_m": 1.5,
+    "tint": [
+     0.85,
+     0.85,
+     0.88
+    ],
+    "from": "Poly Haven gray_rocks: the dark slate-grey boulders below the wall (photo 3)"
+   },
+   "timber_weathered": {
+    "tex": "textures/dock/weathered_plank_siding_diff.jpg",
+    "normal": "textures/dock/weathered_plank_siding_nor.jpg",
+    "tile_m": 1.5,
+    "tint": [
+     1.25,
+     1.2,
+     1.1
+    ],
+    "from": "Poly Haven weathered_plank_siding: the grey split-rail fence (photo 1)"
+   },
+   "paint_white": {
+    "rgb": [
+     0.86,
+     0.86,
+     0.83
+    ],
+    "from": "photo 3, the picket fence in shade"
+   },
+   "iron_black": {
+    "rgb": [
+     0.06,
+     0.06,
+     0.065
+    ],
+    "from": "photos 2 and 5, the railings"
+   },
+   "shrub": {
+    "tex": "textures/terrain/forest_leaves_02/colour.jpg",
+    "tile_m": 1.0,
+    "tint": [
+     0.55,
+     0.85,
+     0.45
+    ],
+    "from": "Poly Haven forest_leaves_02, toward the green of the bayberry and rugosa in photos 1 and 4"
+   }
+  },
+  "parts": {
+   "wall_poured": {
+    "kind": "barrier",
+    "build": "wall",
+    "name": "Poured concrete wall",
+    "face": "concrete",
+    "parapet": 0.32,
+    "thick": 0.45,
+    "offset": 0,
+    "photo": "1, 3"
+   },
+   "wall_granite": {
+    "kind": "barrier",
+    "build": "wall",
+    "name": "Granite seawall",
+    "face": "granite_block",
+    "parapet": 0.12,
+    "thick": 0.6,
+    "offset": 0,
+    "photo": "2; Matt 19 Oct: a big granite retaining wall from the Margaret Todd's pier to the boat ramp"
+   },
+   "wall_low": {
+    "kind": "barrier",
+    "build": "wall",
+    "name": "Low granite wall",
+    "face": "concrete",
+    "parapet": 0.12,
+    "thick": 0.4,
+    "offset": 0,
+    "photo": "2, 5"
+   },
+   "cap_granite": {
+    "kind": "cap",
+    "build": "blocks",
+    "name": "Granite cap blocks",
+    "on": "wall",
+    "material": "granite_cap",
+    "len": [
+     0.7,
+     1.5
+    ],
+    "w": 0.55,
+    "h": 0.22,
+    "gap": [
+     0.01,
+     0.04
+    ],
+    "tilt": 0.025,
+    "lift": [
+     0.0,
+     0.05
+    ],
+    "photo": "1, 3"
+   },
+   "curb_granite": {
+    "kind": "cap",
+    "build": "blocks",
+    "name": "Granite curb",
+    "on": "wall",
+    "material": "granite_cap",
+    "len": [
+     1.2,
+     2.0
+    ],
+    "w": 0.42,
+    "h": 0.18,
+    "gap": [
+     0.005,
+     0.01
+    ],
+    "tilt": 0.005,
+    "lift": [
+     0,
+     0.005
+    ],
+    "photo": "2"
+   },
+   "edging_stones": {
+    "kind": "barrier",
+    "build": "blocks",
+    "name": "Granite edging stones",
+    "on": "ground",
+    "material": "granite_edge",
+    "len": [
+     0.35,
+     1.1
+    ],
+    "w": [
+     0.18,
+     0.32
+    ],
+    "h": [
+     0.18,
+     0.42
+    ],
+    "gap": [
+     0.04,
+     0.7
+    ],
+    "tilt": 0.14,
+    "sink": 0.12,
+    "offset": 0.15,
+    "photo": "4"
+   },
+   "rail_iron": {
+    "kind": "rail",
+    "build": "rail",
+    "name": "Iron picket railing",
+    "on": "wall",
+    "material": "iron_black",
+    "h": 1.0,
+    "post_m": 2.0,
+    "post_w": 0.06,
+    "rails": [
+     0.1,
+     0.92
+    ],
+    "rail_w": 0.035,
+    "picket_m": 0.13,
+    "picket_w": 0.018,
+    "finial": 0.04,
+    "offset": 0.12,
+    "model": "rail_iron_panel",
+    "photo": "2, 5"
+   },
+   "fence_post_rail": {
+    "kind": "fence",
+    "build": "rail",
+    "name": "Split-rail fence",
+    "on": "ground",
+    "material": "timber_weathered",
+    "h": 0.95,
+    "post_m": 2.6,
+    "post_w": 0.14,
+    "rails": [
+     0.45,
+     0.85
+    ],
+    "rail_w": 0.09,
+    "picket_m": 0,
+    "offset": 1.4,
+    "side": "land",
+    "photo": "1"
+   },
+   "fence_picket": {
+    "kind": "fence",
+    "build": "rail",
+    "name": "White picket fence",
+    "on": "ground",
+    "material": "paint_white",
+    "h": 1.15,
+    "post_m": 2.4,
+    "post_w": 0.11,
+    "rails": [
+     0.25,
+     0.95
+    ],
+    "rail_w": 0.06,
+    "picket_m": 0.12,
+    "picket_w": 0.07,
+    "finial": 0.06,
+    "offset": 1.6,
+    "side": "land",
+    "photo": "3"
+   },
+   "boulders": {
+    "kind": "foot",
+    "build": "scatter",
+    "name": "Boulder beach",
+    "material": "rubble",
+    "size": [
+     0.25,
+     0.85
+    ],
+    "band": [
+     0.1,
+     5.5
+    ],
+    "per_m2": 1.1,
+    "sink": 0.35,
+    "flat": 0.62,
+    "model": "boulder",
+    "photo": "1, 3"
+   },
+   "ledge": {
+    "kind": "foot",
+    "build": "none",
+    "name": "Granite ledge",
+    "note": "the terrain's own ledge and veneer; nothing extra is drawn (paint it with the editor's ledge tool)",
+    "photo": "4, 5"
+   },
+   "shrub_row": {
+    "kind": "verge",
+    "build": "scatter",
+    "name": "Shrub row",
+    "material": "shrub",
+    "size": [
+     0.5,
+     1.2
+    ],
+    "band": [
+     0.4,
+     1.8
+    ],
+    "per_m2": 0.75,
+    "sink": 0.25,
+    "flat": 0.85,
+    "shape": "blob",
+    "model": "shrub",
+    "photo": "4"
+   },
+   "shrub_bank": {
+    "kind": "verge",
+    "build": "scatter",
+    "name": "Shrub bank",
+    "material": "shrub",
+    "size": [
+     0.7,
+     1.6
+    ],
+    "band": [
+     1.0,
+     4.5
+    ],
+    "per_m2": 0.45,
+    "sink": 0.3,
+    "flat": 0.8,
+    "shape": "blob",
+    "model": "shrub",
+    "side": "land",
+    "photo": "1, 4, 5"
+   },
+   "feature_boulder": {
+    "kind": "feature",
+    "build": "single",
+    "name": "Glacial boulder",
+    "material": "rubble",
+    "size": 1.7,
+    "offset": 1.6,
+    "side": "land",
+    "photo": "5"
+   },
+   "stone_wall_dry": {
+    "kind": "barrier",
+    "build": "wall",
+    "name": "Dry stone wall",
+    "face": "rubble",
+    "parapet": 0.6,
+    "thick": 0.7,
+    "offset": 0,
+    "model": "stone_wall_scan",
+    "note": "Matt's scans (19 Oct), when Assets has slimmed them into 2 m modules; until then the rough-faced wall"
+   }
+  },
+  "presets": {
+   "none": {
+    "name": "Nothing",
+    "sea": [],
+    "land": []
+   },
+   "shore_wall_rail_fence": {
+    "name": "Shore Path: wall, granite cap, boulders, split-rail fence",
+    "sea": [
+     "wall_poured",
+     "cap_granite",
+     "boulders"
+    ],
+    "land": [
+     "fence_post_rail",
+     "shrub_bank"
+    ],
+    "photo": "Matt 19 Oct, photo 1 (looking to Bar Island at sunset)"
+   },
+   "shore_wall_picket": {
+    "name": "Shore Path: wall, granite cap, boulders, picket fence",
+    "sea": [
+     "wall_poured",
+     "cap_granite",
+     "boulders"
+    ],
+    "land": [
+     "fence_picket"
+    ],
+    "photo": "Matt 19 Oct, photo 3 (late autumn, picket fence)"
+   },
+   "agamont_promenade": {
+    "name": "Agamont Park: granite seawall, granite curb, iron railing, lawn",
+    "sea": [
+     "wall_granite",
+     "curb_granite",
+     "rail_iron"
+    ],
+    "land": [],
+    "photo": "Matt 19 Oct, photo 2 (Agamont Park, the Inn beyond)"
+   },
+   "ledge_edging": {
+    "name": "Shore Path: edging stones, shrub row, ledge",
+    "sea": [
+     "edging_stones",
+     "shrub_row",
+     "ledge"
+    ],
+    "land": [
+     "shrub_bank"
+    ],
+    "photo": "Matt 19 Oct, photo 4 (gravel path along the ledge)"
+   },
+   "inn_corner": {
+    "name": "Inn corner: low wall, iron railing, ledge, boulder and shrubs",
+    "sea": [
+     "wall_low",
+     "curb_granite",
+     "rail_iron",
+     "ledge"
+    ],
+    "land": [
+     "feature_boulder",
+     "shrub_bank"
+    ],
+    "photo": "Matt 19 Oct, photo 5 (the Inn's corner, Bar Island)"
+   },
+   "plain_verge": {
+    "name": "Plain path, grass both sides",
+    "sea": [],
+    "land": []
+   },
+   "shrubs_behind_wall": {
+    "name": "Shore Path behind a dock-file seawall: land-side shrubs only (the wall, its cap and rail are the dock file's)",
+    "sea": [],
+    "land": [
+     "shrub_bank"
+    ],
+    "photo": "Assets, site 1 item 23 (2 Nov): Bar Harbor Story, 16 Apr 2025"
+   },
+   "picket_behind_wall": {
+    "name": "Shore Path behind a dock-file seawall: the picket fence only",
+    "sea": [],
+    "land": [
+     "fence_picket"
+    ],
+    "photo": "Matt 19 Oct, photo 3; the wall is the dock file's (Assets, 2 Nov)"
+   }
+  }
+ }
+}

@@ -1,0 +1,77 @@
+{
+ "id": "ledge",
+ "name": "Shore ledge",
+ "kind": "generator",
+ "paints": "ledge",
+ "plain": "Bare bedrock breaks out as ledge along the shore, more where the ground is steep, from the low-tide line up into the trees.",
+ "where": {
+  "habitat": {
+   "1": 1.0,
+   "2": 0.35,
+   "20": 0.8,
+   "0": 0.6,
+   "8": 0.3,
+   "16": 0.3,
+   "14": 0.3
+  },
+  "slope": [
+   [
+    0,
+    0.55
+   ],
+   [
+    0.09,
+    0.75
+   ],
+   [
+    0.23,
+    1.0
+   ]
+  ],
+  "height_mllw_m": [
+   [
+    -4,
+    0.0
+   ],
+   [
+    -1.5,
+    1.0
+   ],
+   [
+    8,
+    1.0
+   ],
+   [
+    14,
+    0.0
+   ]
+  ],
+  "substrate": {
+   "bare rock": 1.0,
+   "fractured rock / cobble": 0.6,
+   "till / soil": 0.25,
+   "water": 1.0,
+   "other": 0.0
+  }
+ },
+ "params": {
+  "blocks": "from rock_rules.json for the bedrock under it (Cadillac granite blocky, Bar Harbor Formation layered)"
+ },
+ "seed": "natural",
+ "confidence": "medium: curves from World's levels/downeast/coast_rules.json (21 Oct), checked against the Bar Harbor shore and cited above; Matt's field corrections still to come",
+ "sources": [
+  {
+   "cite": "Maine Geological Survey, Coastal Marine Geologic Environments (habitat_detail classes 1, 2)",
+   "note": "where the survey maps ledge"
+  },
+  {
+   "cite": "levels/downeast/rock_rules.json",
+   "note": "jointing, strike and block size per formation: the ledge builder's 'auto' rule (Matt's corrections pending)"
+  },
+  {
+   "cite": "docs/coast-generator.md (Matt, 20 Oct 2026)",
+   "note": "the rule's purpose, in his words"
+  }
+ ],
+ "where_note": "habitat_detail's ledge (1) and barren (20) say where the survey maps rock; a flat ledge is still ledge, slope lifts it where the survey says boulder or forest"
+}

@@ -1,0 +1,53 @@
+{
+ "id": "black_lichen",
+ "name": "The black lichen band (Verrucaria)",
+ "kind": "generator",
+ "paints": "paint",
+ "plain": "A black band of lichen runs along the rock just above the high-tide line, in the splash zone, below the orange lichens.",
+ "where": {
+  "habitat": {
+   "1": 1.0,
+   "2": 0.7,
+   "20": 1.0,
+   "12": 0.6,
+   "0": 0.6
+  },
+  "height_mllw_m": [
+   [
+    3.1,
+    0.0
+   ],
+   [
+    3.5,
+    1.0
+   ],
+   [
+    4.8,
+    1.0
+   ],
+   [
+    5.6,
+    0.0
+   ]
+  ]
+ },
+ "params": {
+  "cover": "verrucaria"
+ },
+ "seed": "natural",
+ "confidence": "medium: curves from World's levels/downeast/coast_rules.json (21 Oct), checked against the Bar Harbor shore and cited above; Matt's field corrections still to come",
+ "sources": [
+  {
+   "cite": "Stephenson & Stephenson (1949), as above",
+   "note": "the black Verrucaria zone at and just above high water, below the orange belt; grey crustose and foliose lichens above it"
+  },
+  {
+   "cite": "rules/xanthoria.json",
+   "note": "the orange belt between them"
+  },
+  {
+   "cite": "docs/coast-generator.md (Matt, 20 Oct 2026)",
+   "note": "the rule's purpose, in his words"
+  }
+ ]
+}

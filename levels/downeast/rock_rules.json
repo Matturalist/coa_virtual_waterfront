@@ -1,0 +1,113 @@
+{
+ "_doc": "How each bedrock formation breaks, for the terrain's rock shaping (docs/rock-rules.md). One rule per formation, matched to the geology grid by class id. Read by src/level.js (not yet: the plan is in docs/rock-rules.md and waits on Matt). Azimuths and strikes in degrees clockwise from north; dips in degrees from horizontal; lengths in metres. 'source' says where each number comes from: lidar (tools/rock_calibrate.py, USGS 3DEP ME MidCoast 2021), the existing veneer, or a starting guess for Matt to correct in the field.",
+ "version": 1,
+ "apply": {
+  "_doc": "Where the rules shape the ground. Outcrop = any of these; everywhere else the surface is left as surveyed.",
+  "outcrop_sources": ["habitat:1 (ledge)", "habitat:20 (barren)", "osm natural=bare_rock", "osm natural=cliff (8 m either side)", "slope > 35 deg above MHW", "editor terrain brushes (raise / lower)"],
+  "mesh_within_m": 150,
+  "normals_within_m": 600,
+  "max_displacement_m": 1.5,
+  "note": "Within mesh_within_m the vertices move (the 1 m rings); out to normals_within_m only the shading follows the rule; beyond, nothing. max_displacement_m caps how far the rule may move the surveyed surface, so the lidar shore line stays where it is."
+ },
+ "formations": [
+  {
+   "id": "bar_harbor_formation",
+   "classes": [8, 16],
+   "name": "Bar Harbor Formation (and the state map's metasedimentary rocks)",
+   "style": "bedded",
+   "bedding": { "strike_deg": 40, "dip_deg": 20, "dip_dir_deg": 130, "thickness_m": 0.35, "thickness_jitter": 0.6,
+     "source": "strike from lidar: the parallel ribs at Compass Harbor trend 25-55 deg (steep-face strike peaks 25 and 55); dip and dip direction are a starting guess, not measurable at 1 m. Correct in the field." },
+   "joints": [
+     { "strike_deg": 130, "dip_deg": 85, "spacing_m": 3.0, "spacing_jitter": 0.5, "persistence": 0.6, "weight": 1.0,
+       "source": "lidar: steep faces on the Shore Path strike 125-165 deg; scarp spacing at Compass Harbor ~3 m (weak). Part of that is the shoreline itself." },
+     { "strike_deg": 40, "dip_deg": 80, "spacing_m": 5.0, "spacing_jitter": 0.6, "persistence": 0.4, "weight": 0.6, "source": "guess: a set along the bedding strike" }
+   ],
+   "step": { "height_m": 0.35, "height_jitter": 0.7, "riser_deg": 72, "tread_tilt_deg": 20, "tread_tilt_follows": "dip",
+     "source": "guess: below what 1 m lidar resolves (risers under ~1 m are invisible in it)" },
+   "rounding_m": 0.05,
+   "jitter": { "block_offset": 0.45, "edge_wander_m": 0.4, "seed_per_block": true, "_doc": "how far each block's step is pushed up or down (x step height), how far its edges wander off the joint plane; no two ledges repeat" },
+   "surface": { "tone": "dark", "crack_dark": 0.6, "material_set": "terrain_sets.formations.8" },
+   "roughness_target_rms_m": 0.27,
+   "roughness_source": "lidar: 0.27 m rms at 4 m on the Shore Path shore band (0.38 at Compass Harbor)",
+   "overhangs": { "where": "riser height > 1.2 m facing the sea", "probability": 0.15, "pieces": ["rock_kit: slab_overhang_*"], "source": "rule for Assets' rock pieces; the height map cannot overhang" },
+   "loose_blocks": { "where": "foot of risers > 0.8 m, below MHW+1", "per_100m2": 3, "size_m": [0.3, 1.2], "pieces": ["rock_kit: bhf_block_*", "fill clasts boulder_small/boulder_large"], "shape": "flat slabs, bedding-parallel" }
+  },
+  {
+   "id": "granites",
+   "classes": [1, 2, 3, 4, 5, 15],
+   "name": "Cadillac, Somesville, Southwest Harbor and the Devonian granites",
+   "style": "sheeted",
+   "sheeting": { "parallel_to": "surface", "thickness_m": 1.6, "thickness_jitter": 0.4, "thins_on_convex": 0.6,
+     "source": "existing veneer (spacing 2.2 m, curvature 0.6); lidar preferred-step 4.9 m at Otter Cliffs is too weak (autocorrelation 0.21) to calibrate it" },
+   "joints": [
+     { "strike_deg": 0, "dip_deg": 88, "spacing_m": 9.0, "spacing_jitter": 0.4, "persistence": 0.8, "weight": 1.0,
+       "source": "lidar: the strongest steep-face strike at Otter Cliffs is 0-10 deg (also the veneer's N-S set)" },
+     { "strike_deg": 115, "dip_deg": 85, "spacing_m": 13.0, "spacing_jitter": 0.5, "persistence": 0.6, "weight": 0.7,
+       "source": "lidar: second peak at 105-125 deg at Otter Cliffs; the veneer had 60 deg (the dike trend). Changed to what the lidar shows; the dikes keep their own trend." }
+   ],
+   "step": { "height_m": 1.6, "height_jitter": 0.35, "riser_deg": 55, "tread_tilt_deg": 0, "tread_tilt_follows": "surface" },
+   "rounding_m": 0.8,
+   "ice": { "flow_deg": 160, "asymmetry": 0.7, "_doc": "stoss (up-ice) sides smoothed and polished, lee sides plucked into steps", "source": "existing veneer" },
+   "jitter": { "block_offset": 0.25, "edge_wander_m": 0.6, "seed_per_block": true },
+   "surface": { "tone": "pale pink", "crack_dark": 0.35, "crack_fill": "vegetation above MHW+3 (huckleberry, crowberry, moss)", "material_set": "terrain_sets.formations.1" },
+   "roughness_target_rms_m": 0.67,
+   "roughness_source": "lidar: 0.67 m rms at 4 m on the Otter Cliffs shore band",
+   "overhangs": { "where": "lee-side risers > 2 m and sea cliffs", "probability": 0.08, "pieces": ["rock_kit: granite_overhang_*"] },
+   "loose_blocks": { "where": "foot of cliffs and risers > 1.5 m; boulder-beach habitat", "per_100m2": 2, "size_m": [0.5, 3.0], "pieces": ["rock_kit: granite_block_*", "fill clasts boulder_large/boulder_huge"], "shape": "rounded, equant" }
+  },
+  {
+   "id": "gabbro_diorite",
+   "classes": [6],
+   "name": "gabbro and diorite",
+   "style": "blocky",
+   "joints": [
+     { "strike_deg": 30, "dip_deg": 80, "spacing_m": 2.5, "spacing_jitter": 0.6, "persistence": 0.5, "weight": 1.0, "source": "guess, near the Compass Harbor rib trend" },
+     { "strike_deg": 120, "dip_deg": 80, "spacing_m": 3.5, "spacing_jitter": 0.6, "persistence": 0.5, "weight": 0.8, "source": "guess" }
+   ],
+   "step": { "height_m": 0.6, "height_jitter": 0.6, "riser_deg": 65, "tread_tilt_deg": 5 },
+   "rounding_m": 0.25,
+   "jitter": { "block_offset": 0.4, "edge_wander_m": 0.3, "seed_per_block": true },
+   "surface": { "tone": "dark grey-green", "crack_dark": 0.5, "material_set": "terrain_sets.formations.6" },
+   "roughness_target_rms_m": 0.38,
+   "loose_blocks": { "where": "foot of risers", "per_100m2": 2, "size_m": [0.3, 1.0], "pieces": ["fill clasts boulder_small"], "shape": "angular" }
+  },
+  {
+   "id": "schist",
+   "classes": [9, 18, 19],
+   "name": "Ellsworth Schist (and schist/gneiss of the state map)",
+   "style": "foliated",
+   "foliation": { "strike_deg": 60, "dip_deg": 55, "dip_dir_deg": 150, "rib_spacing_m": 0.6, "rib_jitter": 0.5, "source": "guess; no schist shore in the lidar patches yet" },
+   "joints": [ { "strike_deg": 150, "dip_deg": 85, "spacing_m": 4.0, "spacing_jitter": 0.5, "persistence": 0.4, "weight": 0.6, "source": "guess" } ],
+   "step": { "height_m": 0.25, "height_jitter": 0.6, "riser_deg": 60, "tread_tilt_deg": 55, "tread_tilt_follows": "foliation" },
+   "rounding_m": 0.1,
+   "jitter": { "block_offset": 0.3, "edge_wander_m": 0.3, "seed_per_block": true },
+   "surface": { "tone": "silvery grey-green", "crack_dark": 0.5, "material_set": "terrain_sets.formations.9" },
+   "roughness_target_rms_m": null
+  },
+  {
+   "id": "volcanics",
+   "classes": [10, 11, 12, 17, 7],
+   "name": "Cranberry Island volcanics, tuff and lava, shatter-zone breccia",
+   "style": "blocky",
+   "joints": [ { "strike_deg": 20, "dip_deg": 80, "spacing_m": 2.0, "spacing_jitter": 0.7, "persistence": 0.5, "weight": 1.0, "source": "guess" },
+               { "strike_deg": 110, "dip_deg": 75, "spacing_m": 2.5, "spacing_jitter": 0.7, "persistence": 0.5, "weight": 0.8, "source": "guess" } ],
+   "step": { "height_m": 0.5, "height_jitter": 0.8, "riser_deg": 65, "tread_tilt_deg": 10 },
+   "rounding_m": 0.15,
+   "jitter": { "block_offset": 0.5, "edge_wander_m": 0.4, "seed_per_block": true },
+   "surface": { "tone": "varied", "crack_dark": 0.5, "material_set": "terrain_sets.formations.10" },
+   "roughness_target_rms_m": null
+  },
+  {
+   "id": "dikes",
+   "classes": [13, 14],
+   "name": "basalt, diabase and aplite dikes",
+   "style": "dike",
+   "_doc": "dikes weather differently from their host: basalt/diabase into trenches (dark, recessed), aplite into ribs (pale, standing proud)",
+   "trench_depth_m": 0.6,
+   "rib_height_m": 0.3,
+   "width_m": [0.5, 4.0],
+   "trend_deg": 60,
+   "source": "existing veneer dikes() (N60E)"
+  }
+ ]
+}

@@ -1,0 +1,556 @@
+{
+ "name": "Habitat test cells",
+ "version": 1,
+ "stamp": "2026-10-17a",
+ "origin": {
+  "lat": 44.4,
+  "lon": -68.2
+ },
+ "frame": "local tangent plane, metres, x east, z south, y up",
+ "kx": 79535.09869672367,
+ "kz": 110574.0,
+ "bbox": {
+  "w": -68.20754383925879,
+  "e": -68.19245616074122,
+  "n": 44.40271311519887,
+  "s": 44.39547814133521
+ },
+ "terrain": {
+  "x0": -600.0,
+  "z0": -300.0,
+  "dx": 4.0,
+  "nx": 300,
+  "nz": 200,
+  "file": "terrain.png",
+  "encoding": "rgb24 mm, h = v/1000 - 1000, metres NAVD 88"
+ },
+ "geology": {
+  "x0": -600.0,
+  "z0": -300.0,
+  "dx": 4.0,
+  "nx": 300,
+  "nz": 200,
+  "file": "geology.png",
+  "classes": [
+   {
+    "id": 0,
+    "name": "unknown",
+    "tex": 2,
+    "tint": "d9d3cc",
+    "tint_grey": "9a8f86"
+   },
+   {
+    "id": 1,
+    "name": "Cadillac Granite",
+    "tex": 0,
+    "tint": "ece6e0",
+    "tint_grey": "c2b3ac"
+   },
+   {
+    "id": 2,
+    "name": "fine felsic granite / granophyre",
+    "tex": 1,
+    "tint": "ebe3da",
+    "tint_grey": "cbbcb4"
+   },
+   {
+    "id": 3,
+    "name": "Somesville Granite",
+    "tex": 2,
+    "tint": "e8e2dc",
+    "tint_grey": "c6bbb4"
+   },
+   {
+    "id": 4,
+    "name": "Southwest Harbor Granite",
+    "tex": 1,
+    "tint": "e4ddd4",
+    "tint_grey": "bdb3ad"
+   },
+   {
+    "id": 5,
+    "name": "Devonian granites (Seawall, Northeast Creek, Baker Island)",
+    "tex": 2,
+    "tint": "e6dfd8",
+    "tint_grey": "c0aea6"
+   },
+   {
+    "id": 6,
+    "name": "gabbro and diorite",
+    "tex": 4,
+    "tint": "9a9c9c",
+    "tint_grey": "55595a"
+   },
+   {
+    "id": 7,
+    "name": "shatter zone breccia",
+    "tex": 6,
+    "tint": "cfc3bb",
+    "tint_grey": "9a8a84"
+   },
+   {
+    "id": 8,
+    "name": "Bar Harbor Formation",
+    "tex": 5,
+    "tint": "bdb6ba",
+    "tint_grey": "8f8892"
+   },
+   {
+    "id": 9,
+    "name": "Ellsworth Schist",
+    "tex": 5,
+    "tint": "aab5a6",
+    "tint_grey": "7d8a7a"
+   },
+   {
+    "id": 10,
+    "name": "Cranberry Island felsic volcanics",
+    "tex": 6,
+    "tint": "d4cfc8",
+    "tint_grey": "a7a29c"
+   },
+   {
+    "id": 11,
+    "name": "Cranberry Island andesite",
+    "tex": 5,
+    "tint": "b79a8c",
+    "tint_grey": "8c6a5c"
+   },
+   {
+    "id": 12,
+    "name": "basaltic tuff and lava",
+    "tex": 3,
+    "tint": "8d918f",
+    "tint_grey": "4d5250"
+   },
+   {
+    "id": 13,
+    "name": "basalt and diabase dikes",
+    "tex": 3,
+    "tint": "6f7274",
+    "tint_grey": "303435"
+   },
+   {
+    "id": 14,
+    "name": "granite (aplite) dikes",
+    "tex": 1,
+    "tint": "f2ece6",
+    "tint_grey": "ddd0c8"
+   },
+   {
+    "id": 15,
+    "name": "coastal granite and gabbro (state map)",
+    "tex": 2,
+    "tint": "e2dbd3",
+    "tint_grey": "bfb0a8"
+   },
+   {
+    "id": 16,
+    "name": "metasedimentary rocks (state map)",
+    "tex": 5,
+    "tint": "b5b5b6",
+    "tint_grey": "858586"
+   },
+   {
+    "id": 17,
+    "name": "volcanic rocks (state map)",
+    "tex": 4,
+    "tint": "9c9a97",
+    "tint_grey": "6c6a68"
+   },
+   {
+    "id": 18,
+    "name": "Ellsworth-type schist (state map)",
+    "tex": 5,
+    "tint": "a9b2a6",
+    "tint_grey": "7c897a"
+   },
+   {
+    "id": 19,
+    "name": "gneiss (state map)",
+    "tex": 5,
+    "tint": "b9b6b2",
+    "tint_grey": "8e8a86"
+   }
+  ],
+  "veneer": {
+   "_doc": "The procedural shore veneer (src/level.js terrain shader) is a function of the height field, this geology grid and these parameters, plus authored.json patches. Azimuths in degrees clockwise from north; heights in metres NAVD 88 (Bar Harbor: MHW +1.6, MLW -1.6, MLLW -1.9).",
+   "joints": [
+    {
+     "az_deg": 0,
+     "spacing_m": 9,
+     "weight": 1.0,
+     "note": "the dominant N-S set on the Mount Desert shore"
+    },
+    {
+     "az_deg": 60,
+     "spacing_m": 13,
+     "weight": 0.6,
+     "note": "N60E, the cross set (the dikes share this trend; dikes() is separate)"
+    }
+   ],
+   "sheeting": {
+    "spacing_m": 2.2,
+    "amplitude_m": 1.0,
+    "curvature_k": 0.6,
+    "note": "sheeting-joint terraces; spacing thins by curvature_k on convex tops (exfoliation shells)"
+   },
+   "ice_flow_deg": 160,
+   "ice_asymmetry": 0.7,
+   "zonation": {
+    "rockweed": [
+     -2.2,
+     1.2
+    ],
+    "barnacle": [
+     0.4,
+     1.9
+    ],
+    "black_lichen": [
+     1.5,
+     4.2
+    ],
+    "splash": [
+     3.6,
+     5.0
+    ],
+    "xanthoria": [
+     3.4,
+     10.0
+    ],
+    "crustose": [
+     5.0,
+     8.0
+    ],
+    "note": "[low, high] NAVD m: bands blend in over the first ~0.5 m and out over the last"
+   }
+  }
+ },
+ "habitat": {
+  "x0": -600.0,
+  "z0": -300.0,
+  "dx": 4.0,
+  "nx": 300,
+  "nz": 200,
+  "file": "habitat.png",
+  "encoding": "8-bit class id",
+  "classes": [
+   {
+    "id": 0,
+    "name": "water / unclassified",
+    "tint": "2f4a5a",
+    "canopy": 1,
+    "trees": 1.0
+   },
+   {
+    "id": 1,
+    "name": "ledge (rocky intertidal)",
+    "tint": "6e6a66",
+    "canopy": 0,
+    "trees": 1.0
+   },
+   {
+    "id": 2,
+    "name": "boulder beach / ramp",
+    "tint": "7a736c",
+    "canopy": 0,
+    "trees": 1.0
+   },
+   {
+    "id": 3,
+    "name": "gravel / cobble beach",
+    "tint": "8c8277",
+    "canopy": 0,
+    "trees": 1.0
+   },
+   {
+    "id": 4,
+    "name": "mixed sand-gravel beach",
+    "tint": "a39584",
+    "canopy": 0,
+    "trees": 1.0
+   },
+   {
+    "id": 5,
+    "name": "sand beach / spit / dune",
+    "tint": "c9b58f",
+    "canopy": 0,
+    "trees": 0
+   },
+   {
+    "id": 6,
+    "name": "mud flat",
+    "tint": "7b6e5e",
+    "canopy": 0,
+    "trees": 0
+   },
+   {
+    "id": 7,
+    "name": "eelgrass flat",
+    "tint": "4f6b4a",
+    "canopy": 0,
+    "trees": 0
+   },
+   {
+    "id": 8,
+    "name": "mussel bar / coarse flat",
+    "tint": "5a5450",
+    "canopy": 0,
+    "trees": 0
+   },
+   {
+    "id": 9,
+    "name": "high salt marsh",
+    "tint": "9c9a52",
+    "canopy": 0,
+    "trees": 0
+   },
+   {
+    "id": 10,
+    "name": "low salt marsh",
+    "tint": "6f8a3c",
+    "canopy": 0,
+    "trees": 0
+   },
+   {
+    "id": 11,
+    "name": "fresh-brackish marsh",
+    "tint": "7f9a4a",
+    "canopy": 0,
+    "trees": 0
+   },
+   {
+    "id": 12,
+    "name": "man-made shore / riprap",
+    "tint": "8a8a8a",
+    "canopy": 0,
+    "trees": 0.05
+   },
+   {
+    "id": 13,
+    "name": "developed, dense",
+    "tint": "9d8f86",
+    "canopy": 0,
+    "trees": 0.06
+   },
+   {
+    "id": 14,
+    "name": "evergreen forest",
+    "tint": "1f4a2c",
+    "canopy": 1,
+    "trees": 1.0
+   },
+   {
+    "id": 15,
+    "name": "deciduous forest",
+    "tint": "4f7a3f",
+    "canopy": 1,
+    "trees": 1.0
+   },
+   {
+    "id": 16,
+    "name": "mixed forest",
+    "tint": "3a6236",
+    "canopy": 1,
+    "trees": 1.0
+   },
+   {
+    "id": 17,
+    "name": "shrub / grass / pasture",
+    "tint": "9db06a",
+    "canopy": 0.1,
+    "trees": 0.12
+   },
+   {
+    "id": 18,
+    "name": "woody wetland",
+    "tint": "3d5f4a",
+    "canopy": 1,
+    "trees": 1.0
+   },
+   {
+    "id": 19,
+    "name": "emergent freshwater wetland",
+    "tint": "6f9a8a",
+    "canopy": 0.05,
+    "trees": 0.05
+   },
+   {
+    "id": 20,
+    "name": "barren",
+    "tint": "a8a097",
+    "canopy": 0.1,
+    "trees": 0.1
+   },
+   {
+    "id": 21,
+    "name": "developed, open / low",
+    "tint": "a9a38f",
+    "canopy": 0.08,
+    "trees": 0.28
+   }
+  ],
+  "_params": "per class: canopy 0..1 (how much of the far canopy texture is drawn; cutouts for towns, flats, marsh), trees 0..1 (share of the shoreline-tree spawner kept; 1 = full). Edited live by the editor through LEVEL.habitat.set(id, {canopy, trees})."
+ },
+ "rockTex": {
+  "file": "../../textures/rocks/rocks.jpg",
+  "height": "../../textures/rocks/rocks_h.jpg",
+  "normal": "../../textures/rocks/rocks_n.jpg",
+  "grid": [
+   4,
+   2
+  ],
+  "note": "Assets: textures/rocks (Poly Haven CC0, colour as photographed); index order in textures/rocks/README.md"
+ },
+ "textures": {
+  "rock": "tex/rock_diff.jpg",
+  "note": "Poly Haven CC0: rocky_terrain, coast_sand_01, dry_river_pebbles, forest_ground_05, forrest_ground_01; 1K"
+ },
+ "tide": "tide.json",
+ "spawn": [
+  {
+   "name": "Off the habitat cells",
+   "x": 0.0,
+   "z": -270.0,
+   "yaw": 3.14159
+  },
+  {
+   "name": "Upland, on foot",
+   "x": 0.0,
+   "z": 150.0,
+   "yaw": 0.0
+  }
+ ],
+ "cells": [
+  {
+   "id": 1,
+   "name": "ledge (rocky intertidal)",
+   "x": -550.0,
+   "z": -150.0
+  },
+  {
+   "id": 2,
+   "name": "boulder beach / ramp",
+   "x": -450.0,
+   "z": -150.0
+  },
+  {
+   "id": 3,
+   "name": "gravel / cobble beach",
+   "x": -350.0,
+   "z": -150.0
+  },
+  {
+   "id": 4,
+   "name": "mixed sand-gravel beach",
+   "x": -250.0,
+   "z": -150.0
+  },
+  {
+   "id": 5,
+   "name": "sand beach / spit / dune",
+   "x": -150.0,
+   "z": -150.0
+  },
+  {
+   "id": 6,
+   "name": "mud flat",
+   "x": -50.0,
+   "z": -150.0
+  },
+  {
+   "id": 7,
+   "name": "eelgrass flat",
+   "x": 50.0,
+   "z": -150.0
+  },
+  {
+   "id": 8,
+   "name": "mussel bar / coarse flat",
+   "x": 150.0,
+   "z": -150.0
+  },
+  {
+   "id": 9,
+   "name": "high salt marsh",
+   "x": 250.0,
+   "z": -150.0
+  },
+  {
+   "id": 10,
+   "name": "low salt marsh",
+   "x": 350.0,
+   "z": -150.0
+  },
+  {
+   "id": 11,
+   "name": "fresh-brackish marsh",
+   "x": 450.0,
+   "z": -150.0
+  },
+  {
+   "id": 12,
+   "name": "man-made shore / riprap",
+   "x": 550.0,
+   "z": -150.0
+  },
+  {
+   "id": 13,
+   "name": "developed, dense",
+   "x": -500.0,
+   "z": 0.0
+  },
+  {
+   "id": 14,
+   "name": "evergreen forest",
+   "x": -300.0,
+   "z": 0.0
+  },
+  {
+   "id": 15,
+   "name": "deciduous forest",
+   "x": -100.0,
+   "z": 0.0
+  },
+  {
+   "id": 16,
+   "name": "mixed forest",
+   "x": 100.0,
+   "z": 0.0
+  },
+  {
+   "id": 17,
+   "name": "shrub / grass / pasture",
+   "x": 300.0,
+   "z": 0.0
+  },
+  {
+   "id": 18,
+   "name": "woody wetland",
+   "x": 500.0,
+   "z": 0.0
+  },
+  {
+   "id": 19,
+   "name": "emergent freshwater wetland",
+   "x": -500.0,
+   "z": 200.0
+  },
+  {
+   "id": 20,
+   "name": "barren",
+   "x": -300.0,
+   "z": 200.0
+  },
+  {
+   "id": 21,
+   "name": "developed, open / low",
+   "x": -100.0,
+   "z": 200.0
+  }
+ ],
+ "sources": [
+  "synthetic: tools/make_habitat_level.py; habitat classes, geology classes and tide copied from levels/downeast"
+ ],
+ "made_by": "tools/make_habitat_level.py"
+}

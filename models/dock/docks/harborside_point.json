@@ -1,0 +1,654 @@
+{
+ "id": "harborside_point",
+ "style": "west_street",
+ "wear": 0.3,
+ "seed": 408,
+ "_doc": "Site 1 item 21 (docs/sites/bar-harbor-waterfront.md, rows 4.08, 4.09, 4.16). Level metres. The Harborside point's seawall and the former Golden Anchor pier under the pavilion. Wall line: chart SLCONS 4.09, moved landward to the face the 2021 lidar shows (0.5 m on the west, north and east faces, 1.2 m on the south stretch). Coping +3.9 then +3.5; rail tops +4.93 and +4.53 [lidar]; feet from the lidar on the beach, from detail.png under water. Dry granite with granite posts (Matt's photos 18 Oct, docs/docks.md) and a cream rail (photo_aerial_town_autumn.jpg). ASSUMED until V4.1: dry-laid rather than mortared, 3.6 m post pitch. Pier: 21.7 m wide, 50 m from the fill to the seaward end, deck +3.3 (the lidar's neck; the survey's +4.9 was not a deck). The building's roof covers the outer 32 m. Timber piles ASSUMED; nothing published describes them. Dressing (item 20b): authored, level metres. Seven twin-arm lamps on the east lawn from the autumn aerial: count and line seen, shape and exact spots ASSUMED until V4.1. Rail damage, the broken post, fallen stones, signs and their wording, the old piles and iron beside the pier: ASSUMED, chosen for interest; no photo shows them. Beds under the old piles from detail.png.",
+ "walls": [
+  {
+   "id": "harborside_point_nne",
+   "kind": "granite",
+   "top_navd_m": 3.9,
+   "water_side": "right",
+   "posts": {
+    "pitch_m": 3.6,
+    "h_m": 1.03,
+    "w_m": 0.4,
+    "setback_m": 0.55,
+    "broken": [
+     [
+      3,
+      5
+     ]
+    ]
+   },
+   "rail": {
+    "h_m": 1.03,
+    "damage": [
+     {
+      "run": 1,
+      "bay": 7,
+      "kind": "snapped"
+     },
+     {
+      "run": 2,
+      "bay": 10,
+      "kind": "patched"
+     },
+     {
+      "run": 3,
+      "bay": 5,
+      "kind": "roped"
+     }
+    ]
+   },
+   "path": [
+    [
+     -608.6,
+     842.56,
+     3.9,
+     0.6
+    ],
+    [
+     -609.96,
+     827.0,
+     3.9,
+     -1.0
+    ],
+    [
+     -547.17,
+     814.31,
+     3.9,
+     -2.0
+    ],
+    [
+     -544.4,
+     872.02,
+     3.9,
+     -1.7
+    ],
+    [
+     -542.7,
+     906.52,
+     3.9,
+     0.0
+    ]
+   ],
+   "cap": {
+    "h": 0.45,
+    "depth_m": 1.1,
+    "corner_m": 1.5
+   }
+  },
+  {
+   "id": "harborside_point_s",
+   "kind": "granite",
+   "top_navd_m": 3.5,
+   "water_side": "right",
+   "posts": {
+    "pitch_m": 3.6,
+    "h_m": 1.03,
+    "w_m": 0.4,
+    "setback_m": 0.55
+   },
+   "rail": {
+    "h_m": 1.03,
+    "damage": [
+     {
+      "run": 0,
+      "bay": 2,
+      "kind": "snapped"
+     }
+    ]
+   },
+   "path": [
+    [
+     -543.02,
+     907.38,
+     3.5,
+     0.2
+    ],
+    [
+     -531.02,
+     918.56,
+     3.5,
+     0.1
+    ],
+    [
+     -520.44,
+     921.96,
+     3.5,
+     -0.3
+    ],
+    [
+     -513.24,
+     929.05,
+     3.5,
+     -0.6
+    ]
+   ],
+   "cap": {
+    "h": 0.45,
+    "depth_m": 1.1,
+    "corner_m": 1.5
+   }
+  }
+ ],
+ "platforms": [
+  {
+   "id": "golden_anchor_pier",
+   "at": [
+    -503.2,
+    929.2
+   ],
+   "heading_deg": 130.5,
+   "deck_navd_m": 3.3,
+   "width_m": 21.7,
+   "depth_m": 50.0,
+   "seabed_in_m": 4.3,
+   "seabed_out_m": 6.7,
+   "pitch_m": [
+    3,
+    3
+   ],
+   "water_edges": [
+    "out",
+    "port",
+    "stbd"
+   ],
+   "roofed_from_m": 18.0
+  }
+ ],
+ "dressing": {
+  "id": "harborside_dress",
+  "far_m": 120,
+  "cutoff_m": 900,
+  "items": [
+   {
+    "type": "lamp_twin",
+    "at": [
+     -552.11,
+     826.0
+    ],
+    "y": 3.62,
+    "yaw_deg": 3
+   },
+   {
+    "type": "lamp_twin",
+    "at": [
+     -551.46,
+     839.5
+    ],
+    "y": 3.62,
+    "yaw_deg": 3
+   },
+   {
+    "type": "lamp_twin",
+    "at": [
+     -550.81,
+     853.0
+    ],
+    "y": 3.62,
+    "yaw_deg": 3
+   },
+   {
+    "type": "lamp_twin",
+    "at": [
+     -550.16,
+     866.5
+    ],
+    "y": 3.62,
+    "yaw_deg": 3
+   },
+   {
+    "type": "lamp_twin",
+    "at": [
+     -549.51,
+     880.0
+    ],
+    "y": 3.62,
+    "yaw_deg": 3
+   },
+   {
+    "type": "lamp_twin",
+    "at": [
+     -548.84,
+     893.5
+    ],
+    "y": 3.62,
+    "yaw_deg": 3
+   },
+   {
+    "type": "lamp_twin",
+    "at": [
+     -548.18,
+     907.0
+    ],
+    "y": 3.62,
+    "yaw_deg": 3
+   },
+   {
+    "type": "sign",
+    "sign": "wall",
+    "at": [
+     -545.1,
+     890.3
+    ],
+    "y": 3.62,
+    "yaw_deg": 90,
+    "h_m": 1.15
+   },
+   {
+    "type": "block",
+    "at": [
+     -535.5,
+     911.4
+    ],
+    "y": 0.42,
+    "yaw_deg": 22,
+    "pitch_deg": 9,
+    "roll_deg": -14,
+    "size": [
+     1.5,
+     0.45,
+     1.0
+    ]
+   },
+   {
+    "type": "block",
+    "at": [
+     -533.9,
+     909.6
+    ],
+    "y": 0.28,
+    "yaw_deg": -41,
+    "pitch_deg": -6,
+    "roll_deg": 24,
+    "size": [
+     0.8,
+     0.4,
+     0.6
+    ]
+   },
+   {
+    "type": "ring_bolt",
+    "at": [
+     -546.6,
+     834.0
+    ],
+    "y": 3.9,
+    "yaw_deg": 90
+   },
+   {
+    "type": "ring_bolt",
+    "at": [
+     -545.5,
+     861.0
+    ],
+    "y": 3.9,
+    "yaw_deg": 90
+   },
+   {
+    "type": "chain",
+    "path": [
+     [
+      -546.5,
+      3.97,
+      861.05
+     ],
+     [
+      -545.45,
+      3.95,
+      861.15
+     ],
+     [
+      -545.1,
+      3.9,
+      861.2
+     ],
+     [
+      -544.95,
+      3.2,
+      861.25
+     ],
+     [
+      -544.95,
+      2.2,
+      861.2
+     ]
+    ],
+    "link_m": 0.13
+   },
+   {
+    "type": "sign",
+    "sign": "marina",
+    "at": [
+     -501.65,
+     914.86
+    ],
+    "y": 3.3,
+    "yaw_deg": -139.5,
+    "h_m": 1.7
+   },
+   {
+    "type": "sign",
+    "sign": "gangway",
+    "at": [
+     -498.86,
+     913.66
+    ],
+    "y": 3.3,
+    "yaw_deg": -49.5,
+    "h_m": 1.45
+   },
+   {
+    "type": "sign",
+    "sign": "no_swim",
+    "at": [
+     -497.47,
+     911.29
+    ],
+    "y": 3.3,
+    "yaw_deg": -139.5,
+    "h_m": 1.35
+   },
+   {
+    "type": "life_ring",
+    "at": [
+     -499.66,
+     914.88
+    ],
+    "y": 3.3,
+    "yaw_deg": -49.5
+   },
+   {
+    "type": "sign",
+    "sign": "ghost",
+    "at": [
+     -489.68,
+     931.19
+    ],
+    "y": 3.3,
+    "yaw_deg": 40.5,
+    "h_m": 1.75
+   },
+   {
+    "type": "old_piles",
+    "piles": [
+     [
+      -489.55,
+      935.95,
+      -1.18,
+      1.6,
+      2,
+      40
+     ],
+     [
+      -486.99,
+      934.02,
+      -1.3,
+      0.2,
+      0,
+      0
+     ],
+     [
+      -485.05,
+      931.84,
+      -1.41,
+      2.3,
+      3,
+      200
+     ],
+     [
+      -482.74,
+      934.07,
+      -1.42,
+      0.8,
+      18,
+      130
+     ],
+     [
+      -482.42,
+      929.99,
+      -1.53,
+      -0.4,
+      0,
+      0
+     ],
+     [
+      -480.13,
+      927.9,
+      -1.64,
+      1.9,
+      6,
+      300
+     ],
+     [
+      -477.83,
+      930.14,
+      -1.65,
+      -0.2,
+      0,
+      0
+     ],
+     [
+      -477.5,
+      926.05,
+      -1.76,
+      2.6,
+      4,
+      80
+     ],
+     [
+      -475.27,
+      923.74,
+      -1.88,
+      0.1,
+      25,
+      220
+     ],
+     [
+      -472.85,
+      921.81,
+      -2.0,
+      1.2,
+      9,
+      20
+     ],
+     [
+      -468.67,
+      921.93,
+      -2.12,
+      2.9,
+      2,
+      130
+     ],
+     [
+      -468.14,
+      917.93,
+      -2.23,
+      -0.8,
+      0,
+      0
+     ]
+    ]
+   },
+   {
+    "type": "sign",
+    "sign": "no_wake",
+    "at": [
+     -468.48,
+     921.76
+    ],
+    "y": 2.4,
+    "yaw_deg": 130.5,
+    "h_m": 0.75,
+    "post": true,
+    "scale": 1.0
+   },
+   {
+    "type": "anchor",
+    "at": [
+     -483.2,
+     932.62
+    ],
+    "y": -1.22,
+    "yaw_deg": 58,
+    "pitch_deg": -14,
+    "roll_deg": 38,
+    "l_m": 1.5
+   },
+   {
+    "type": "chain",
+    "path": [
+     [
+      -482.39,
+      -1.05,
+      932.33
+     ],
+     [
+      -481.96,
+      -1.29,
+      932.22
+     ],
+     [
+      -481.35,
+      -1.47,
+      931.7
+     ],
+     [
+      -481.15,
+      -1.5,
+      931.01
+     ],
+     [
+      -480.65,
+      -1.54,
+      930.05
+     ],
+     [
+      -480.16,
+      -1.54,
+      930.02
+     ],
+     [
+      -479.46,
+      -1.56,
+      930.22
+     ],
+     [
+      -478.74,
+      -1.59,
+      929.99
+     ],
+     [
+      -477.96,
+      -1.64,
+      929.2
+     ],
+     [
+      -477.76,
+      -1.65,
+      928.37
+     ],
+     [
+      -477.25,
+      -1.69,
+      927.27
+     ],
+     [
+      -476.74,
+      -1.72,
+      927.1
+     ]
+    ],
+    "link_m": 0.14
+   },
+   {
+    "type": "ladder",
+    "from": [
+     -478.16,
+     -1.7,
+     928.05
+    ],
+    "to": [
+     -479.86,
+     1.5,
+     928.06
+    ],
+    "w_m": 0.42,
+    "missing": [
+     4,
+     5,
+     9
+    ]
+   },
+   {
+    "type": "iron",
+    "path": [
+     [
+      -475.34,
+      -1.77,
+      926.43
+     ],
+     [
+      -474.53,
+      -1.75,
+      926.14
+     ],
+     [
+      -473.75,
+      -1.37,
+      926.13
+     ],
+     [
+      -473.42,
+      -0.87,
+      926.37
+     ]
+    ],
+    "w_m": 0.1,
+    "t_m": 0.015
+   },
+   {
+    "type": "iron",
+    "path": [
+     [
+      -484.84,
+      -1.32,
+      934.55
+     ],
+     [
+      -484.27,
+      -1.34,
+      933.67
+     ],
+     [
+      -484.28,
+      -1.14,
+      932.89
+     ]
+    ],
+    "w_m": 0.14,
+    "t_m": 0.02
+   },
+   {
+    "type": "iron",
+    "path": [
+     [
+      -472.53,
+      -1.94,
+      923.25
+     ],
+     [
+      -471.49,
+      -1.97,
+      922.62
+     ]
+    ],
+    "w_m": 0.3,
+    "t_m": 0.012
+   }
+  ]
+ }
+}

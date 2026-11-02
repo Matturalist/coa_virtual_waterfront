@@ -1,0 +1,3284 @@
+{
+ "_doc": "docs/docks.md. The level's dock descriptions, one entry per dock (pier, ramps, floats), in level metres. One file for all of them (19 Oct: the published page's file limit); tools/coa_pier.py replaces its own entry by id.",
+ "docks": [
+  {
+   "id": "bar_harbor_ferry_pier",
+   "style": "town_pier",
+   "wear": 0.4,
+   "seed": 7,
+   "_doc": "tools/inn_pier.py (Publisher 20 Oct, Matt's photograph): the Bar Harbor Inn pier. The fixed walkway, its piles and the booth are a landmark (landmarks.json bar_harbor_inn_pier); here the aluminium gangway from its end (lidar: 20 m, falling north), the float in line beyond it and the schooner float across its end, running east. The id is the old one: the \"off-the-float\" scenario names it.",
+   "replaces_osm": [
+    299398552,
+    797733959
+   ],
+   "retires_osm": [
+    299398552,
+    797733959
+   ],
+   "covers": [
+    {
+     "x": -214.65,
+     "z": 987.85,
+     "h": 3.0291,
+     "L": 53.0,
+     "W": 9.0,
+     "_doc": "the walkway and its booth bay (the landmark): no OSM or charted pier is drawn over it"
+    }
+   ],
+   "ramps": [
+    {
+     "id": "ramp",
+     "hinge": [
+      -211.9,
+      963.5
+     ],
+     "hinge_navd_m": 4.67,
+     "dir_deg": 173.56,
+     "length_m": 19.5,
+     "width_m": 1.3,
+     "kind": "gangway",
+     "to": "F1",
+     "on_pier": true,
+     "_doc": "lidar: 4.67 m NAVD at the hinge, -0.2 at z 944; on_pier: it hangs off the walkway (the landmark), so no landing deck is built under the hinge"
+    }
+   ],
+   "floats": [
+    {
+     "id": "F1",
+     "at": [
+      -209.5,
+      939.5
+     ],
+     "heading_deg": 176.82,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "modules": [
+      {
+       "type": "float_2.4x9"
+      },
+      {
+       "type": "float_2.4x9",
+       "join": "end"
+      }
+     ],
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "cleat_pitch_m": 3.0,
+     "landing": {
+      "ramp": "ramp",
+      "mode": "inline"
+     },
+     "_doc": "lidar: z 944 -> 926, ~2.4 m wide"
+    },
+    {
+     "id": "F2",
+     "at": [
+      -202.75,
+      924.0
+     ],
+     "heading_deg": 90.0,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "modules": [
+      {
+       "type": "float_4x14.5"
+      },
+      {
+       "type": "float_4x14.5",
+       "join": "end"
+      }
+     ],
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "cleat_pitch_m": 3.0,
+     "dress": "working",
+     "_doc": "lidar: z 922-926, x -210 -> -181; the schooners lie along its north face"
+    }
+   ],
+   "overrides": {
+    "F2[0].hoop.0.15.port": null,
+    "F2[0].hoop.0.85.port": null,
+    "_doc": "no pilings on the north (port) face: the boats lie there"
+   }
+  },
+  {
+   "id": "bar_harbor_downtown_floats",
+   "style": "town_pier",
+   "wear": 0.5,
+   "seed": 11,
+   "_doc": "Matt, 18 Oct: the downtown floats and the ramps down to them, traced from his aerial (Apple Maps, north up) and georeferenced to level metres on five OSM pier points (residual <= 3 m; tools/assets/aerial/trace.py). Everything a boat lies against is a float; anything coming off a float to a fixed structure is a ramp (free hinge: hinge [x, z], hinge_navd_m, dir_deg = direction down the ramp, atan2(dx, dz)). The whale-watch gangways run parallel to their floats and land mid-float. Floats are hand-placed (at = the first module's centre, heading along the run), split into ~12 m modules, each run held by four pilings on its first module (hoops 0.15 and 0.85, both sides); the whole run is one body that rides the tide. Hinge heights are +4.5 m NAVD everywhere until World checks them against its decks. replaces_osm: the OSM pier ids World draws today as fixed piers here.",
+   "replaces_osm": [
+    1180543362,
+    1180543363,
+    1180543364,
+    1180543365,
+    1180543366,
+    1180543368,
+    797733960,
+    797733961,
+    797733963,
+    797733964
+   ],
+   "ramps": [
+    {
+     "id": "m_r",
+     "hinge": [
+      -503.05,
+      908.97
+     ],
+     "hinge_navd_m": 4.5,
+     "dir_deg": -149.1,
+     "length_m": 18.0,
+     "width_m": 1.2,
+     "kind": "gangway",
+     "to": "m_diag"
+    },
+    {
+     "id": "sq_r",
+     "hinge": [
+      -472.1,
+      888.8
+     ],
+     "hinge_navd_m": 3.3,
+     "dir_deg": 90.0,
+     "length_m": 9.96,
+     "width_m": 1.2,
+     "kind": "gangway",
+     "to": "sq_f",
+     "moved_hs": "hung from the Golden Anchor pier deck edge at +3.3 (it hinged at +4.5, 4 m off the deck); Harborside point (Assets, 1 Nov; tools/harborside_point.py)"
+    },
+    {
+     "id": "st_r",
+     "hinge": [
+      -473.28,
+      935.65
+     ],
+     "hinge_navd_m": 4.5,
+     "dir_deg": 129.4,
+     "length_m": 19.9,
+     "width_m": 1.2,
+     "kind": "gangway",
+     "to": "st_f"
+    },
+    {
+     "id": "ww_rk",
+     "hinge": [
+      -389.77,
+      919.34
+     ],
+     "hinge_navd_m": 3.3,
+     "dir_deg": 179.6,
+     "length_m": 5.6,
+     "width_m": 1.0,
+     "kind": "wood",
+     "to": "ww_k"
+    },
+    {
+     "id": "tp_rw",
+     "hinge": [
+      -342.06,
+      865.9
+     ],
+     "hinge_navd_m": 4.5,
+     "dir_deg": -97.1,
+     "length_m": 14.1,
+     "width_m": 1.2,
+     "kind": "gangway",
+     "to": "tp_t"
+    },
+    {
+     "id": "tp_r1",
+     "hinge": [
+      -303.43,
+      873.62
+     ],
+     "hinge_navd_m": 4.5,
+     "dir_deg": 77.5,
+     "length_m": 15.0,
+     "width_m": 1.2,
+     "kind": "gangway",
+     "to": "tp_e1"
+    },
+    {
+     "id": "tp_r2",
+     "hinge": [
+      -307.21,
+      891.57
+     ],
+     "hinge_navd_m": 4.5,
+     "dir_deg": 75.3,
+     "length_m": 15.3,
+     "width_m": 1.2,
+     "kind": "gangway",
+     "to": "tp_e2"
+    }
+   ],
+   "floats": [
+    {
+     "id": "m_main",
+     "at": [
+      -520.79,
+      810.57
+     ],
+     "heading_deg": 0.9,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_3.3x11.95"
+      },
+      {
+       "type": "float_3.3x11.95",
+       "join": "end"
+      },
+      {
+       "type": "float_3.3x11.95",
+       "join": "end"
+      },
+      {
+       "type": "float_3.3x11.95",
+       "join": "end"
+      },
+      {
+       "type": "float_3.3x11.95",
+       "join": "end"
+      },
+      {
+       "type": "float_3.3x11.95",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "m_top",
+     "at": [
+      -513.32,
+      803.45
+     ],
+     "heading_deg": 91.2,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_2.6x11.73"
+      },
+      {
+       "type": "float_2.6x11.73",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "m_f1",
+     "at": [
+      -514.13,
+      824.59
+     ],
+     "heading_deg": 89.6,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_2.0x10.42"
+      },
+      {
+       "type": "float_2.0x10.42",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "m_f2",
+     "at": [
+      -512.64,
+      842.77
+     ],
+     "heading_deg": 90.2,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_2.0x11.08"
+      },
+      {
+       "type": "float_2.0x11.08",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "m_diag",
+     "at": [
+      -517.62,
+      881.17
+     ],
+     "heading_deg": 23.6,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_3.3x9.27"
+      },
+      {
+       "type": "float_3.3x9.27",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "sq_f",
+     "at": [
+      -461.54,
+      859.45
+     ],
+     "heading_deg": 0.4,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_2.2x11.08"
+      },
+      {
+       "type": "float_2.2x11.08",
+       "join": "end"
+      },
+      {
+       "type": "float_2.2x11.08",
+       "join": "end"
+      },
+      {
+       "type": "float_2.2x11.08",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "st_f",
+     "at": [
+      -453.32,
+      919.77
+     ],
+     "heading_deg": 119.8,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_5.2x10.34"
+      },
+      {
+       "type": "float_5.2x10.34",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "ww_k",
+     "at": [
+      -388.76,
+      914.66
+     ],
+     "heading_deg": 89.6,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_3.3x13.68"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "tp_t",
+     "at": [
+      -362.11,
+      862.62
+     ],
+     "heading_deg": 84.9,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_4.6x12.81"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "tp_d",
+     "at": [
+      -354.61,
+      871.09
+     ],
+     "heading_deg": -0.4,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_3.3x11.89"
+      },
+      {
+       "type": "float_3.3x11.89",
+       "join": "end"
+      },
+      {
+       "type": "float_3.3x11.89",
+       "join": "end"
+      },
+      {
+       "type": "float_3.3x11.89",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "tp_e1",
+     "at": [
+      -282.55,
+      878.47
+     ],
+     "heading_deg": 80.9,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_4.3x13.84"
+      },
+      {
+       "type": "float_4.3x13.84",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    },
+    {
+     "id": "tp_e2",
+     "at": [
+      -285.76,
+      897.59
+     ],
+     "heading_deg": 79.3,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_4.6x14.57"
+      },
+      {
+       "type": "float_4.6x14.57",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0
+    }
+   ],
+   "sites": [
+    {
+     "id": "m_main",
+     "kind": "float",
+     "name": "Marina float (catamaran berths), north-south",
+     "length_m": 71.7,
+     "width_m": 3.3,
+     "note": "two catamarans lie against it",
+     "px": [
+      [
+       627,
+       445
+      ],
+      [
+       640,
+       995
+      ]
+     ]
+    },
+    {
+     "id": "m_top",
+     "kind": "float",
+     "name": "Marina float, top arm",
+     "length_m": 23.5,
+     "width_m": 2.6,
+     "note": "",
+     "px": [
+      [
+       640,
+       437
+      ],
+      [
+       820,
+       432
+      ]
+     ]
+    },
+    {
+     "id": "m_f1",
+     "kind": "float",
+     "name": "Marina finger float 1",
+     "length_m": 20.8,
+     "width_m": 2.0,
+     "note": "a catamaran lies against it",
+     "px": [
+      [
+       640,
+       598
+      ],
+      [
+       800,
+       598
+      ]
+     ]
+    },
+    {
+     "id": "m_f2",
+     "kind": "float",
+     "name": "Marina finger float 2",
+     "length_m": 22.2,
+     "width_m": 2.0,
+     "note": "a catamaran lies against it",
+     "px": [
+      [
+       650,
+       738
+      ],
+      [
+       820,
+       736
+      ]
+     ]
+    },
+    {
+     "id": "m_diag",
+     "kind": "float",
+     "name": "Marina float, diagonal run to the ramp",
+     "length_m": 18.5,
+     "width_m": 3.3,
+     "note": "",
+     "px": [
+      [
+       642,
+       1000
+      ],
+      [
+       700,
+       1130
+      ]
+     ]
+    },
+    {
+     "id": "sq_f",
+     "kind": "float",
+     "name": "Float east of the square building on piles",
+     "length_m": 44.3,
+     "width_m": 2.2,
+     "note": "a skiff lies against it",
+     "px": [
+      [
+       1085,
+       820
+      ],
+      [
+       1090,
+       1160
+      ]
+     ]
+    },
+    {
+     "id": "st_f",
+     "kind": "float",
+     "name": "Stewman's picnic float",
+     "length_m": 20.7,
+     "width_m": 5.2,
+     "note": "picnic tables and umbrellas on it",
+     "px": [
+      [
+       1118,
+       1345
+      ],
+      [
+       1255,
+       1265
+      ]
+     ]
+    },
+    {
+     "id": "ww_w",
+     "kind": "float",
+     "name": "Whale watch, west float of the ship slip",
+     "length_m": 46.0,
+     "width_m": 3.9,
+     "note": "the big whale-watch catamaran lies between the two slip floats",
+     "px": [
+      [
+       1490,
+       965
+      ],
+      [
+       1565,
+       1310
+      ]
+     ]
+    },
+    {
+     "id": "ww_e",
+     "kind": "float",
+     "name": "Whale watch, east float of the ship slip",
+     "length_m": 44.8,
+     "width_m": 2.9,
+     "note": "",
+     "px": [
+      [
+       1612,
+       965
+      ],
+      [
+       1690,
+       1300
+      ]
+     ]
+    },
+    {
+     "id": "ww_e2",
+     "kind": "float",
+     "name": "Whale watch, east float (second gangway)",
+     "length_m": 19.5,
+     "width_m": 3.3,
+     "note": "",
+     "px": [
+      [
+       1760,
+       1118
+      ],
+      [
+       1800,
+       1262
+      ]
+     ]
+    },
+    {
+     "id": "ww_k",
+     "kind": "float",
+     "name": "Whale watch, skiff / kayak float under the deck",
+     "length_m": 13.7,
+     "width_m": 3.3,
+     "note": "a row of skiffs; kayak storage inshore on the deck",
+     "px": [
+      [
+       1595,
+       1282
+      ],
+      [
+       1700,
+       1282
+      ]
+     ]
+    },
+    {
+     "id": "tp_t",
+     "kind": "float",
+     "name": "Town pier, west T float",
+     "length_m": 12.8,
+     "width_m": 4.6,
+     "note": "",
+     "px": [
+      [
+       1800,
+       877
+      ],
+      [
+       1898,
+       885
+      ]
+     ]
+    },
+    {
+     "id": "tp_d",
+     "kind": "float",
+     "name": "Town pier, west dinghy float",
+     "length_m": 47.6,
+     "width_m": 3.3,
+     "note": "about twenty dinghies tied along its east side",
+     "px": [
+      [
+       1907,
+       900
+      ],
+      [
+       1907,
+       1265
+      ]
+     ]
+    },
+    {
+     "id": "tp_e1",
+     "kind": "float",
+     "name": "Town pier, east float (north)",
+     "length_m": 27.7,
+     "width_m": 4.3,
+     "note": "",
+     "px": [
+      [
+       2408,
+       990
+      ],
+      [
+       2618,
+       1022
+      ]
+     ]
+    },
+    {
+     "id": "tp_e2",
+     "kind": "float",
+     "name": "Town pier, east float (south)",
+     "length_m": 29.1,
+     "width_m": 4.6,
+     "note": "a skiff lies against it",
+     "px": [
+      [
+       2382,
+       1135
+      ],
+      [
+       2602,
+       1175
+      ]
+     ]
+    },
+    {
+     "id": "m_r",
+     "kind": "ramp",
+     "name": "Marina gangway to the shore",
+     "length_m": 18.0,
+     "lands_on": "m_diag",
+     "px": [
+      [
+       770,
+       1245
+      ],
+      [
+       700,
+       1130
+      ]
+     ]
+    },
+    {
+     "id": "sq_r",
+     "kind": "ramp",
+     "name": "Gangway, square building to its float",
+     "length_m": 7.7,
+     "lands_on": "sq_f",
+     "px": [
+      [
+       1030,
+       1068
+      ],
+      [
+       1080,
+       1068
+      ]
+     ]
+    },
+    {
+     "id": "st_r",
+     "kind": "ramp",
+     "name": "Stewman's gangway to the picnic float",
+     "length_m": 19.9,
+     "lands_on": "st_f",
+     "px": [
+      [
+       1000,
+       1448
+      ],
+      [
+       1115,
+       1352
+      ]
+     ]
+    },
+    {
+     "id": "ww_r1",
+     "kind": "ramp",
+     "name": "Whale watch passenger gangway (lands mid-float)",
+     "length_m": 22.0,
+     "lands_on": "ww_e",
+     "px": [
+      [
+       1698,
+       1290
+      ],
+      [
+       1655,
+       1130
+      ]
+     ]
+    },
+    {
+     "id": "ww_r2",
+     "kind": "ramp",
+     "name": "Whale watch passenger gangway 2 (lands mid-float)",
+     "length_m": 14.5,
+     "lands_on": "ww_e2",
+     "px": [
+      [
+       1805,
+       1295
+      ],
+      [
+       1784,
+       1190
+      ]
+     ]
+    },
+    {
+     "id": "ww_rk",
+     "kind": "ramp",
+     "name": "Kayak float: short timber ramp",
+     "length_m": 5.6,
+     "lands_on": "ww_k",
+     "px": [
+      [
+       1640,
+       1318
+      ],
+      [
+       1640,
+       1290
+      ]
+     ]
+    },
+    {
+     "id": "tp_rw",
+     "kind": "ramp",
+     "name": "Town pier work ramp, west, to the T and dinghy floats",
+     "length_m": 14.1,
+     "lands_on": "tp_t",
+     "px": [
+      [
+       2003,
+       905
+      ],
+      [
+       1900,
+       893
+      ]
+     ]
+    },
+    {
+     "id": "tp_r1",
+     "kind": "ramp",
+     "name": "Town pier east ramp (north)",
+     "length_m": 15.0,
+     "lands_on": "tp_e1",
+     "px": [
+      [
+       2300,
+       962
+      ],
+      [
+       2408,
+       985
+      ]
+     ]
+    },
+    {
+     "id": "tp_r2",
+     "kind": "ramp",
+     "name": "Town pier east ramp (south)",
+     "length_m": 15.3,
+     "lands_on": "tp_e2",
+     "px": [
+      [
+       2272,
+       1100
+      ],
+      [
+       2382,
+       1128
+      ]
+     ]
+    }
+   ],
+   "overrides": {}
+  },
+  {
+   "id": "bar_harbor_whale_watch",
+   "style": "whale_watch",
+   "wear": 0.25,
+   "seed": 23,
+   "_doc": "The whale-watch floats and their gangways (moved out of bar_harbor_downtown_floats, 30 Oct, so they can look like themselves). Matt's photo from the head of the slips, 30 Oct (Friendship V port side to ww_e, a second catamaran between ww_e and ww_e2): concrete floats painted with light grey non-skid, black rub rails, black cleats, flush round yellow deck plates, short yellow bollards, a dark red line along the outer edge, a hose reel and life ring at the gangway foot, steel piles with a yellow collar at deck level, coiled lines on deck. look: the deck and the float sides are the repo's concrete_pavement (non-skid grit) tinted to the sunlit deck in the photo (#bab7b0: median of two 40 x 40 px patches of the sunlit float deck; docs/waterfront-photos.md); no planks (one board spans the float); dressing none until Assets' whale-watch dressing (requests.md). The slips are 3 m wider each than the aerial trace (Matt).",
+   "ramps": [
+    {
+     "id": "ww_r1",
+     "hinge": [
+      -382.18,
+      915.75
+     ],
+     "hinge_navd_m": 3.3,
+     "dir_deg": -165.4,
+     "length_m": 22.0,
+     "width_m": 1.5,
+     "kind": "passenger",
+     "to": "ww_e"
+    },
+    {
+     "id": "ww_r2",
+     "hinge": [
+      -365.35,
+      915.73
+     ],
+     "hinge_navd_m": 3.3,
+     "dir_deg": -169.1,
+     "length_m": 14.5,
+     "width_m": 1.5,
+     "kind": "passenger",
+     "to": "ww_e2",
+     "moved": "with ww_e2 (3.0 m east)"
+    }
+   ],
+   "floats": [
+    {
+     "id": "ww_w",
+     "at": [
+      -411.73,
+      874.6
+     ],
+     "heading_deg": 11.8,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_3.9x11.5"
+      },
+      {
+       "type": "float_3.9x11.5",
+       "join": "end"
+      },
+      {
+       "type": "float_3.9x11.5",
+       "join": "end"
+      },
+      {
+       "type": "float_3.9x11.5",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0,
+     "moved": "Matt, 30 Oct (photo from the slip head): the slips are wider than the aerial trace showed; moved 3.0 m west, square to its run",
+     "moved_hp": "Assets 31 Oct: shore end ~1 m short of the Harbor Place wharf face (z 914.0), moved 4.9 m north along its run, length kept (tools/harbor_place.py)"
+    },
+    {
+     "id": "ww_e",
+     "at": [
+      -393.42,
+      871.76
+     ],
+     "heading_deg": 12.7,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_2.9x11.2"
+      },
+      {
+       "type": "float_2.9x11.2",
+       "join": "end"
+      },
+      {
+       "type": "float_2.9x11.2",
+       "join": "end"
+      },
+      {
+       "type": "float_2.9x11.2",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0,
+     "moved_hp": "Assets 31 Oct: shore end ~1 m short of the Harbor Place wharf face (z 910.0), moved 7.2 m north along its run, length kept (tools/harbor_place.py)"
+    },
+    {
+     "id": "ww_e2",
+     "at": [
+      -370.83,
+      893.39
+     ],
+     "heading_deg": 15.1,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "hoops": [
+      0.15,
+      0.85
+     ],
+     "modules": [
+      {
+       "type": "float_3.3x9.74"
+      },
+      {
+       "type": "float_3.3x9.74",
+       "join": "end"
+      }
+     ],
+     "cleat_pitch_m": 3.0,
+     "moved": "Matt, 30 Oct: the slips are wider than the aerial trace showed; moved 3.0 m east, square to its run, with its gangway ww_r2",
+     "moved_hp": "Assets 31 Oct: shore end ~1 m short of the Harbor Place wharf face (z 907.5), moved 4.1 m north along its run, length kept (tools/harbor_place.py)"
+    }
+   ],
+   "overrides": {},
+   "fittings": [
+    {
+     "model": "dock_boarding_stair",
+     "at": [
+      -370.21,
+      892.22
+     ],
+     "yaw_deg": 195.1
+    }
+   ]
+  },
+  {
+   "id": "coa_pier",
+   "style": "coa_pier",
+   "wear": 0.45,
+   "seed": 31,
+   "_doc": "College of the Atlantic pier (tools/coa_pier.py; Matt 19 Oct, four photographs): fixed pier on timber piles from the shore, the wide aluminium gangway off its end, the float inline at its foot with a finger on the south side. The teal rails, arch and benches on the fixed pier are a landmark (landmarks.json coa_pier). style_patch and materials are applied by world.js over the coa_pier style for this dock only, until Assets restyles coa_pier from the photos.",
+   "replaces_osm": [
+    1162481355,
+    1162481356
+   ],
+   "materials": {
+    "coa_alu": {
+     "color": 12764864,
+     "roughness": 0.839,
+     "diff": "textures/dock/alu_sheet_diff.jpg",
+     "nor": "textures/dock/alu_sheet_nor.jpg",
+     "orm": "textures/dock/alu_sheet_orm.jpg",
+     "metric": true,
+     "tile_m": 1,
+     "color_lin": [
+      1.5929,
+      1.5981,
+      1.3957
+     ],
+     "metalness": 0.35,
+     "from": "photo 2: gangway rail (182,186,181), treads (218,220,212)"
+    },
+    "coa_teal": {
+     "color": 5213600,
+     "roughness": 1,
+     "diff": "textures/dock/paint_chipped_diff.jpg",
+     "nor": "textures/dock/paint_chipped_nor.jpg",
+     "orm": "textures/dock/paint_chipped_orm.jpg",
+     "metric": true,
+     "tile_m": 1,
+     "color_lin": [
+      0.2207,
+      0.8006,
+      1.0877
+     ],
+     "metalness": 0.1,
+     "from": "photos 1, 3, 4: sunlit teal paint, mean (79,141,160)"
+    },
+    "coa_skirt": {
+     "color": 12875612,
+     "roughness": 1,
+     "diff": "textures/dock/paint_chipped_diff.jpg",
+     "nor": "textures/dock/paint_chipped_nor.jpg",
+     "orm": "textures/dock/paint_chipped_orm.jpg",
+     "metric": true,
+     "tile_m": 1,
+     "color_lin": [
+      1.6292,
+      0.5512,
+      0.3219
+     ],
+     "from": "photo 4, white-balanced on the Osprey hull: float skirt (196,119,92)"
+    }
+   },
+   "style_patch": {
+    "pier": {
+     "deck": {
+      "new": "deck_grey",
+      "weathered": "deck_grey"
+     },
+     "pile_mat": "creosote",
+     "rail": false
+    },
+    "ramp": {
+     "deck_mat": "coa_alu",
+     "rail_mat": "coa_alu",
+     "tread_mat": "coa_alu",
+     "rail_r_m": 0.025,
+     "post_pitch_m": 1.0,
+     "hoops": false,
+     "camber_m": 0.0
+    },
+    "float": {
+     "deck": {
+      "new": "deck_grey",
+      "weathered": "deck_grey"
+     },
+     "frame_mat": "coa_skirt",
+     "bumper": false
+    }
+   },
+   "pier": {
+    "at": [
+     -1587.86,
+     457.18
+    ],
+    "heading_deg": 142.09,
+    "length_m": 37.0,
+    "width_m": 2.2,
+    "deck_navd_m": 4.85,
+    "height_m": 9.0,
+    "_doc": "lidar: deck +4.85 NAVD, 2.2 m between the rails, s = -2 .. 35 m from the shore end"
+   },
+   "ramps": [
+    {
+     "id": "ramp",
+     "hinge": [
+      -1576.43,
+      442.51
+     ],
+     "hinge_navd_m": 4.85,
+     "on_pier": true,
+     "dir_deg": 142.09,
+     "to": "F1",
+     "length_m": 23.0,
+     "width_m": 1.8,
+     "camber_m": 0.0,
+     "_doc": "the wide aluminium gangway (photo 2); lidar: 1.8 m wide, 22-23 m"
+    }
+   ],
+   "floats": [
+    {
+     "id": "F1",
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "modules": [
+      {
+       "type": "float_5.3x11"
+      },
+      {
+       "type": "float_5.3x11",
+       "join": "end"
+      }
+     ],
+     "hoops": [],
+     "cleat_pitch_m": 3.0,
+     "dress": "working",
+     "landing": {
+      "ramp": "ramp",
+      "mode": "inline"
+     },
+     "_doc": "OSM 1162481355: 22 x 5.3 m; shore end s = 57.0 at mid tide"
+    },
+    {
+     "id": "F2",
+     "at": [
+      -1557.49,
+      428.03
+     ],
+     "heading_deg": 52.09,
+     "deck_y": 0.4,
+     "freeboard_m": 0.5,
+     "modules": [
+      {
+       "type": "float_2.4x6.8"
+      }
+     ],
+     "hoops": [],
+     "cleat_pitch_m": 2.0,
+     "_doc": "the dinghy float, square off the main floats' south side at their shore end (OSM 1162481355): the L"
+    }
+   ],
+   "moorings": "chain",
+   "_moorings": "Matt, 19 Oct: the COA floats have no pilings; they lie on chains (photo 4). world.js holds them with springs under the floats, nothing drawn"
+  },
+  {
+   "id": "bar_harbor_waterfront_kit",
+   "style": "town_pier",
+   "wear": 0.55,
+   "seed": 41,
+   "platforms": [
+    {
+     "id": "stewmans_deck",
+     "name": "Stewman's deck",
+     "at": [
+      -476.7,
+      979.1
+     ],
+     "heading_deg": 180.0,
+     "deck_navd_m": 4.5,
+     "width_m": 39.2,
+     "depth_m": 46.4,
+     "seabed_in_m": 1.0,
+     "seabed_out_m": 5.98,
+     "pitch_m": [
+      3.0,
+      3.0
+     ],
+     "rail": true,
+     "_doc": "NOAA ENC SLCONS CATSLC 10 (the wharf line) north of Stewman's Downtown (OSM 295040243); z = 0 at the West Street side, the deck runs north over the water; deck +4.5 m NAVD (Assets)"
+    }
+   ],
+   "_doc": "tools/waterfront_kit.py: the waterfront kit (docs/docks.md) placed from the chart. world.js makes the platform solid (deck box, pile cylinders)."
+  },
+  {
+   "id": "bar_harbor_harbor_place",
+   "style": "whale_watch",
+   "wear": 0.3,
+   "seed": 41,
+   "_doc": "Harbor Place, Bar Harbor: the whole fixed waterfront from the whale-watch slip head to the inlet wall, built on piles (Matt 31 Oct: \"the whole of Harbor Place is also built on pilings (there is no actual ground around at all)\"). Generated by tools/assets/harbor_place/dock_json.py from layout.json (docs/harbor-place.md items 1 and 4). Coordinates are LEVEL metres (x east, z south): each platform has its own at/heading, the walls are paths in level metres with at [0,0]. Floats and gangways are NOT here: they stay in levels/downeast/docks.json bar_harbor_whale_watch, hinged on this deck at +3.3. The only ground is the beach between the timber deck and Stewman's; everything under these decks is water and mud (World cuts the terrain).",
+   "sources": [
+    "NOAA ENC US5ME2GM SLCONS (features.json)",
+    "USGS 3DEP lidar 2021 (detail.png)",
+    "OSM way 422549225 (the building)",
+    "Matt's photos docs/look/photo_whale_watch_slips.jpg, photo_aerial_town_overcast.jpg, photo_aerial_town_autumn.jpg"
+   ],
+   "frame": {
+    "yaw_deg": -166.402,
+    "note": "the slip-head frame every platform shares: local +z toward the water, local +x to the west"
+   },
+   "platforms": [
+    {
+     "id": "apron",
+     "_doc": "A: the apron, slip head (out) and the dinghy channel (port, east). The safety fence of the slip photo along both. ww_r1 and ww_r2 hinge on its out edge.",
+     "at": [
+      -375.83,
+      936.61
+     ],
+     "heading_deg": -166.4,
+     "deck_navd_m": 3.3,
+     "width_m": 35.0,
+     "depth_m": 25.1,
+     "deck": "concrete",
+     "seabed_in_m": 3.17,
+     "seabed_out_m": 5.8,
+     "water_edges": [
+      "out",
+      "port"
+     ]
+    },
+    {
+     "id": "under_hp",
+     "_doc": "A: the deck Harbor Place stands on (World's building, base +3.3). East end on the town pier fill; west face over the beach (stbd), no fence (the building wall is there).",
+     "at": [
+      -368.36,
+      955.38
+     ],
+     "heading_deg": -166.4,
+     "deck_navd_m": 3.3,
+     "width_m": 41.3,
+     "depth_m": 20.0,
+     "deck": "concrete",
+     "seabed_in_m": 2.3,
+     "seabed_out_m": 3.17,
+     "water_edges": [
+      "stbd"
+     ],
+     "fence": false
+    },
+    {
+     "id": "street_e",
+     "_doc": "B: the street-level deck behind the building, east half, its back on the West Street retaining wall.",
+     "at": [
+      -359.32,
+      966.57
+     ],
+     "heading_deg": -166.4,
+     "deck_navd_m": 5.5,
+     "width_m": 19.0,
+     "depth_m": 13.0,
+     "deck": "concrete",
+     "seabed_in_m": 4.04,
+     "seabed_out_m": 4.5,
+     "water_edges": [],
+     "fence": false
+    },
+    {
+     "id": "street_w",
+     "_doc": "B: west half, shallower because West Street bends north; its west end looks over the inlet (fence).",
+     "at": [
+      -378.96,
+      965.15
+     ],
+     "heading_deg": -166.4,
+     "deck_navd_m": 5.5,
+     "width_m": 18.5,
+     "depth_m": 7.0,
+     "deck": "concrete",
+     "seabed_in_m": 4.25,
+     "seabed_out_m": 4.5,
+     "water_edges": [
+      "stbd"
+     ]
+    },
+    {
+     "id": "timber_n",
+     "_doc": "C: the open-board deck at ww_w's head; ww_rk (kayak ramp) and ww_k along its north edge. Rail on the slip (out) and ww_w (stbd) sides.",
+     "at": [
+      -397.46,
+      936.09
+     ],
+     "heading_deg": -166.4,
+     "deck_navd_m": 3.3,
+     "width_m": 6.8,
+     "depth_m": 19.5,
+     "deck": "timber",
+     "seabed_in_m": 3.59,
+     "seabed_out_m": 5.8,
+     "water_edges": [
+      "out",
+      "stbd"
+     ]
+    },
+    {
+     "id": "timber_w",
+     "_doc": "C: its west lobe over the beach, rail on the open sides.",
+     "at": [
+      -405.02,
+      934.62
+     ],
+     "heading_deg": -166.4,
+     "deck_navd_m": 3.3,
+     "width_m": 7.2,
+     "depth_m": 6.6,
+     "deck": "timber",
+     "seabed_in_m": 3.96,
+     "seabed_out_m": 4.7,
+     "water_edges": [
+      "out",
+      "stbd"
+     ]
+    }
+   ],
+   "walls": [
+    {
+     "id": "inlet_wall",
+     "_doc": "The granite wall at the head of the inlet, West Street's retaining wall (USA18); face north to the beach. Top +6.0 (street), foot +1.0.",
+     "kind": "granite",
+     "top_navd_m": 6.0,
+     "height_m": 5.0,
+     "path": [
+      [
+       -458.1,
+       967.5
+      ],
+      [
+       -437.2,
+       970.5
+      ],
+      [
+       -390.0,
+       957.1
+      ]
+     ],
+     "water_side": "right"
+    },
+    {
+     "id": "street_back",
+     "_doc": "The poured retaining wall under the street deck (B), West Street's edge; face north. B bears on its top; foot on the +1.5 beach.",
+     "kind": "concrete",
+     "top_navd_m": 5.5,
+     "height_m": 4.0,
+     "path": [
+      [
+       -387.95,
+       967.32
+      ],
+      [
+       -369.97,
+       962.98
+      ],
+      [
+       -368.56,
+       968.81
+      ],
+      [
+       -350.09,
+       964.34
+      ]
+     ],
+     "water_side": "right"
+    }
+   ]
+  },
+  {
+   "id": "harborside_point",
+   "style": "west_street",
+   "wear": 0.3,
+   "seed": 408,
+   "_doc": "Site 1 item 21 (docs/sites/bar-harbor-waterfront.md, rows 4.08, 4.09, 4.16). Level metres. The Harborside point's seawall and the former Golden Anchor pier under the pavilion. Wall line: chart SLCONS 4.09, moved landward to the face the 2021 lidar shows (0.5 m on the west, north and east faces, 1.2 m on the south stretch). Coping +3.9 then +3.5; rail tops +4.93 and +4.53 [lidar]; feet from the lidar on the beach, from detail.png under water. Dry granite with granite posts (Matt's photos 18 Oct, docs/docks.md) and a cream rail (photo_aerial_town_autumn.jpg). ASSUMED until V4.1: dry-laid rather than mortared, 3.6 m post pitch. Pier: 21.7 m wide, 50 m from the fill to the seaward end, deck +3.3 (the lidar's neck; the survey's +4.9 was not a deck). The building's roof covers the outer 32 m. Timber piles ASSUMED; nothing published describes them. Dressing (item 20b): authored, level metres. Seven twin-arm lamps on the east lawn from the autumn aerial: count and line seen, shape and exact spots ASSUMED until V4.1. Rail damage, the broken post, fallen stones, signs and their wording, the old piles and iron beside the pier: ASSUMED, chosen for interest; no photo shows them. Beds under the old piles from detail.png.",
+   "walls": [
+    {
+     "id": "harborside_point_nne",
+     "kind": "granite",
+     "top_navd_m": 3.9,
+     "water_side": "right",
+     "posts": {
+      "pitch_m": 3.6,
+      "h_m": 1.03,
+      "w_m": 0.4,
+      "setback_m": 0.55,
+      "broken": [
+       [
+        3,
+        5
+       ]
+      ]
+     },
+     "rail": {
+      "h_m": 1.03,
+      "damage": [
+       {
+        "run": 1,
+        "bay": 7,
+        "kind": "snapped"
+       },
+       {
+        "run": 2,
+        "bay": 10,
+        "kind": "patched"
+       },
+       {
+        "run": 3,
+        "bay": 5,
+        "kind": "roped"
+       }
+      ]
+     },
+     "path": [
+      [
+       -608.6,
+       842.56,
+       3.9,
+       0.6
+      ],
+      [
+       -609.96,
+       827.0,
+       3.9,
+       -1.0
+      ],
+      [
+       -547.17,
+       814.31,
+       3.9,
+       -2.0
+      ],
+      [
+       -544.4,
+       872.02,
+       3.9,
+       -1.7
+      ],
+      [
+       -542.7,
+       906.52,
+       3.9,
+       0.0
+      ]
+     ],
+     "cap": {
+      "h": 0.45,
+      "depth_m": 1.1,
+      "corner_m": 1.5
+     }
+    },
+    {
+     "id": "harborside_point_s",
+     "kind": "granite",
+     "top_navd_m": 3.5,
+     "water_side": "right",
+     "posts": {
+      "pitch_m": 3.6,
+      "h_m": 1.03,
+      "w_m": 0.4,
+      "setback_m": 0.55
+     },
+     "rail": {
+      "h_m": 1.03,
+      "damage": [
+       {
+        "run": 0,
+        "bay": 2,
+        "kind": "snapped"
+       }
+      ]
+     },
+     "path": [
+      [
+       -543.02,
+       907.38,
+       3.5,
+       0.2
+      ],
+      [
+       -531.02,
+       918.56,
+       3.5,
+       0.1
+      ],
+      [
+       -520.44,
+       921.96,
+       3.5,
+       -0.3
+      ],
+      [
+       -513.24,
+       929.05,
+       3.5,
+       -0.6
+      ]
+     ],
+     "cap": {
+      "h": 0.45,
+      "depth_m": 1.1,
+      "corner_m": 1.5
+     }
+    }
+   ],
+   "platforms": [
+    {
+     "id": "golden_anchor_pier",
+     "at": [
+      -503.2,
+      929.2
+     ],
+     "heading_deg": 130.5,
+     "deck_navd_m": 3.3,
+     "width_m": 21.7,
+     "depth_m": 50.0,
+     "seabed_in_m": 4.3,
+     "seabed_out_m": 6.7,
+     "pitch_m": [
+      3,
+      3
+     ],
+     "water_edges": [
+      "out",
+      "port",
+      "stbd"
+     ],
+     "roofed_from_m": 18.0
+    }
+   ],
+   "dressing": {
+    "id": "harborside_dress",
+    "far_m": 120,
+    "cutoff_m": 900,
+    "items": [
+     {
+      "type": "lamp_twin",
+      "at": [
+       -552.11,
+       826.0
+      ],
+      "y": 3.62,
+      "yaw_deg": 3
+     },
+     {
+      "type": "lamp_twin",
+      "at": [
+       -551.46,
+       839.5
+      ],
+      "y": 3.62,
+      "yaw_deg": 3
+     },
+     {
+      "type": "lamp_twin",
+      "at": [
+       -550.81,
+       853.0
+      ],
+      "y": 3.62,
+      "yaw_deg": 3
+     },
+     {
+      "type": "lamp_twin",
+      "at": [
+       -550.16,
+       866.5
+      ],
+      "y": 3.62,
+      "yaw_deg": 3
+     },
+     {
+      "type": "lamp_twin",
+      "at": [
+       -549.51,
+       880.0
+      ],
+      "y": 3.62,
+      "yaw_deg": 3
+     },
+     {
+      "type": "lamp_twin",
+      "at": [
+       -548.84,
+       893.5
+      ],
+      "y": 3.62,
+      "yaw_deg": 3
+     },
+     {
+      "type": "lamp_twin",
+      "at": [
+       -548.18,
+       907.0
+      ],
+      "y": 3.62,
+      "yaw_deg": 3
+     },
+     {
+      "type": "sign",
+      "sign": "wall",
+      "at": [
+       -545.1,
+       890.3
+      ],
+      "y": 3.62,
+      "yaw_deg": 90,
+      "h_m": 1.15
+     },
+     {
+      "type": "block",
+      "at": [
+       -535.5,
+       911.4
+      ],
+      "y": 0.42,
+      "yaw_deg": 22,
+      "pitch_deg": 9,
+      "roll_deg": -14,
+      "size": [
+       1.5,
+       0.45,
+       1.0
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -533.9,
+       909.6
+      ],
+      "y": 0.28,
+      "yaw_deg": -41,
+      "pitch_deg": -6,
+      "roll_deg": 24,
+      "size": [
+       0.8,
+       0.4,
+       0.6
+      ]
+     },
+     {
+      "type": "ring_bolt",
+      "at": [
+       -546.6,
+       834.0
+      ],
+      "y": 3.9,
+      "yaw_deg": 90
+     },
+     {
+      "type": "ring_bolt",
+      "at": [
+       -545.5,
+       861.0
+      ],
+      "y": 3.9,
+      "yaw_deg": 90
+     },
+     {
+      "type": "chain",
+      "path": [
+       [
+        -546.5,
+        3.97,
+        861.05
+       ],
+       [
+        -545.45,
+        3.95,
+        861.15
+       ],
+       [
+        -545.1,
+        3.9,
+        861.2
+       ],
+       [
+        -544.95,
+        3.2,
+        861.25
+       ],
+       [
+        -544.95,
+        2.2,
+        861.2
+       ]
+      ],
+      "link_m": 0.13
+     },
+     {
+      "type": "sign",
+      "sign": "marina",
+      "at": [
+       -501.65,
+       914.86
+      ],
+      "y": 3.3,
+      "yaw_deg": -139.5,
+      "h_m": 1.7
+     },
+     {
+      "type": "sign",
+      "sign": "gangway",
+      "at": [
+       -498.86,
+       913.66
+      ],
+      "y": 3.3,
+      "yaw_deg": -49.5,
+      "h_m": 1.45
+     },
+     {
+      "type": "sign",
+      "sign": "no_swim",
+      "at": [
+       -497.47,
+       911.29
+      ],
+      "y": 3.3,
+      "yaw_deg": -139.5,
+      "h_m": 1.35
+     },
+     {
+      "type": "life_ring",
+      "at": [
+       -499.66,
+       914.88
+      ],
+      "y": 3.3,
+      "yaw_deg": -49.5
+     },
+     {
+      "type": "sign",
+      "sign": "ghost",
+      "at": [
+       -489.68,
+       931.19
+      ],
+      "y": 3.3,
+      "yaw_deg": 40.5,
+      "h_m": 1.75
+     },
+     {
+      "type": "old_piles",
+      "piles": [
+       [
+        -489.55,
+        935.95,
+        -1.18,
+        1.6,
+        2,
+        40
+       ],
+       [
+        -486.99,
+        934.02,
+        -1.3,
+        0.2,
+        0,
+        0
+       ],
+       [
+        -485.05,
+        931.84,
+        -1.41,
+        2.3,
+        3,
+        200
+       ],
+       [
+        -482.74,
+        934.07,
+        -1.42,
+        0.8,
+        18,
+        130
+       ],
+       [
+        -482.42,
+        929.99,
+        -1.53,
+        -0.4,
+        0,
+        0
+       ],
+       [
+        -480.13,
+        927.9,
+        -1.64,
+        1.9,
+        6,
+        300
+       ],
+       [
+        -477.83,
+        930.14,
+        -1.65,
+        -0.2,
+        0,
+        0
+       ],
+       [
+        -477.5,
+        926.05,
+        -1.76,
+        2.6,
+        4,
+        80
+       ],
+       [
+        -475.27,
+        923.74,
+        -1.88,
+        0.1,
+        25,
+        220
+       ],
+       [
+        -472.85,
+        921.81,
+        -2.0,
+        1.2,
+        9,
+        20
+       ],
+       [
+        -468.67,
+        921.93,
+        -2.12,
+        2.9,
+        2,
+        130
+       ],
+       [
+        -468.14,
+        917.93,
+        -2.23,
+        -0.8,
+        0,
+        0
+       ]
+      ]
+     },
+     {
+      "type": "sign",
+      "sign": "no_wake",
+      "at": [
+       -468.48,
+       921.76
+      ],
+      "y": 2.4,
+      "yaw_deg": 130.5,
+      "h_m": 0.75,
+      "post": true,
+      "scale": 1.0
+     },
+     {
+      "type": "anchor",
+      "at": [
+       -483.2,
+       932.62
+      ],
+      "y": -1.22,
+      "yaw_deg": 58,
+      "pitch_deg": -14,
+      "roll_deg": 38,
+      "l_m": 1.5
+     },
+     {
+      "type": "chain",
+      "path": [
+       [
+        -482.39,
+        -1.05,
+        932.33
+       ],
+       [
+        -481.96,
+        -1.29,
+        932.22
+       ],
+       [
+        -481.35,
+        -1.47,
+        931.7
+       ],
+       [
+        -481.15,
+        -1.5,
+        931.01
+       ],
+       [
+        -480.65,
+        -1.54,
+        930.05
+       ],
+       [
+        -480.16,
+        -1.54,
+        930.02
+       ],
+       [
+        -479.46,
+        -1.56,
+        930.22
+       ],
+       [
+        -478.74,
+        -1.59,
+        929.99
+       ],
+       [
+        -477.96,
+        -1.64,
+        929.2
+       ],
+       [
+        -477.76,
+        -1.65,
+        928.37
+       ],
+       [
+        -477.25,
+        -1.69,
+        927.27
+       ],
+       [
+        -476.74,
+        -1.72,
+        927.1
+       ]
+      ],
+      "link_m": 0.14
+     },
+     {
+      "type": "ladder",
+      "from": [
+       -478.16,
+       -1.7,
+       928.05
+      ],
+      "to": [
+       -479.86,
+       1.5,
+       928.06
+      ],
+      "w_m": 0.42,
+      "missing": [
+       4,
+       5,
+       9
+      ]
+     },
+     {
+      "type": "iron",
+      "path": [
+       [
+        -475.34,
+        -1.77,
+        926.43
+       ],
+       [
+        -474.53,
+        -1.75,
+        926.14
+       ],
+       [
+        -473.75,
+        -1.37,
+        926.13
+       ],
+       [
+        -473.42,
+        -0.87,
+        926.37
+       ]
+      ],
+      "w_m": 0.1,
+      "t_m": 0.015
+     },
+     {
+      "type": "iron",
+      "path": [
+       [
+        -484.84,
+        -1.32,
+        934.55
+       ],
+       [
+        -484.27,
+        -1.34,
+        933.67
+       ],
+       [
+        -484.28,
+        -1.14,
+        932.89
+       ]
+      ],
+      "w_m": 0.14,
+      "t_m": 0.02
+     },
+     {
+      "type": "iron",
+      "path": [
+       [
+        -472.53,
+        -1.94,
+        923.25
+       ],
+       [
+        -471.49,
+        -1.97,
+        922.62
+       ]
+      ],
+      "w_m": 0.3,
+      "t_m": 0.012
+     }
+    ]
+   }
+  },
+  {
+   "id": "west_street_walls",
+   "style": "west_street",
+   "wear": 0.3,
+   "seed": 311,
+   "_doc": "Site 1 item 22 (docs/sites/bar-harbor-waterfront.md, rows 3.10, 3.15, 3.16). Level metres. The Bar Harbor Club's wall and deck, the cove's curved back wall, the Harborside's west wall as far as harborside_point.json's first point. Faces, feet and tops from the 2021 lidar. Stone, rail form and the dressing are ASSUMED until V3.3.",
+   "walls": [
+    {
+     "id": "bar_harbor_club_wall",
+     "kind": "granite_mortar",
+     "top_navd_m": 4.95,
+     "water_side": "right",
+     "path": [
+      [
+       -755.0,
+       885.6,
+       4.95,
+       2.1
+      ],
+      [
+       -754.8,
+       880.5,
+       4.95,
+       1.65
+      ],
+      [
+       -755.5,
+       873.2,
+       4.95,
+       1.1
+      ],
+      [
+       -745.6,
+       871.3,
+       4.95,
+       0.83
+      ],
+      [
+       -733.9,
+       869.0,
+       4.95,
+       0.92
+      ],
+      [
+       -722.1,
+       866.7,
+       4.95,
+       1.2
+      ],
+      [
+       -708.6,
+       864.3,
+       4.95,
+       1.35
+      ],
+      [
+       -706.1,
+       864.5,
+       4.95,
+       1.3
+      ],
+      [
+       -704.8,
+       873.0,
+       4.95,
+       1.45
+      ],
+      [
+       -703.1,
+       880.8,
+       4.95,
+       1.3
+      ],
+      [
+       -701.4,
+       885.2,
+       4.95,
+       1.5
+      ],
+      [
+       -698.6,
+       887.8,
+       4.95,
+       1.5
+      ]
+     ],
+     "cap": {
+      "h": 0.4,
+      "depth_m": 0.9,
+      "corner_m": 1.2
+     },
+     "walk": {
+      "w_m": 3.1,
+      "t_m": 0.2
+     },
+     "posts": {
+      "pitch_m": 2.44,
+      "h_m": 1.15,
+      "w_m": 0.07,
+      "setback_m": 0.45,
+      "mat": "steel_dark",
+      "runs": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8
+      ]
+     },
+     "rail": {
+      "h_m": 1.15,
+      "mat": "steel_dark",
+      "damage": [
+       {
+        "run": 4,
+        "bay": 2,
+        "kind": "patched"
+       }
+      ]
+     }
+    },
+    {
+     "id": "west_street_cove_wall",
+     "kind": "granite",
+     "top_navd_m": 4.15,
+     "water_side": "right",
+     "path": [
+      [
+       -698.6,
+       887.8,
+       4.15,
+       1.5
+      ],
+      [
+       -693.3,
+       891.0,
+       4.15,
+       1.3
+      ],
+      [
+       -686.0,
+       894.4,
+       4.15,
+       1.4
+      ],
+      [
+       -677.1,
+       896.9,
+       4.15,
+       1.5
+      ],
+      [
+       -668.0,
+       898.2,
+       4.15,
+       1.85
+      ],
+      [
+       -660.4,
+       898.2,
+       4.15,
+       2.05
+      ],
+      [
+       -652.2,
+       896.3,
+       4.15,
+       2.2
+      ],
+      [
+       -646.6,
+       894.2,
+       4.15,
+       2.4
+      ],
+      [
+       -642.8,
+       891.8,
+       4.15,
+       2.4
+      ],
+      [
+       -640.0,
+       888.6,
+       3.95,
+       2.25
+      ]
+     ],
+     "cap": {
+      "h": 0.45,
+      "depth_m": 1.1,
+      "corner_m": 1.5
+     },
+     "walk": {
+      "w_m": 1.6,
+      "t_m": 0.2
+     },
+     "posts": {
+      "pitch_m": 3.6,
+      "h_m": 1.2,
+      "w_m": 0.4,
+      "setback_m": 0.55
+     },
+     "rail": {
+      "h_m": 1.2,
+      "damage": [
+       {
+        "run": 3,
+        "bay": 1,
+        "kind": "roped"
+       }
+      ]
+     }
+    },
+    {
+     "id": "harborside_west_wall",
+     "kind": "granite",
+     "top_navd_m": 3.9,
+     "water_side": "right",
+     "path": [
+      [
+       -640.0,
+       888.6,
+       3.9,
+       2.2
+      ],
+      [
+       -640.6,
+       883.6,
+       3.9,
+       1.7
+      ],
+      [
+       -641.5,
+       877.6,
+       3.9,
+       1.25
+      ],
+      [
+       -642.5,
+       871.7,
+       3.9,
+       0.9
+      ],
+      [
+       -644.0,
+       862.8,
+       3.9,
+       0.35
+      ],
+      [
+       -644.9,
+       855.9,
+       3.9,
+       0.03
+      ],
+      [
+       -644.4,
+       854.1,
+       3.9,
+       -0.1
+      ],
+      [
+       -642.8,
+       852.6,
+       3.9,
+       -0.3
+      ],
+      [
+       -634.7,
+       850.4,
+       3.9,
+       -0.49
+      ],
+      [
+       -625.0,
+       847.7,
+       3.9,
+       -0.35
+      ],
+      [
+       -616.8,
+       845.6,
+       3.9,
+       0.03
+      ],
+      [
+       -611.4,
+       844.2,
+       3.9,
+       0.45
+      ],
+      [
+       -608.6,
+       842.56,
+       3.9,
+       0.6
+      ]
+     ],
+     "cap": {
+      "h": 0.45,
+      "depth_m": 1.1,
+      "corner_m": 1.5
+     },
+     "posts": {
+      "pitch_m": 3.6,
+      "h_m": 1.03,
+      "w_m": 0.4,
+      "setback_m": 0.55,
+      "broken": [
+       [
+        8,
+        1
+       ]
+      ]
+     },
+     "rail": {
+      "h_m": 1.03,
+      "damage": [
+       {
+        "run": 4,
+        "bay": 1,
+        "kind": "snapped"
+       },
+       {
+        "run": 9,
+        "bay": 1,
+        "kind": "patched"
+       }
+      ]
+     }
+    }
+   ],
+   "dressing": {
+    "id": "west_street_dress",
+    "far_m": 120,
+    "cutoff_m": 900,
+    "items": [
+     {
+      "type": "block",
+      "at": [
+       -684.2,
+       892.6
+      ],
+      "y": 1.62,
+      "yaw_deg": 17,
+      "pitch_deg": 8,
+      "roll_deg": -16,
+      "size": [
+       1.3,
+       0.5,
+       0.9
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -682.6,
+       891.4
+      ],
+      "y": 1.5,
+      "yaw_deg": -38,
+      "pitch_deg": -7,
+      "roll_deg": 21,
+      "size": [
+       0.8,
+       0.42,
+       0.6
+      ]
+     },
+     {
+      "type": "ring_bolt",
+      "at": [
+       -725.9,
+       868.2
+      ],
+      "y": 4.95,
+      "yaw_deg": 169
+     },
+     {
+      "type": "sign",
+      "sign": "wall",
+      "at": [
+       -670.0,
+       899.0
+      ],
+      "y": 4.15,
+      "yaw_deg": 180,
+      "h_m": 1.3
+     },
+     {
+      "type": "life_ring",
+      "at": [
+       -716.0,
+       867.2
+      ],
+      "y": 4.95,
+      "yaw_deg": 169
+     }
+    ]
+   }
+  },
+  {
+   "id": "shore_path_inn_walls",
+   "style": "west_street",
+   "wear": 0.25,
+   "seed": 523,
+   "_doc": "Site 1 item 23 (docs/sites/bar-harbor-waterfront.md, stretch 5). Level metres. The Inn's seawall round its point and Grant Park's, poured in 2024-25 (VIA; Bar Harbor Inn). Faces, feet and tops: 2021 lidar (tools/assets/sites/wall_profile.py), so pre-storm positions; parapet 0.35 m over the old ground. Form, coping, footing and rail from Bar Harbor Story's photos (16 Apr 2025, 3 Jul 2024). The rail's extent and the stair's spot are ASSUMED until V5.1, V5.2.",
+   "walls": [
+    {
+     "id": "inn_high_wall",
+     "kind": "concrete",
+     "concrete_mat": "apron_concrete",
+     "pour": true,
+     "water_side": "right",
+     "pitch_m": 2.44,
+     "lift_m": 1.22,
+     "weep_pitch_m": 4.8,
+     "batter_deg": 1,
+     "coping": {
+      "w_m": 0.7,
+      "h_m": 0.12,
+      "mat": "cap_cobble"
+     },
+     "footing": {
+      "proud_m": 0.45,
+      "h_m": 0.5
+     },
+     "cap": {
+      "h": 0.12,
+      "depth_m": 0.7
+     },
+     "top_navd_m": 4.8,
+     "path": [
+      [
+       -157.1,
+       1007.5,
+       4.8,
+       1.18
+      ],
+      [
+       -153.6,
+       1010.3,
+       5.25,
+       1.27
+      ],
+      [
+       -150.8,
+       1014.2,
+       6.0,
+       1.54
+      ],
+      [
+       -148.4,
+       1018.5,
+       6.45,
+       1.97
+      ],
+      [
+       -145.7,
+       1022.6,
+       6.45,
+       2.07
+      ],
+      [
+       -142.5,
+       1026.3,
+       7.65,
+       2.42
+      ],
+      [
+       -138.4,
+       1029.1,
+       7.65,
+       1.86
+      ],
+      [
+       -133.9,
+       1031.2,
+       7.65,
+       1.52
+      ],
+      [
+       -129.6,
+       1033.5,
+       7.65,
+       1.01
+      ],
+      [
+       -125.5,
+       1036.3,
+       7.65,
+       1.39
+      ],
+      [
+       -121.5,
+       1039.4,
+       7.65,
+       1.74
+      ],
+      [
+       -117.2,
+       1041.8,
+       7.35,
+       2.3
+      ],
+      [
+       -112.4,
+       1043.3,
+       6.75,
+       2.7
+      ],
+      [
+       -108.4,
+       1046.0,
+       6.75,
+       2.65
+      ],
+      [
+       -106.3,
+       1050.7,
+       6.3,
+       4.22
+      ]
+     ],
+     "orn_rail": {
+      "runs": [
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12
+      ],
+      "h_m": 1.07,
+      "pitch_m": 2.4,
+      "picket_m": 0.125,
+      "hoop_m": 0.25
+     }
+    },
+    {
+     "id": "inn_point_wall",
+     "kind": "concrete",
+     "concrete_mat": "apron_concrete",
+     "pour": true,
+     "water_side": "right",
+     "pitch_m": 2.44,
+     "lift_m": 1.22,
+     "weep_pitch_m": 4.8,
+     "batter_deg": 1,
+     "coping": {
+      "w_m": 0.7,
+      "h_m": 0.12,
+      "mat": "cap_cobble"
+     },
+     "footing": {
+      "proud_m": 0.45,
+      "h_m": 0.5
+     },
+     "cap": {
+      "h": 0.12,
+      "depth_m": 0.7
+     },
+     "top_navd_m": 6.3,
+     "path": [
+      [
+       -106.3,
+       1050.7,
+       6.3,
+       4.22
+      ],
+      [
+       -105.8,
+       1055.7,
+       6.75,
+       4.12
+      ],
+      [
+       -104.3,
+       1060.6,
+       6.45,
+       4.41
+      ],
+      [
+       -102.7,
+       1065.4,
+       6.45,
+       4.3
+      ],
+      [
+       -101.2,
+       1070.1,
+       6.45,
+       4.32
+      ],
+      [
+       -98.9,
+       1074.4,
+       6.45,
+       3.95
+      ],
+      [
+       -96.0,
+       1078.4,
+       6.15,
+       3.7
+      ],
+      [
+       -93.5,
+       1082.7,
+       6.15,
+       3.98
+      ],
+      [
+       -91.6,
+       1087.3,
+       5.85,
+       3.17
+      ],
+      [
+       -90.1,
+       1092.0,
+       5.85,
+       3.83
+      ],
+      [
+       -88.8,
+       1096.8,
+       5.85,
+       3.2
+      ],
+      [
+       -87.2,
+       1101.5,
+       6.15,
+       2.62
+      ],
+      [
+       -85.5,
+       1106.3,
+       6.15,
+       2.84
+      ],
+      [
+       -84.1,
+       1111.1,
+       6.15,
+       3.8
+      ],
+      [
+       -82.8,
+       1115.9,
+       6.15,
+       2.23
+      ],
+      [
+       -81.5,
+       1120.8,
+       6.15,
+       3.24
+      ],
+      [
+       -79.5,
+       1125.4,
+       6.15,
+       3.52
+      ],
+      [
+       -76.9,
+       1129.7,
+       6.15,
+       3.9
+      ],
+      [
+       -74.4,
+       1134.0,
+       6.15,
+       3.0
+      ],
+      [
+       -72.0,
+       1138.5,
+       6.15,
+       2.91
+      ],
+      [
+       -69.3,
+       1142.8,
+       5.85,
+       2.95
+      ],
+      [
+       -66.3,
+       1146.9,
+       5.85,
+       2.5
+      ],
+      [
+       -63.2,
+       1150.8,
+       5.85,
+       2.14
+      ],
+      [
+       -59.8,
+       1154.3,
+       5.85,
+       2.93
+      ],
+      [
+       -55.7,
+       1157.2,
+       5.85,
+       3.8
+      ]
+     ]
+    },
+    {
+     "id": "grant_park_wall_n",
+     "kind": "concrete",
+     "concrete_mat": "apron_concrete",
+     "pour": true,
+     "water_side": "right",
+     "pitch_m": 2.44,
+     "lift_m": 1.22,
+     "weep_pitch_m": 4.8,
+     "batter_deg": 1,
+     "coping": {
+      "w_m": 0.7,
+      "h_m": 0.12,
+      "mat": "cap_cobble"
+     },
+     "footing": {
+      "proud_m": 0.45,
+      "h_m": 0.5
+     },
+     "cap": {
+      "h": 0.12,
+      "depth_m": 0.7
+     },
+     "top_navd_m": 5.85,
+     "path": [
+      [
+       -55.7,
+       1157.2,
+       5.85,
+       3.8
+      ],
+      [
+       -52.1,
+       1160.8,
+       5.85,
+       3.57
+      ],
+      [
+       -47.6,
+       1163.3,
+       5.85,
+       3.86
+      ],
+      [
+       -43.7,
+       1166.4,
+       5.55,
+       3.71
+      ],
+      [
+       -41.6,
+       1170.9,
+       5.55,
+       3.86
+      ],
+      [
+       -40.2,
+       1175.8,
+       5.55,
+       3.58
+      ],
+      [
+       -38.3,
+       1180.3,
+       5.55,
+       3.76
+      ],
+      [
+       -36.4,
+       1185.0,
+       5.55,
+       3.53
+      ],
+      [
+       -34.9,
+       1189.8,
+       5.55,
+       3.53
+      ],
+      [
+       -33.5,
+       1194.6,
+       5.55,
+       3.32
+      ],
+      [
+       -32.4,
+       1199.5,
+       5.55,
+       3.6
+      ],
+      [
+       -31.6,
+       1204.3,
+       5.55,
+       3.9
+      ],
+      [
+       -30.7,
+       1209.2,
+       5.55,
+       4.16
+      ],
+      [
+       -29.5,
+       1214.0,
+       5.55,
+       3.97
+      ],
+      [
+       -28.2,
+       1218.5,
+       5.55,
+       3.75
+      ],
+      [
+       -27.3,
+       1222.3,
+       5.55,
+       3.92
+      ]
+     ]
+    },
+    {
+     "id": "grant_park_wall_s",
+     "kind": "concrete",
+     "concrete_mat": "apron_concrete",
+     "pour": true,
+     "water_side": "right",
+     "pitch_m": 2.44,
+     "lift_m": 1.22,
+     "weep_pitch_m": 4.8,
+     "batter_deg": 1,
+     "coping": {
+      "w_m": 0.7,
+      "h_m": 0.12,
+      "mat": "cap_cobble"
+     },
+     "footing": {
+      "proud_m": 0.45,
+      "h_m": 0.5
+     },
+     "cap": {
+      "h": 0.12,
+      "depth_m": 0.7
+     },
+     "top_navd_m": 5.55,
+     "path": [
+      [
+       -26.5,
+       1225.0,
+       5.55,
+       3.92
+      ],
+      [
+       -25.6,
+       1228.8,
+       5.55,
+       3.71
+      ],
+      [
+       -24.3,
+       1233.3,
+       5.55,
+       4.01
+      ],
+      [
+       -22.4,
+       1238.0,
+       5.55,
+       3.3
+      ],
+      [
+       -20.7,
+       1242.7,
+       5.25,
+       3.39
+      ],
+      [
+       -19.2,
+       1247.5,
+       5.25,
+       3.72
+      ],
+      [
+       -17.6,
+       1252.2,
+       5.25,
+       3.37
+      ],
+      [
+       -15.7,
+       1256.8,
+       5.25,
+       3.5
+      ],
+      [
+       -13.7,
+       1261.6,
+       5.25,
+       4.03
+      ],
+      [
+       -11.7,
+       1266.7,
+       5.25,
+       2.99
+      ]
+     ]
+    }
+   ],
+   "steps": [
+    {
+     "id": "grant_park_stairs",
+     "path": [
+      [
+       -27.0,
+       1223.7,
+       5.1
+      ],
+      [
+       -23.6,
+       1222.9,
+       3.6
+      ]
+     ],
+     "width_m": 1.9,
+     "rise_m": 0.3,
+     "cheeks": "none",
+     "top_navd_m": 5.1
+    }
+   ],
+   "dressing": {
+    "id": "shore_path_inn_dress",
+    "far_m": 120,
+    "cutoff_m": 900,
+    "items": [
+     {
+      "type": "block",
+      "at": [
+       -22.6,
+       1222.2
+      ],
+      "y": 3.05,
+      "yaw_deg": 24,
+      "pitch_deg": 14,
+      "roll_deg": -9,
+      "size": [
+       1.7,
+       0.3,
+       0.5
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -21.2,
+       1223.3
+      ],
+      "y": 2.75,
+      "yaw_deg": -31,
+      "pitch_deg": -11,
+      "roll_deg": 19,
+      "size": [
+       1.5,
+       0.3,
+       0.45
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -20.6,
+       1221.2
+      ],
+      "y": 2.55,
+      "yaw_deg": 61,
+      "pitch_deg": 23,
+      "roll_deg": 6,
+      "size": [
+       1.6,
+       0.3,
+       0.5
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -19.2,
+       1222.6
+      ],
+      "y": 2.3,
+      "yaw_deg": -8,
+      "pitch_deg": -6,
+      "roll_deg": -27,
+      "size": [
+       1.2,
+       0.28,
+       0.45
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -79.2,
+       1117.4
+      ],
+      "y": 2.55,
+      "yaw_deg": 33,
+      "pitch_deg": 7,
+      "roll_deg": 12,
+      "size": [
+       1.3,
+       0.35,
+       0.6
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -77.9,
+       1119.8
+      ],
+      "y": 2.35,
+      "yaw_deg": -52,
+      "pitch_deg": -12,
+      "roll_deg": 5,
+      "size": [
+       0.9,
+       0.32,
+       0.55
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -45.4,
+       1160.3
+      ],
+      "y": 3.25,
+      "yaw_deg": 14,
+      "pitch_deg": -9,
+      "roll_deg": -14,
+      "size": [
+       1.1,
+       0.34,
+       0.6
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -33.75,
+       1222.18
+      ],
+      "y": 5.42,
+      "yaw_deg": 76,
+      "size": [
+       0.45,
+       0.42,
+       0.28
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -34.15,
+       1223.82
+      ],
+      "y": 5.42,
+      "yaw_deg": 76,
+      "size": [
+       0.45,
+       0.42,
+       0.28
+      ]
+     },
+     {
+      "type": "block",
+      "at": [
+       -33.95,
+       1223.0
+      ],
+      "y": 5.69,
+      "yaw_deg": 76,
+      "size": [
+       0.5,
+       0.13,
+       1.9
+      ]
+     },
+     {
+      "type": "pipe",
+      "from": [
+       -88.7,
+       3.9,
+       1096.9
+      ],
+      "to": [
+       -87.6,
+       3.82,
+       1097.3
+      ],
+      "r_m": 0.05
+     },
+     {
+      "type": "pipe",
+      "from": [
+       -37.0,
+       4.45,
+       1184.9
+      ],
+      "to": [
+       -35.9,
+       4.38,
+       1185.2
+      ],
+      "r_m": 0.05
+     },
+     {
+      "type": "sign",
+      "sign": "wall",
+      "at": [
+       -28.6,
+       1224.2
+      ],
+      "y": 5.15,
+      "yaw_deg": 76,
+      "h_m": 1.2
+     }
+    ]
+   }
+  }
+ ]
+}

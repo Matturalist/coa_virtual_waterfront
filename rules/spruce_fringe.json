@@ -1,0 +1,57 @@
+{
+ "id": "spruce_fringe",
+ "name": "The spruce fringe",
+ "kind": "generator",
+ "paints": "trees",
+ "plain": "Spruce grows dense right to the top of the granite, not as scattered cones: a dark edge just above the rock.",
+ "where": {
+  "habitat": {
+   "14": 1.0,
+   "16": 0.9,
+   "18": 0.6,
+   "15": 0.4,
+   "20": 0.5,
+   "1": 0.3
+  },
+  "height_mllw_m": [
+   [
+    4.5,
+    0.0
+   ],
+   [
+    6.0,
+    1.0
+   ],
+   [
+    12,
+    1.0
+   ],
+   [
+    18,
+    0.0
+   ]
+  ]
+ },
+ "params": {
+  "mix": {
+   "red_spruce": 0.5,
+   "white_spruce": 0.3,
+   "black_spruce": 0.2
+  },
+  "per_ha": 900,
+  "edge": "dense to the rock's top edge"
+ },
+ "seed": "natural",
+ "confidence": "medium: curves from World's levels/downeast/coast_rules.json (21 Oct), checked against the Bar Harbor shore and cited above; Matt's field corrections still to come",
+ "sources": [
+  {
+   "cite": "Davis, R.B. (1966) Spruce-fir forests of the coast of Maine. Ecol. Monogr. 36: 79-94.",
+   "note": "red and white spruce with balsam fir to the edge of the rock on the outer coast"
+  },
+  {
+   "cite": "docs/coast-generator.md (Matt, 20 Oct 2026)",
+   "note": "the rule's purpose, in his words"
+  }
+ ],
+ "where_note": "the fringe is the forest's edge on the rock, not the whole forest: from just above high water to ~14 m above it (derive.py's salt field reaches only a few metres inland, so height stands in for distance; the forest spawner and the canopy cover the rest)"
+}

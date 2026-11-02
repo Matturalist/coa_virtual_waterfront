@@ -1,0 +1,48 @@
+{
+ "id": "ogden_point_pier",
+ "style": "private_pier",
+ "wear": 0.5,
+ "seed": 614,
+ "_doc": "K6 test and first use: the private pier off Ogden Point (survey 6.14/6.15, docs/sites/bar-harbor-waterfront.md stretch 6). Level metres. 41 m x 3 m, deck +4.3 NAVD; the lidar's ground falls from +1.6 at the root to -1.1 at the outer end (height_root_m 2.7, height_m 5.4 below the deck). The charted head 6.15 (6 x 7 m) is absent from the 2021 lidar, flown out of season: a seasonal float on a gangway (summer_only). Rails at +5.3 match the lidar's raised edges. Timber or aluminium waits on photo V6.2.",
+ "pier": {
+  "at": [
+   336.5,
+   2260.0
+  ],
+  "heading_deg": -167.3,
+  "length_m": 41.0,
+  "width_m": 3.0,
+  "deck_navd_m": 4.3,
+  "height_m": 5.4,
+  "height_root_m": 2.7
+ },
+ "ramps": [
+  {
+   "id": "gangway",
+   "from": "pier:ramp_hinge[end]",
+   "to": "F1",
+   "length_m": 11.0,
+   "width_m": 0.9,
+   "summer_only": true
+  }
+ ],
+ "floats": [
+  {
+   "id": "F1",
+   "deck_y": 0.6,
+   "freeboard_m": 0.45,
+   "modules": [
+    {
+     "type": "float_6x7"
+    }
+   ],
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "landing": {
+    "ramp": "gangway",
+    "mode": "inline"
+   }
+  }
+ ],
+ "overrides": {}
+}

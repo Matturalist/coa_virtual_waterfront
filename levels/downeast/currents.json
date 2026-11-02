@@ -1,0 +1,47 @@
+{
+ "version": 2,
+ "phases": 12,
+ "M2": {
+  "amp_m": 1.572,
+  "period_s": 44714.16470214156,
+  "station": "8413320 Bar Harbor, ME"
+ },
+ "encoding": "One RGBA 8-bit atlas per grid, phase k at column k % atlas_cols, row k // atlas_cols, each cell nx x nz: R = u east, G = v south, (v/255*2-1)*uscale m/s; B = local water level minus the open-sea level, (v/255*2-1)*escale m; A = 255 wet at that phase (the flats dry and flood). Phase 0 = high water at the open sea, phases evenly through one M2 cycle. Run time: the stream scales with the tidal range of the cycle in progress over the M2 range (currents.js).",
+ "model": "2-D shallow-water (continuity + momentum with Manning n = 0.025, Coriolis, upwind advection), explicit C-grid, forced by M2 at the grid edge, 1.0 cycle spin-up; nests take their edge levels from the parent run",
+ "depth_datum": "MSL -0.084 m NAVD 88",
+ "sources": [
+  "NOAA NCEI CUDEM topobathy via terrain.png",
+  "NOAA CO-OPS 8413320 Bar Harbor, ME harmonic constituents (tide.json)"
+ ],
+ "made_by": "tools/tidal_flow.py",
+ "grids": [
+  {
+   "name": "region",
+   "x0": -47721.05921803375,
+   "z0": -22114.800000000316,
+   "dx": 180.0,
+   "nx": 419,
+   "nz": 399,
+   "uscale": 2.0394697189331055,
+   "escale": 3.1440000534057617,
+   "parent": null,
+   "atlas": "tidal/region.png",
+   "atlas_cols": 4,
+   "phases": 12
+  },
+  {
+   "name": "mdi",
+   "x0": -14991.059218033748,
+   "z0": -9004.800000000316,
+   "dx": 60.0,
+   "nx": 400,
+   "nz": 500,
+   "uscale": 1.113561987876892,
+   "escale": 1.153503656387329,
+   "parent": "region",
+   "atlas": "tidal/mdi.png",
+   "atlas_cols": 4,
+   "phases": 12
+  }
+ ]
+}

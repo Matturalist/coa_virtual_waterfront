@@ -1,0 +1,12 @@
+{
+ "_doc": "every rule file the editor's Rules panel lists (rules/README.md). Add a file here when you add a rule.",
+ "rules": [
+  "xanthoria.json",
+  "ledge.json",
+  "beach_stones.json",
+  "rockweed.json",
+  "kelp.json",
+  "black_lichen.json",
+  "spruce_fringe.json"
+ ]
+}

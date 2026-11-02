@@ -1,0 +1,348 @@
+{
+ "_doc": "tools/assets/rock_palettes.py \u2014 the default rock palettes (textures/rocks/palettes.json), one per rock_rules formation. Built by tools/assets/rock_palettes.py; edit palettes in the editor, not here.",
+ "amount_doc": "amount: 0 = the scans as photographed, 1 = the scans' pattern in the palette's colours.",
+ "formations": {
+  "bar_harbor_formation": {
+   "name": "Bar Harbor Formation (siltstone, sandstone)",
+   "amount": 1.0,
+   "wet": 0.55,
+   "top": [
+    [
+     63,
+     56,
+     46
+    ],
+    [
+     82,
+     71,
+     57
+    ],
+    [
+     98,
+     86,
+     69
+    ]
+   ],
+   "face": [
+    [
+     45,
+     39,
+     34
+    ],
+    [
+     50,
+     44,
+     38
+    ],
+    [
+     56,
+     49,
+     41
+    ]
+   ],
+   "lichen": [
+    [
+     83,
+     83,
+     73
+    ],
+    [
+     109,
+     107,
+     88
+    ],
+    [
+     134,
+     130,
+     102
+    ]
+   ],
+   "source": "mean colour of luminance bands p5-25 / p40-60 / p75-95 of the scans (top: seaside_rock 0.7 + marble_rock_03 0.3; face: dark_rock_02 0.6 + dark_rock 0.4; lichen: mossy_rock 0.5)"
+  },
+  "granites": {
+   "name": "Granite",
+   "amount": 1.0,
+   "wet": 0.55,
+   "top": [
+    [
+     108,
+     82,
+     57
+    ],
+    [
+     140,
+     117,
+     93
+    ],
+    [
+     166,
+     148,
+     129
+    ]
+   ],
+   "face": [
+    [
+     108,
+     82,
+     57
+    ],
+    [
+     140,
+     117,
+     93
+    ],
+    [
+     166,
+     148,
+     129
+    ]
+   ],
+   "lichen": [
+    [
+     47,
+     33,
+     24
+    ],
+    [
+     64,
+     49,
+     38
+    ],
+    [
+     94,
+     88,
+     76
+    ]
+   ],
+   "source": "mean colour of luminance bands p5-25 / p40-60 / p75-95 of the scans (top: Matt's reference for Cadillac granite: Poly Haven namaqualand_stones_01 diffuse (CC0), detail pixels only (textures/rocks/ref/namaqualand_stones_01.jpg); face: Matt's reference for Cadillac granite: Poly Haven namaqualand_stones_01 diffuse (CC0), detail pixels only (textures/rocks/ref/namaqualand_stones_01.jpg); lichen: lichen_rock 0.6)"
+  },
+  "gabbro_diorite": {
+   "name": "Gabbro and diorite",
+   "amount": 1.0,
+   "wet": 0.55,
+   "top": [
+    [
+     67,
+     59,
+     38
+    ],
+    [
+     83,
+     72,
+     51
+    ],
+    [
+     100,
+     88,
+     66
+    ]
+   ],
+   "face": [
+    [
+     50,
+     54,
+     58
+    ],
+    [
+     75,
+     81,
+     84
+    ],
+    [
+     111,
+     116,
+     120
+    ]
+   ],
+   "lichen": [
+    [
+     47,
+     33,
+     24
+    ],
+    [
+     64,
+     49,
+     38
+    ],
+    [
+     94,
+     88,
+     76
+    ]
+   ],
+   "source": "mean colour of luminance bands p5-25 / p40-60 / p75-95 of the scans (top: Matt's reference for gabbro-diorite: Poly Haven coastal_cliff_04 diffuse (CC0), detail pixels, moss left out (textures/rocks/ref/coastal_cliff_04.jpg); face: Nubble Lighthouse scan (Cape Neddick, Matt's upload nubble_lighthouse__cape_neddick_maine.glb): ortho of the scan, pixels on 25-70 deg slopes, not green, median of 612k px. Cape Neddick gabbro-diorite: right rock type, 100 km from MDI.; lichen: lichen_rock 0.4)"
+  },
+  "schist": {
+   "name": "Schist and gneiss",
+   "amount": 1.0,
+   "wet": 0.55,
+   "top": [
+    [
+     61,
+     56,
+     49
+    ],
+    [
+     69,
+     64,
+     54
+    ],
+    [
+     78,
+     72,
+     61
+    ]
+   ],
+   "face": [
+    [
+     29,
+     24,
+     21
+    ],
+    [
+     32,
+     27,
+     23
+    ],
+    [
+     38,
+     33,
+     27
+    ]
+   ],
+   "lichen": [
+    [
+     83,
+     83,
+     73
+    ],
+    [
+     109,
+     107,
+     88
+    ],
+    [
+     134,
+     130,
+     102
+    ]
+   ],
+   "source": "mean colour of luminance bands p5-25 / p40-60 / p75-95 of the scans (top: seaside_rock 1; face: dark_rock 1; lichen: mossy_rock 0.5)"
+  },
+  "volcanics": {
+   "name": "Volcanics",
+   "amount": 1.0,
+   "wet": 0.55,
+   "top": [
+    [
+     67,
+     57,
+     46
+    ],
+    [
+     83,
+     70,
+     55
+    ],
+    [
+     101,
+     85,
+     66
+    ]
+   ],
+   "face": [
+    [
+     108,
+     85,
+     61
+    ],
+    [
+     150,
+     123,
+     94
+    ],
+    [
+     188,
+     163,
+     134
+    ]
+   ],
+   "lichen": [
+    [
+     83,
+     83,
+     73
+    ],
+    [
+     109,
+     107,
+     88
+    ],
+    [
+     134,
+     130,
+     102
+    ]
+   ],
+   "source": "mean colour of luminance bands p5-25 / p40-60 / p75-95 of the scans (top: rock_face_04 1; face: marble_cliff_06 1; lichen: mossy_rock 0.5)"
+  },
+  "dikes": {
+   "name": "Dikes (basalt, diabase, aplite)",
+   "amount": 1.0,
+   "wet": 0.55,
+   "top": [
+    [
+     29,
+     24,
+     21
+    ],
+    [
+     32,
+     27,
+     23
+    ],
+    [
+     38,
+     33,
+     27
+    ]
+   ],
+   "face": [
+    [
+     29,
+     24,
+     21
+    ],
+    [
+     32,
+     27,
+     23
+    ],
+    [
+     38,
+     33,
+     27
+    ]
+   ],
+   "lichen": [
+    [
+     83,
+     83,
+     73
+    ],
+    [
+     109,
+     107,
+     88
+    ],
+    [
+     134,
+     130,
+     102
+    ]
+   ],
+   "source": "mean colour of luminance bands p5-25 / p40-60 / p75-95 of the scans (top: dark_rock 1; face: dark_rock 1; lichen: mossy_rock 0.3)"
+  }
+ }
+}

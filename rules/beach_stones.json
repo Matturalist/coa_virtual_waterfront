@@ -1,0 +1,149 @@
+{
+ "id": "beach_stones",
+ "name": "Beach stones: size follows the waves",
+ "kind": "generator",
+ "paints": "fill",
+ "plain": "Where stones collect on a gentle shore, exposed beaches (lots of open water to windward) get big, round, well-sorted boulders with a storm berm at the top; sheltered coves get small, mixed cobble over mud.",
+ "where": {
+  "habitat": {
+   "2": 1.0,
+   "3": 1.0,
+   "4": 0.8,
+   "5": 0.3,
+   "6": 0.55,
+   "8": 0.6,
+   "12": 0.25,
+   "1": 0.25,
+   "13": 0.7,
+   "21": 0.7,
+   "0": 0.5
+  },
+  "slope": [
+   [
+    0,
+    0.3
+   ],
+   [
+    0.017,
+    1.0
+   ],
+   [
+    0.14,
+    1.0
+   ],
+   [
+    0.29,
+    0.1
+   ]
+  ],
+  "height_mllw_m": [
+   [
+    -0.6,
+    0.0
+   ],
+   [
+    0.4,
+    1.0
+   ],
+   [
+    3.6,
+    1.0
+   ],
+   [
+    5.2,
+    0.0
+   ]
+  ]
+ },
+ "params": {
+  "d50_m": {
+   "field": "fetch_m",
+   "curve": [
+    [
+     300,
+     0.07
+    ],
+    [
+     1500,
+     0.16
+    ],
+    [
+     3000,
+     0.35
+    ],
+    [
+     4000,
+     0.55
+    ]
+   ]
+  },
+  "sorting": {
+   "field": "fetch_m",
+   "curve": [
+    [
+     300,
+     1.0
+    ],
+    [
+     1500,
+     0.7
+    ],
+    [
+     4000,
+     0.35
+    ]
+   ]
+  },
+  "roundedness": {
+   "field": "fetch_m",
+   "curve": [
+    [
+     300,
+     0.35
+    ],
+    [
+     1500,
+     0.6
+    ],
+    [
+     4000,
+     0.85
+    ]
+   ]
+  },
+  "storm_berm": {
+   "field": "fetch_m",
+   "curve": [
+    [
+     0,
+     0
+    ],
+    [
+     1500,
+     0
+    ],
+    [
+     3000,
+     1
+    ]
+   ]
+  }
+ },
+ "seed": "natural",
+ "confidence": "medium: curves from World's levels/downeast/coast_rules.json (21 Oct), checked against the Bar Harbor shore and cited above; Matt's field corrections still to come",
+ "sources": [
+  {
+   "cite": "Bird, E.C.F. (2008) Coastal Geomorphology: An Introduction, 2nd ed. Wiley.",
+   "note": "shingle and boulder beaches coarsen, sort and round with wave energy; a storm berm at the top of exposed ones"
+  },
+  {
+   "cite": "Kelley, J.T. et al. (1989) The Maine coastal zone: an atlas (Maine Geological Survey)",
+   "note": "Maine pocket beaches: boulder and cobble on exposed headlands, cobble over mud in sheltered coves"
+  },
+  {
+   "cite": "docs/coast-generator.md (Matt, 20 Oct 2026)",
+   "note": "the rule's purpose, in his words"
+  }
+ ],
+ "where_note": "habitat 13/21 (developed) counts on the shore: the 30 m land cover runs over the beaches in town (the beach below Agamont Park is 'developed, dense'); the height curve keeps the rule on the shore"
+}

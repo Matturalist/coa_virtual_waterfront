@@ -1,0 +1,346 @@
+{
+ "_doc": "Corrections to the level's generated data inside site 1 (Bar Harbor Waterfront), each from a survey with its reason. Applied by tools/site_fixes.py (World) to roads.json, edges.json and the manifest's building_fixes; the generated files stay regenerable and these are re-applied after them.",
+ "roads": [
+  {
+   "name": "Shore Path",
+   "from": [
+    15.0,
+    1313.0
+   ],
+   "to": [
+    126.0,
+    1376.0
+   ],
+   "onto_wall": [
+    [
+     19,
+     1312
+    ],
+    [
+     31,
+     1328
+    ],
+    [
+     38,
+     1335
+    ],
+    [
+     69,
+     1355
+    ],
+    [
+     98,
+     1365
+    ],
+    [
+     125,
+     1371
+    ],
+    [
+     143,
+     1378
+    ]
+   ],
+   "landward_m": 1.0,
+   "why": "Assets' stretch 5 survey (1 Nov; docs/sites/bar-harbor-waterfront.md): OSM ran the path across the cove south of the Balance Rock Inn, on lidar ground +0.5..+1.8 (awash at high water); it runs on the wall at the back of the cove (top +3.4..+4.2), so the line goes 1 m landward of the wall's top"
+  },
+  {
+   "name": "Shore Path",
+   "from": [
+    -152.8,
+    1018.4
+   ],
+   "to": [
+    -37.4,
+    1187.1
+   ],
+   "line": [
+    [
+     -149.68,
+     1019.28
+    ],
+    [
+     -146.9,
+     1023.5
+    ],
+    [
+     -143.5,
+     1027.42
+    ],
+    [
+     -139.14,
+     1030.4
+    ],
+    [
+     -134.57,
+     1032.54
+    ],
+    [
+     -130.38,
+     1034.78
+    ],
+    [
+     -126.38,
+     1037.51
+    ],
+    [
+     -122.33,
+     1040.65
+    ],
+    [
+     -117.79,
+     1043.18
+    ],
+    [
+     -113.05,
+     1044.65
+    ],
+    [
+     -109.56,
+     1046.95
+    ],
+    [
+     -107.67,
+     1051.31
+    ],
+    [
+     -107.27,
+     1056.0
+    ],
+    [
+     -105.73,
+     1061.06
+    ],
+    [
+     -104.13,
+     1065.87
+    ],
+    [
+     -102.58,
+     1070.68
+    ],
+    [
+     -100.17,
+     1075.2
+    ],
+    [
+     -97.26,
+     1079.22
+    ],
+    [
+     -94.84,
+     1083.36
+    ],
+    [
+     -93.01,
+     1087.82
+    ],
+    [
+     -91.54,
+     1092.42
+    ],
+    [
+     -90.23,
+     1097.24
+    ],
+    [
+     -88.62,
+     1101.99
+    ],
+    [
+     -86.93,
+     1106.76
+    ],
+    [
+     -85.54,
+     1111.51
+    ],
+    [
+     -84.25,
+     1116.29
+    ],
+    [
+     -82.92,
+     1121.29
+    ],
+    [
+     -80.83,
+     1126.09
+    ],
+    [
+     -78.19,
+     1130.47
+    ],
+    [
+     -75.71,
+     1134.73
+    ],
+    [
+     -73.3,
+     1139.25
+    ],
+    [
+     -70.54,
+     1143.64
+    ],
+    [
+     -67.49,
+     1147.81
+    ],
+    [
+     -64.33,
+     1151.79
+    ],
+    [
+     -60.77,
+     1155.44
+    ],
+    [
+     -56.57,
+     1158.42
+    ],
+    [
+     -53.0,
+     1162.0
+    ],
+    [
+     -48.43,
+     1164.55
+    ],
+    [
+     -44.88,
+     1167.33
+    ],
+    [
+     -43.01,
+     1171.42
+    ],
+    [
+     -41.62,
+     1176.3
+    ],
+    [
+     -39.69,
+     1180.87
+    ],
+    [
+     -37.81,
+     1185.51
+    ]
+   ],
+   "why": "Assets, site 1 item 23 (2 Nov): the Inn's and Grant Park's walls were rebuilt in concrete in 2024-25 (Bar Harbor Story's photos); the path is gravel directly behind the parapet, 1.5 m landward of the wall's station line",
+   "by": "shore_path_inn_walls"
+  }
+ ],
+ "spans": [
+  {
+   "line": "shore_path",
+   "split_preset": "shore_wall_picket",
+   "from": [
+    203.0,
+    1465.0
+   ],
+   "to": [
+    212.0,
+    1508.0
+   ],
+   "preset": "plain_verge",
+   "why": "Assets' stretch 5 survey: a gully (ground dips to +1.6 between +5.0 and +4.9); steps, a bridge or a causeway are unknown until there is a photo, so no wall is laid along the dip"
+  },
+  {
+   "line": "shore_path",
+   "split_preset": "shore_wall_rail_fence",
+   "from": [
+    -194.37,
+    1007.96
+   ],
+   "to": [
+    -37.35,
+    1187.14
+   ],
+   "preset": "shrubs_behind_wall",
+   "why": "Assets, site 1 item 23: the Inn's 2024-25 concrete wall and its rail are drawn by the dock file (shore_path_inn_walls); the land-side shrubs stay",
+   "by": "shore_path_inn_walls"
+  },
+  {
+   "line": "shore_path",
+   "split_preset": "shore_wall_picket",
+   "from": [
+    -22.31,
+    1243.87
+   ],
+   "to": [
+    -15.77,
+    1258.82
+   ],
+   "preset": "picket_behind_wall",
+   "why": "Assets, site 1 item 23: Grant Park's 2024-25 concrete wall is drawn by the dock file; the picket fence stays",
+   "by": "shore_path_inn_walls"
+  }
+ ],
+ "buildings": [
+  {
+   "at": [
+    276.54,
+    2086.03
+   ],
+   "r": 2.0,
+   "drop": true,
+   "why": "survey 5.60: on the water, a boat (Assets, stretch 5)"
+  },
+  {
+   "at": [
+    178.95,
+    1462.34
+   ],
+   "r": 2.0,
+   "drop": true,
+   "why": "survey 5.40: 0.1 m high, not a building (Assets, stretch 5)"
+  },
+  {
+   "at": [
+    -2.56,
+    1511.62
+   ],
+   "r": 2.0,
+   "drop": true,
+   "why": "survey 5.36: flat at the ground, a terrace, pool or court (Assets, stretch 5)"
+  },
+  {
+   "at": [
+    158.2,
+    1621.16
+   ],
+   "r": 2.0,
+   "drop": true,
+   "why": "survey 5.49: flat at the ground, a terrace, pool or court (Assets, stretch 5)"
+  },
+  {
+   "at": [
+    883.48,
+    3021.96
+   ],
+   "r": 2.0,
+   "drop": true,
+   "why": "survey 7.13: lidar flat at +40.0, 0.2 m above the ground round it: a terrace, a pad or a building since removed (Assets, stretch 7)"
+  },
+  {
+   "at": [
+    -405.93,
+    797.57
+   ],
+   "r": 2.0,
+   "drop": true,
+   "why": "survey 4.60: a boat on a mooring, not a building; Harborside point (Assets, 1 Nov; tools/harborside_point.py)"
+  },
+  {
+   "at": [
+    -483.21,
+    914.02
+   ],
+   "r": 2.0,
+   "drop": true,
+   "why": "survey 4.16: the Golden Anchor building, drawn as a landmark now; Harborside point (Assets, 1 Nov; tools/harborside_point.py)"
+  }
+ ]
+}

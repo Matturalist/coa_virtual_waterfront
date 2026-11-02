@@ -1,0 +1,1261 @@
+{
+ "_doc": "Dock styles for src/docks.js (docs/docks.md). A style names materials from _materials for each part, member sizes, pontoon type, rail type and a dressing palette (manifest ids). wear blends deck.new -> deck.weathered. Assets owns this file. ramp.camber_m: default mid-span rise of the gangway arc in metres (0 = flat); dock.json ramps[].camber_m overrides it. Plank materials carry rows (board rows across the texture) and span_m (metres the texture covers): Geo.plank gives every plank one board row, a random grain offset, flip and tint.",
+ "_materials": {
+  "deck_new": {
+   "diff": "textures/dock/wood_planks_diff.jpg",
+   "nor": "textures/dock/wood_planks_nor.jpg",
+   "credit": "Poly Haven wood_planks CC0",
+   "rows": 6,
+   "span_m": 2.0,
+   "mean": [
+    121,
+    89,
+    58
+   ],
+   "orm": "textures/dock/wood_planks_orm.jpg",
+   "roughness_target": 0.732,
+   "roughness": 0.85
+  },
+  "deck_pt": {
+   "diff": "textures/dock/brown_planks_07_diff.jpg",
+   "nor": "textures/dock/brown_planks_07_nor.jpg",
+   "credit": "Poly Haven brown_planks_07 CC0",
+   "rows": 6,
+   "span_m": 2.0,
+   "mean": [
+    138,
+    124,
+    108
+   ],
+   "orm": "textures/dock/brown_planks_07_orm.jpg",
+   "roughness_target": 0.83,
+   "roughness": 0.849
+  },
+  "deck_grey": {
+   "diff": "textures/dock/weathered_plank_siding_diff.jpg",
+   "nor": "textures/dock/weathered_plank_siding_nor.jpg",
+   "credit": "Poly Haven weathered_plank_siding CC0",
+   "rows": 8,
+   "span_m": 2.0,
+   "mean": [
+    76,
+    62,
+    51
+   ],
+   "orm": "textures/dock/weathered_plank_siding_orm.jpg",
+   "roughness_target": 0.762,
+   "roughness": 0.85
+  },
+  "deck_old": {
+   "diff": "textures/dock/old_wooden_floor_02_diff.jpg",
+   "nor": "textures/dock/old_wooden_floor_02_nor.jpg",
+   "credit": "Poly Haven old_wooden_floor_02 CC0",
+   "rows": 16,
+   "span_m": 2.0,
+   "mean": [
+    83,
+    50,
+    13
+   ],
+   "orm": "textures/dock/old_wooden_floor_02_orm.jpg",
+   "roughness_target": 0.394,
+   "roughness": 0.849
+  },
+  "deck_boards": {
+   "diff": "textures/dock/wood_floor_deck_diff.jpg",
+   "nor": "textures/dock/wood_floor_deck_nor.jpg",
+   "credit": "Poly Haven wood_floor_deck CC0",
+   "rows": 9,
+   "span_m": 2.0,
+   "mean": [
+    112,
+    54,
+    19
+   ],
+   "orm": "textures/dock/wood_floor_deck_orm.jpg",
+   "roughness_target": 0.374,
+   "roughness": 0.85
+  },
+  "wharf_asphalt": {
+   "diff": "textures/dock/worn_asphalt_diff.jpg",
+   "nor": "textures/dock/worn_asphalt_nor.jpg",
+   "roughness": 1.0,
+   "credit": "Poly Haven worn_asphalt CC0",
+   "mean": [
+    71,
+    57,
+    47
+   ],
+   "orm": "textures/dock/worn_asphalt_orm.jpg",
+   "roughness_target": 0.95
+  },
+  "wharf_concrete": {
+   "diff": "textures/dock/concrete_pavement_diff.jpg",
+   "nor": "textures/dock/concrete_pavement_nor.jpg",
+   "roughness": 1.0,
+   "credit": "Poly Haven concrete_pavement CC0",
+   "mean": [
+    127,
+    117,
+    102
+   ],
+   "orm": "textures/dock/concrete_pavement_orm.jpg",
+   "roughness_target": 0.9
+  },
+  "rust": {
+   "diff": "textures/dock/rusty_metal_04_diff.jpg",
+   "nor": "textures/dock/rusty_metal_04_nor.jpg",
+   "roughness": 1.0,
+   "credit": "Poly Haven rusty_metal_04 CC0",
+   "mean": [
+    91,
+    76,
+    66
+   ],
+   "orm": "textures/dock/rusty_metal_04_orm.jpg",
+   "roughness_target": 0.8
+  },
+  "wood_frame": {
+   "color": 16777215,
+   "roughness": 1.0,
+   "colour_note": "weathered timber, grey-brown (was 0x5B6245, which read olive-green)",
+   "diff": "textures/dock/weathered_plank_siding_diff.jpg",
+   "nor": "textures/dock/weathered_plank_siding_nor.jpg",
+   "credit": "Poly Haven weathered_plank_siding CC0 (Matt's imported set); each member samples one board row (Geo.plank)",
+   "rows": 8,
+   "span_m": 2.0,
+   "mean": [
+    76,
+    62,
+    51
+   ],
+   "orm": "textures/dock/weathered_plank_siding_orm.jpg",
+   "roughness_target": 0.9
+  },
+  "creosote": {
+   "color": 16777215,
+   "roughness": 1.0,
+   "colour_note": "weathered creosoted pile, grey-brown (Matt 19 Oct: the piles read red; was 0x381612 drawn without sRGB conversion)",
+   "diff": "textures/dock/pile_wood_diff.jpg",
+   "nor": "textures/dock/pile_wood_nor.jpg",
+   "credit": "sampled from the pile of 'Wooden planks dock set' by CharlieCatling (Sketchfab, Sketchfab Standard licence), Matt's download 19 Oct; tools/assets/pile/pilewood.py",
+   "layout": "u 0..0.742 the side, once round the pile; u 0.758..1, v 0.758..1 the end-grain disc (Geo.pile maps both)",
+   "mean": [
+    91,
+    82,
+    64
+   ],
+   "orm": "textures/dock/pile_wood_orm.jpg",
+   "roughness_target": 0.9
+  },
+  "cedar_log": {
+   "color": 16777215,
+   "roughness": 1.0,
+   "diff": "textures/dock/cedar_log_diff.jpg",
+   "nor": "textures/dock/cedar_log_nor.jpg",
+   "credit": "Poly Haven chinese_cedar_bark CC0 (Matt's imported set), tools/assets/pile/cedarlog.py",
+   "colour_note": "texture colour as scanned; the flat colour is ignored once the texture loads",
+   "mean": [
+    84,
+    65,
+    49
+   ],
+   "orm": "textures/dock/cedar_log_orm.jpg",
+   "roughness_target": 0.95
+  },
+  "pontoon": {
+   "color": 1250067,
+   "roughness": 1.0,
+   "orm": "textures/dock/hdpe_black_orm.jpg",
+   "diff": "textures/dock/hdpe_black_diff.jpg",
+   "nor": "textures/dock/hdpe_black_nor.jpg",
+   "credit": "ambientCG Plastic012B CC0",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.6,
+   "paint_target": "#131313",
+   "mean": [
+    43,
+    42,
+    40
+   ],
+   "color_lin": [
+    0.1658,
+    0.1746,
+    0.1944
+   ]
+  },
+  "poly_float": {
+   "color": 1184274,
+   "roughness": 1.0,
+   "orm": "textures/dock/hdpe_black_orm.jpg",
+   "diff": "textures/dock/hdpe_black_diff.jpg",
+   "nor": "textures/dock/hdpe_black_nor.jpg",
+   "credit": "ambientCG Plastic012B CC0",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.5,
+   "paint_target": "#121212",
+   "mean": [
+    43,
+    42,
+    40
+   ],
+   "color_lin": [
+    0.1472,
+    0.155,
+    0.1726
+   ]
+  },
+  "alu": {
+   "color": 10592673,
+   "roughness": 0.839,
+   "metalness": 0.6,
+   "orm": "textures/dock/alu_sheet_orm.jpg",
+   "diff": "textures/dock/alu_sheet_diff.jpg",
+   "nor": "textures/dock/alu_sheet_nor.jpg",
+   "credit": "ambientCG Metal011 CC0",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.45,
+   "paint_target": "#a1a1a1",
+   "mean": [
+    157,
+    160,
+    165
+   ],
+   "color_lin": [
+    1.0569,
+    1.0138,
+    0.9474
+   ]
+  },
+  "galv": {
+   "color": 10263718,
+   "roughness": 1.0,
+   "metalness": 0.5,
+   "orm": "textures/dock/galv_sheet_orm.jpg",
+   "diff": "textures/dock/galv_sheet_diff.jpg",
+   "nor": "textures/dock/galv_sheet_nor.jpg",
+   "credit": "ambientCG Metal038 CC0",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.55,
+   "paint_target": "#9c9ca6",
+   "mean": [
+    96,
+    97,
+    99
+   ],
+   "color_lin": [
+    2.9099,
+    2.8443,
+    3.1177
+   ]
+  },
+  "teal_steel": {
+   "color": 2399894,
+   "roughness": 1.0,
+   "metalness": 0.2,
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.6,
+   "paint_target": "#249e96",
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "color_lin": [
+    0.0392,
+    1.0284,
+    0.9437
+   ]
+  },
+  "rubber": {
+   "color": 1315860,
+   "roughness": 1.0,
+   "orm": "textures/dock/rubber_grit_orm.jpg",
+   "diff": "textures/dock/rubber_grit_diff.jpg",
+   "nor": "textures/dock/rubber_grit_nor.jpg",
+   "credit": "ambientCG Rubber004 CC0",
+   "metric": true,
+   "tile_m": 0.5,
+   "roughness_target": 0.95,
+   "paint_target": "#141414",
+   "mean": [
+    43,
+    43,
+    50
+   ],
+   "color_lin": [
+    0.1856,
+    0.1856,
+    0.1332
+   ]
+  },
+  "granite_block": {
+   "diff": "textures/dock/granite_block_diff.jpg",
+   "nor": "textures/dock/granite_block_nor.jpg",
+   "roughness": 0.998,
+   "span_m": 2.0,
+   "credit": "Poly Haven marble_rock_01 CC0",
+   "colour_note": "provisional: pale grey with dark lichen flecks reads as weathered Maine granite block; tint range eyeballed from Matt's 18 Oct Harborside photo, not pixel-sampled",
+   "mean": [
+    155,
+    142,
+    125
+   ],
+   "orm": "textures/dock/granite_block_orm.jpg",
+   "roughness_target": 0.9
+  },
+  "concrete_wall": {
+   "diff": "textures/dock/concrete_pavement_diff.jpg",
+   "nor": "textures/dock/concrete_pavement_nor.jpg",
+   "roughness": 1.0,
+   "span_m": 3.0,
+   "credit": "Poly Haven concrete_pavement CC0",
+   "mean": [
+    127,
+    117,
+    102
+   ],
+   "orm": "textures/dock/concrete_pavement_orm.jpg",
+   "roughness_target": 0.92
+  },
+  "white_trim": {
+   "color": 15131610,
+   "roughness": 1.0,
+   "colour_note": "weathered white paint, eyeballed from Matt's 18 Oct Stewman's photo (railings, fascia); provisional",
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.7,
+   "paint_target": "#e6e3da",
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "color_lin": [
+    2.3164,
+    2.2824,
+    2.1481
+   ]
+  },
+  "weathered_timber": {
+   "diff": "textures/dock/weathered_plank_siding_diff.jpg",
+   "nor": "textures/dock/weathered_plank_siding_nor.jpg",
+   "roughness": 1.0,
+   "credit": "Poly Haven weathered_plank_siding CC0",
+   "colour_note": "silver-grey weathered timber (piles, caps, braces), as photographed",
+   "mean": [
+    76,
+    62,
+    51
+   ],
+   "orm": "textures/dock/weathered_plank_siding_orm.jpg",
+   "roughness_target": 0.9
+  },
+  "pile_wood": {
+   "diff": "textures/dock/pile_wood_diff.jpg",
+   "nor": "textures/dock/pile_wood_nor.jpg",
+   "roughness": 1.0,
+   "credit": "sampled from the pile of 'Wooden planks dock set' by CharlieCatling (Sketchfab, Sketchfab Standard licence), Matt's download 19 Oct; tools/assets/pile/pilewood.py",
+   "layout": "u 0..0.742 the side, once round the pile; u 0.758..1, v 0.758..1 the end-grain disc (Geo.pile maps both)",
+   "mean": [
+    91,
+    82,
+    64
+   ],
+   "orm": "textures/dock/pile_wood_orm.jpg",
+   "roughness_target": 0.88
+  },
+  "paint_yellow": {
+   "color": 13809515,
+   "roughness": 1.0,
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.6,
+   "paint_target": "#d2b76b",
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "color_lin": [
+    1.8963,
+    1.4208,
+    0.4488
+   ]
+  },
+  "float_nonskid": {
+   "diff": "textures/dock/concrete_pavement_diff.jpg",
+   "nor": "textures/dock/concrete_pavement_nor.jpg",
+   "roughness": 1.0,
+   "span_m": 1.0,
+   "mean": [
+    127,
+    117,
+    102
+   ],
+   "color_lin": [
+    2.3702,
+    2.7401,
+    3.4888
+   ],
+   "credit": "Poly Haven concrete_pavement CC0: one paver's interior per module, mirrored in 0.6 m patches (src/docks.js castFace), its grit as the non-skid, no paver joints; tinted to the painted deck",
+   "from": "#bcb9b4: median of photo_whale_watch_slips.jpg (5,850)-(25,880), sunlit deck of ww_e (tools/assets/harbor_place/palette.json float_deck_nonskid)",
+   "todo": "a faint roller texture (paint laid in 0.23 m roller passes) is not in the repo; materials-to-source",
+   "orm": "textures/dock/concrete_pavement_orm.jpg",
+   "roughness_target": 0.95
+  },
+  "float_concrete": {
+   "diff": "textures/dock/concrete_pavement_diff.jpg",
+   "nor": "textures/dock/concrete_pavement_nor.jpg",
+   "roughness": 1.0,
+   "span_m": 3.0,
+   "mean": [
+    127,
+    117,
+    102
+   ],
+   "color_lin": [
+    2.3702,
+    2.7401,
+    3.4888
+   ],
+   "credit": "Poly Haven concrete_pavement CC0, one paver's interior mirrored in 1.2 m patches (castFace; the formed sides are smoother than the deck), the same paint",
+   "from": "the deck paint #bcb9b4 (the sides are painted with it; in the photo they read #51688c sky-lit on the chamfer and #1d2c3c in shade)",
+   "orm": "textures/dock/concrete_pavement_orm.jpg",
+   "roughness_target": 0.9
+  },
+  "waler": {
+   "diff": "textures/dock/weathered_plank_siding_diff.jpg",
+   "nor": "textures/dock/weathered_plank_siding_nor.jpg",
+   "roughness": 0.948,
+   "rows": 8,
+   "span_m": 2.0,
+   "mean": [
+    76,
+    62,
+    51
+   ],
+   "color_lin": [
+    0.5729,
+    0.9304,
+    1.4298
+   ],
+   "credit": "Poly Haven weathered_plank_siding CC0, one board row per waler (Geo.plank)",
+   "from": "dark-stained timber; only seen in shade (#1d2c3c, photo_whale_watch_slips.jpg (600,660)-(740,720)), so its sunlit value #3b3c3c is provisional",
+   "orm": "textures/dock/weathered_plank_siding_orm.jpg",
+   "roughness_target": 0.85
+  },
+  "paint_red": {
+   "color": 10183526,
+   "roughness": 1.0,
+   "from": "photo_whale_watch_slips.jpg (0,770)-(140,945), pixels R > G + 50: the red line along the float edge (31 Oct: it is a red hose lying on the deck, dock_hose_red; the floats carry no painted line)",
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.6,
+   "paint_target": "#9b6366",
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "color_lin": [
+    0.9722,
+    0.3677,
+    0.404
+   ]
+  },
+  "uhmw_face": {
+   "color": 12173510,
+   "roughness": 1.0,
+   "stain_k": 0.3,
+   "from": "the same UHMW measurement as fender_white (photo_whale_watch_slips.jpg about (95,880)); per-sheet tints 0.6-0.8 for a weathered berth face, provisional until photo V1.x. stain_k: ships scrub it and little grows on it",
+   "orm": "textures/dock/hdpe_white_orm.jpg",
+   "diff": "textures/dock/hdpe_white_diff.jpg",
+   "nor": "textures/dock/hdpe_white_nor.jpg",
+   "credit": "ambientCG Plastic018B CC0",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.55,
+   "paint_target": "#b9c0c6",
+   "mean": [
+    120,
+    120,
+    120
+   ],
+   "color_lin": [
+    2.5917,
+    2.8123,
+    3.0093
+   ]
+  },
+  "fender_white": {
+   "color": 12173510,
+   "roughness": 1.0,
+   "from": "UHMW fender strips on the float sides, photo_whale_watch_slips.jpg about (95,880): sky-lit pixel (169,179,188); provisional, they were too thin to take a patch median",
+   "orm": "textures/dock/hdpe_white_orm.jpg",
+   "diff": "textures/dock/hdpe_white_diff.jpg",
+   "nor": "textures/dock/hdpe_white_nor.jpg",
+   "credit": "ambientCG Plastic018B CC0",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.5,
+   "paint_target": "#b9c0c6",
+   "mean": [
+    120,
+    120,
+    120
+   ],
+   "color_lin": [
+    2.5917,
+    2.8123,
+    3.0093
+   ]
+  },
+  "apron_concrete": {
+   "diff": "textures/dock/concrete_pavement_diff.jpg",
+   "nor": "textures/dock/concrete_pavement_nor.jpg",
+   "roughness": 1.0,
+   "mean": [
+    127,
+    117,
+    102
+   ],
+   "color_lin": [
+    1.7675,
+    2.1576,
+    2.8061
+   ],
+   "credit": "Poly Haven concrete_pavement CC0, tinted; each cast piece samples one paver's interior in ~1 m patches (src/docks.js concretePlatform pourUV), so no paver joints show",
+   "from": "#a5a6a4: the overcast aerial's apron luminance (#9da9a1, photo_aerial_town_overcast.jpg (555,632)-(585,645)) with the mean chroma of that and the sunlit autumn aerial's pale apron pixels (#bfb6ba, photo_aerial_town_autumn.jpg (500,588)-(560,612), max-min < 30, sum > 360): one photo blue-cast, one warm, their mean a near-neutral grey (palette.json apron_concrete, apron_concrete_sunlit)",
+   "orm": "textures/dock/concrete_pavement_orm.jpg",
+   "roughness_target": 0.9
+  },
+  "joint_sealant": {
+   "color": 2829097,
+   "roughness": 1.0,
+   "from": "black polyurethane joint sealant in the sawcuts (a material colour; the joints are below the photos' resolution)",
+   "orm": "textures/dock/rubber_grit_orm.jpg",
+   "diff": "textures/dock/rubber_grit_diff.jpg",
+   "nor": "textures/dock/rubber_grit_nor.jpg",
+   "credit": "ambientCG Rubber004 CC0",
+   "metric": true,
+   "tile_m": 0.5,
+   "roughness_target": 0.6,
+   "paint_target": "#2b2b29",
+   "mean": [
+    43,
+    43,
+    50
+   ],
+   "color_lin": [
+    1.0,
+    1.0,
+    0.6462
+   ]
+  },
+  "net_galv": {
+   "color": 12041399,
+   "roughness": 1.0,
+   "metalness": 0.35,
+   "from": "#b7bcb7: the safety net on the slip-head fence, photo_whale_watch_slips.jpg (200,960)-(700,1010), pixels with R+G+B > 540, sunlit (palette.json fence_net)",
+   "orm": "textures/dock/galv_sheet_orm.jpg",
+   "diff": "textures/dock/galv_sheet_diff.jpg",
+   "nor": "textures/dock/galv_sheet_nor.jpg",
+   "credit": "ambientCG Metal038 CC0",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.5,
+   "paint_target": "#b7bcb7",
+   "mean": [
+    96,
+    97,
+    99
+   ],
+   "color_lin": [
+    4.1342,
+    4.2879,
+    3.8636
+   ]
+  },
+  "steel_dark": {
+   "color": 2304564,
+   "roughness": 1.0,
+   "metalness": 0.3,
+   "from": "photo_whale_watch_slips.jpg (0,665)-(90,700), median of pixels with R+G+B < 200: the dark-painted steel lattice of the gangway at the foot of ww_e",
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.55,
+   "paint_target": "#232a34",
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "color_lin": [
+    0.0368,
+    0.0558,
+    0.0918
+   ]
+  },
+  "chain_link": {
+   "diff": "textures/dock/chain_link_diff.jpg",
+   "nor": "textures/dock/chain_link_nor.jpg",
+   "alpha": "textures/dock/chain_link_alpha.png",
+   "double": true,
+   "roughness": 0.49,
+   "metalness": 0.5,
+   "span_m": 1.14,
+   "mean": [
+    157,
+    158,
+    161
+   ],
+   "credit": "ambientCG Fence003 CC0 (ambientcg.com/a/Fence003, 1K set): a galvanised chain-link scan; tools/assets/chain_link.py slims it",
+   "from": "colour is the scan's own galvanised wire (mean of Color.jpg where Opacity > 0.5: 169,166,165); roughness the scan's mean on the wire; metalness 0.5 as galv (the scan's 0.84 reads black without an environment map). The tile spans 1.14 m: 16 diamonds of 2 in mesh (72 mm across), its wire 2.5 px = 2.8 mm (11 gauge is 3.05)"
+  },
+  "galv_pipe": {
+   "diff": "textures/dock/galv_sheet_diff.jpg",
+   "roughness": 1.0,
+   "metalness": 0.5,
+   "span_m": 0.5,
+   "mean": [
+    96,
+    97,
+    99
+   ],
+   "credit": "ambientCG Metal038 CC0",
+   "from": "galv_sheet (ambientCG Metal038), tinted to the chain-link scan's galvanised wire (169,166,165): hot-dip galvanised pipe for the fence's posts and rails",
+   "color": 11118245,
+   "orm": "textures/dock/galv_sheet_orm.jpg",
+   "nor": "textures/dock/galv_sheet_nor.jpg",
+   "metric": true,
+   "tile_m": 1.0,
+   "roughness_target": 0.5,
+   "paint_target": "#a9a6a5",
+   "color_lin": [
+    3.4702,
+    3.2609,
+    3.0766
+   ]
+  },
+  "sign_atlas": {
+   "diff": "textures/dock/signs_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "color": 16777215,
+   "roughness": 1.0,
+   "credit": "tools/assets/dock_signs.py, weathered with Poly Haven green_metal_rust and weathered_plank_siding, CC0",
+   "colour_note": "ASSUMED until V4.x photos",
+   "cells": {
+    "ghost": {
+     "uv": [
+      0.0117,
+      0.793,
+      0.9883,
+      0.9883
+     ],
+     "w_m": 2.5,
+     "h_m": 0.5
+    },
+    "marina": {
+     "uv": [
+      0.0117,
+      0.4561,
+      0.5,
+      0.7812
+     ],
+     "w_m": 1.25,
+     "h_m": 0.8325
+    },
+    "no_wake": {
+     "uv": [
+      0.5117,
+      0.4297,
+      0.7461,
+      0.7812
+     ],
+     "w_m": 0.6,
+     "h_m": 0.9
+    },
+    "gangway": {
+     "uv": [
+      0.7578,
+      0.6055,
+      0.9922,
+      0.7812
+     ],
+     "w_m": 0.6,
+     "h_m": 0.45
+    },
+    "ring": {
+     "uv": [
+      0.7578,
+      0.4375,
+      0.9922,
+      0.5938
+     ],
+     "w_m": 0.6,
+     "h_m": 0.4
+    },
+    "no_swim": {
+     "uv": [
+      0.0117,
+      0.1943,
+      0.3047,
+      0.4141
+     ],
+     "w_m": 0.75,
+     "h_m": 0.5625
+    },
+    "wall": {
+     "uv": [
+      0.3164,
+      0.1943,
+      0.6094,
+      0.4141
+     ],
+     "w_m": 0.75,
+     "h_m": 0.5625
+    },
+    "balance_rock": {
+     "uv": [
+      0.6211,
+      0.1387,
+      0.9883,
+      0.4141
+     ],
+     "w_m": 0.94,
+     "h_m": 0.705
+    }
+   }
+  },
+  "lamp_cream": {
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "metric": true,
+   "tile_m": 1.0,
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "roughness": 1.0,
+   "paint_target": "#e2d896",
+   "roughness_target": 0.6,
+   "color_lin": [
+    2.2263,
+    2.0403,
+    0.9344
+   ],
+   "colour_note": "the Harborside's lawn lamps: #e8ee94 at (1352, 805) in photo_aerial_town_autumn.jpg, an over-processed photo with the lawn's green in it, taken back toward the hotel trim's cream; provisional"
+  },
+  "lamp_glass": {
+   "color": 15986656,
+   "emissive": 16767392,
+   "roughness": 0.25,
+   "colour_note": "milky glass globe; ASSUMED. Night glow is Lighting's (requests.md)"
+  },
+  "cap_cobble": {
+   "diff": "textures/terrain/dry_river_pebbles/colour.jpg",
+   "nor": "textures/terrain/dry_river_pebbles/normal.jpg",
+   "roughness": 0.9,
+   "span_m": 1.3,
+   "credit": "Poly Haven dry_river_pebbles CC0 (textures/terrain)",
+   "from": "#929088, the rebuilt coping's median, Bar Harbor Story 16 Apr 2025, photo 'After repair' with the curved wall and the pipe (w=1000 render, box (250,450)-(420,560)); stones pressed into the 2024 concrete, Poly Haven pebbles neutralised to it",
+   "color_lin": [
+    1.272,
+    1.764,
+    2.641
+   ]
+  }
+ },
+ "town_pier": {
+  "_ref": "Bar Harbor town pier (photo 1, 17 Oct): timber-pile pier, aluminium gangway, grey timber floats on black plastic drums, galvanised hardware",
+  "pier": {
+   "deck": {
+    "new": "deck_pt",
+    "weathered": "deck_pt"
+   },
+   "pile_mat": "pile_wood",
+   "stringer_mat": "wood_frame",
+   "fender_mat": "wood_frame",
+   "bent_pitch_m": 3.0,
+   "pile_r_m": 0.16,
+   "plank_w_m": 0.15,
+   "rail": true,
+   "rail_mat": "galv",
+   "fender_piles": 0.5
+  },
+  "ramp": {
+   "deck_mat": "alu",
+   "rail_mat": "alu",
+   "tread_mat": "rubber",
+   "rail_r_m": 0.02,
+   "post_pitch_m": 1.6,
+   "hoops": false,
+   "camber_m": 0.25
+  },
+  "float": {
+   "deck": {
+    "new": "deck_grey",
+    "weathered": "deck_grey"
+   },
+   "frame_mat": "weathered_timber",
+   "pontoon": "drum",
+   "pontoon_mat": "pontoon",
+   "pontoon_r_m": 0.28,
+   "pontoon_pitch_m": 1.2,
+   "pontoon_draft_m": 0.35,
+   "plank_w_m": 0.14,
+   "plank_gap_m": 0.012,
+   "bumper": true
+  },
+  "dressing": [
+   "dock_box",
+   "lobster_crate",
+   "lobster_crate",
+   "lobster_trap",
+   "dock_hose_reel",
+   "lobster_buoy"
+  ]
+ },
+ "coa_pier": {
+  "_ref": "COA pier (photo 2): timber floats on cedar logs, teal-painted steel ramp with hoops, newer PT decking",
+  "pier": {
+   "deck": {
+    "new": "deck_new",
+    "weathered": "deck_pt"
+   },
+   "pile_mat": "pile_wood",
+   "stringer_mat": "wood_frame",
+   "fender_mat": "wood_frame",
+   "bent_pitch_m": 3.0,
+   "pile_r_m": 0.15,
+   "plank_w_m": 0.14,
+   "rail": false,
+   "fender_piles": 0.25
+  },
+  "ramp": {
+   "deck_mat": "teal_steel",
+   "rail_mat": "teal_steel",
+   "tread_mat": "rubber",
+   "rail_r_m": 0.025,
+   "post_pitch_m": 1.2,
+   "hoops": true,
+   "camber_m": 0.0
+  },
+  "float": {
+   "deck": {
+    "new": "deck_new",
+    "weathered": "deck_pt"
+   },
+   "frame_mat": "wood_frame",
+   "pontoon": "log",
+   "pontoon_mat": "cedar_log",
+   "pontoon_r_m": 0.3,
+   "pontoon_pitch_m": 6.0,
+   "pontoon_draft_m": 0.3,
+   "plank_w_m": 0.14,
+   "plank_gap_m": 0.01,
+   "bumper": false
+  },
+  "dressing": [
+   "lobster_crate",
+   "dock_life_ring"
+  ]
+ },
+ "yard_float": {
+  "_ref": "lumber-yard float (photo 3): new PT decking, black poly pontoons, galvanised brackets",
+  "pier": {
+   "deck": {
+    "new": "deck_new",
+    "weathered": "deck_pt"
+   },
+   "pile_mat": "pile_wood",
+   "stringer_mat": "wood_frame",
+   "fender_mat": "wood_frame",
+   "bent_pitch_m": 3.0,
+   "pile_r_m": 0.15,
+   "plank_w_m": 0.14,
+   "rail": false
+  },
+  "ramp": {
+   "deck_mat": "deck_new",
+   "rail_mat": "galv",
+   "tread_mat": "rubber",
+   "rail_r_m": 0.02,
+   "post_pitch_m": 1.5,
+   "hoops": false,
+   "camber_m": 0.15
+  },
+  "float": {
+   "deck": {
+    "new": "deck_new",
+    "weathered": "deck_pt"
+   },
+   "frame_mat": "wood_frame",
+   "pontoon": "poly",
+   "pontoon_mat": "poly_float",
+   "pontoon_r_m": 0.25,
+   "pontoon_pitch_m": 1.2,
+   "pontoon_draft_m": 0.3,
+   "plank_w_m": 0.14,
+   "plank_gap_m": 0.008,
+   "bumper": false
+  },
+  "dressing": []
+ },
+ "west_street": {
+  "_ref": "Bar Harbor West Street waterfront (Matt's photos, 18 Oct): Stewman's deck on a timber pile grid with X-bracing and white rails; the Harborside's dry-laid granite breakwater with granite posts on the cap; poured concrete seawall along West Street",
+  "pier": {
+   "deck": {
+    "new": "deck_pt",
+    "weathered": "deck_pt"
+   },
+   "pile_mat": "pile_wood",
+   "stringer_mat": "wood_frame",
+   "fender_mat": "wood_frame",
+   "bent_pitch_m": 3.0,
+   "pile_r_m": 0.16,
+   "plank_w_m": 0.15,
+   "rail": true,
+   "rail_mat": "galv",
+   "fender_piles": 0.35
+  },
+  "ramp": {
+   "deck_mat": "alu",
+   "rail_mat": "alu",
+   "tread_mat": "rubber",
+   "rail_r_m": 0.02,
+   "post_pitch_m": 1.6,
+   "hoops": false,
+   "camber_m": 0.25
+  },
+  "float": {
+   "deck": {
+    "new": "deck_pt",
+    "weathered": "deck_grey"
+   },
+   "frame_mat": "wood_frame",
+   "pontoon": "drum",
+   "pontoon_mat": "pontoon",
+   "pontoon_r_m": 0.28,
+   "pontoon_pitch_m": 1.2,
+   "pontoon_draft_m": 0.35,
+   "plank_w_m": 0.14,
+   "plank_gap_m": 0.012,
+   "bumper": true
+  },
+  "platform": {
+   "deck": {
+    "new": "deck_grey",
+    "weathered": "deck_old"
+   },
+   "pile_mat": "pile_wood",
+   "frame_mat": "weathered_timber",
+   "trim_mat": "white_trim",
+   "pitch_m": [
+    3.0,
+    3.0
+   ],
+   "pile_r_m": 0.15,
+   "inner_brace": 3,
+   "plank_w_m": 0.14,
+   "rail": true
+  },
+  "seawall": {
+   "kind": "granite",
+   "block_mat": "granite_block",
+   "concrete_mat": "concrete_wall",
+   "cap": {
+    "h": 0.45,
+    "depth_m": 1.1
+   },
+   "posts": null
+  },
+  "dressing": [
+   "dock_box",
+   "lobster_crate",
+   "lobster_crate",
+   "lobster_trap",
+   "dock_hose_reel",
+   "lobster_buoy"
+  ]
+ },
+ "_stain": {
+  "_doc": "Intertidal stain colours (sRGB 0-255), sampled; written by tools/assets/stain/palette.py. Read by docks.js DOCKS.stainMaterial.",
+  "green": {
+   "rgb": [
+    108,
+    137,
+    107
+   ],
+   "source": "tools/assets/weed/palette.json ulva p50 (seaweed_scan ortho, the sea-lettuce mat SW of the boulder)"
+  },
+  "olive": {
+   "rgb": [
+    68,
+    64,
+    56
+   ],
+   "source": "tools/assets/weed/palette.json fucus p35 (seaweed_scan ortho, the dark Fucus clumps NW and SE of the boulder)"
+  },
+  "black": {
+   "rgb": [
+    27,
+    22,
+    19
+   ],
+   "source": "textures/terrain/dark_rock/colour.jpg, mean of the darkest 10% of pixels (Poly Haven dark_rock, CC0)"
+  },
+  "barnacle": {
+   "rgb": [
+    124,
+    119,
+    106
+   ],
+   "source": "PROVISIONAL: textures/terrain/lichen_rock/colour.jpg, mean of the palest 8% with saturation < 40 (lichen crust standing in for barnacles until a photo of a Bar Harbor piling at low tide is attached)"
+  }
+ },
+ "whale_watch": {
+  "_ref": "Bar Harbor Whale Watch floats (Matt's photo from the slip head, 30 Oct): concrete floats in light grey non-skid, black rub rail, flush yellow deck plates, short yellow steel bollards, dark steel piles with a yellow collar; on deck a green hose, a red hose, white lines flaked in figure-eights, black lines along the edge. 31 Oct: the floats are precast concrete modules (pontoon: concrete).",
+  "pier": {
+   "deck": {
+    "new": "deck_pt",
+    "weathered": "deck_pt"
+   },
+   "pile_mat": "pile_wood",
+   "stringer_mat": "wood_frame",
+   "fender_mat": "wood_frame",
+   "bent_pitch_m": 3.0,
+   "pile_r_m": 0.16,
+   "plank_w_m": 0.15,
+   "rail": true,
+   "rail_mat": "galv",
+   "fender_piles": 0.5
+  },
+  "ramp": {
+   "deck_mat": "alu",
+   "rail_mat": "alu",
+   "tread_mat": "rubber",
+   "rail_r_m": 0.02,
+   "post_pitch_m": 1.6,
+   "hoops": false,
+   "camber_m": 0.25,
+   "truss": "pratt",
+   "_truss": "Matt's slip photo: the aluminium gangway to ww_e2 has welded lattice sides (verticals and a diagonal per panel); a ramp entry may set truss 'x' and rail_mat 'steel_dark' (the dark steel gangway to ww_e)"
+  },
+  "float": {
+   "deck": {
+    "new": "float_nonskid",
+    "weathered": "float_nonskid"
+   },
+   "pontoon": "concrete",
+   "bumper": true,
+   "plates": {
+    "n": 2,
+    "d_m": 0.5,
+    "mat": "paint_yellow"
+   },
+   "pile_model": "dock_pile_steel",
+   "concrete": {
+    "_doc": "docs/harbor-place.md item 2: precast concrete float modules (src/docks.js concreteFloat)",
+    "draft_m": 0.6,
+    "chamfer_m": 0.05,
+    "gap_m": 0.025,
+    "waler_h_m": 0.25,
+    "waler_t_m": 0.075,
+    "fender_pitch_m": 2.0,
+    "line_inset_m": 0.3,
+    "line_w_m": 0,
+    "waler_mat": "float_concrete",
+    "fender_mat": "fender_white",
+    "rod_pitch_m": 0.6
+   },
+   "landing_dressing": [
+    {
+     "model": "dock_hose_reel",
+     "at": [
+      -1.0,
+      0.4
+     ],
+     "yaw": 1.57
+    },
+    {
+     "model": "dock_hose_red",
+     "at": [
+      -0.95,
+      0.2
+     ],
+     "yaw": 3.1
+    },
+    {
+     "model": "dock_hose_coil",
+     "at": [
+      -0.95,
+      -4.4
+     ],
+     "yaw": 0.6
+    },
+    {
+     "model": "dock_line_flaked",
+     "at": [
+      -0.9,
+      -6.0
+     ],
+     "yaw": 1.2
+    },
+    {
+     "model": "dock_line_flaked",
+     "at": [
+      0.6,
+      2.6
+     ],
+     "yaw": -0.4
+    },
+    {
+     "model": "dock_bollard_yellow",
+     "at": [
+      -1.0,
+      3.6
+     ],
+     "yaw": 0
+    }
+   ],
+   "_landing_dressing": "what lies at each gangway's foot, [across (+ = right of the way down), along (+ = on past the foot)] m; from the slip photo's near float (31 Oct): reel at the foot, the red hose run back along the deck, green coil, two flaked white lines, a yellow bollard"
+  },
+  "dressing": [
+   "dock_line_flaked",
+   "dock_line_flaked",
+   "dock_hose_coil",
+   "dock_line_run",
+   "dock_bollard_yellow",
+   "dock_bollard_yellow",
+   "dock_hose_red"
+  ],
+  "platform": {
+   "_doc": "Harbor Place's apron (docs/harbor-place.md item 3): concrete deck on timber piles, src/docks.js concretePlatform",
+   "deck_kind": "concrete",
+   "deck": {
+    "new": "deck_pt",
+    "weathered": "deck_pt"
+   },
+   "pile_mat": "pile_wood",
+   "frame_mat": "wood_frame",
+   "pitch_m": [
+    3.0,
+    3.0
+   ],
+   "pile_r_m": 0.16,
+   "far_m": 250,
+   "cutoff_m": 3000,
+   "concrete": {
+    "topping_m": 0.1,
+    "plank_t_m": 0.3,
+    "plank_w_m": 1.2,
+    "plank_gap_m": 0.02,
+    "cap_w_m": 0.75,
+    "cap_d_m": 0.6,
+    "edge_w_m": 0.35,
+    "kerb_h_m": 0.15,
+    "inset_m": 0.45,
+    "fender_pitch_m": 2.4,
+    "fender_r_m": 0.16,
+    "fence": {
+     "pitch_m": 2.4,
+     "h_m": 1.07,
+     "mesh_m": 0.15
+    },
+    "deck_mat": "apron_concrete",
+    "struct_mat": "apron_concrete",
+    "joint_mat": "joint_sealant",
+    "net_mat": "net_galv"
+   }
+  }
+ },
+ "private_pier": {
+  "_ref": "K6, a Maine private pier (docs/sites/bar-harbor-waterfront.md item 13): two-pile bents, doubled caps, rails both sides, pressure-treated deck going grey; an aluminium gangway down to a seasonal float on black poly drums. Ogden Point (6.14), the Atlantic Oceanside (2.02), the Regency (1.07), the pier at (-1757, 285). Timber or aluminium waits on photo V6.2; timber first.",
+  "pier": {
+   "variant": "private",
+   "deck": {
+    "new": "deck_new",
+    "weathered": "deck_pt"
+   },
+   "pile_mat": "pile_wood",
+   "stringer_mat": "wood_frame",
+   "rail_mat": "wood_frame",
+   "bent_pitch_m": 3.0,
+   "pile_r_m": 0.14,
+   "plank_w_m": 0.14,
+   "rail": true,
+   "far_m": 150,
+   "cutoff_m": 2500
+  },
+  "ramp": {
+   "deck_mat": "alu",
+   "rail_mat": "alu",
+   "tread_mat": "rubber",
+   "rail_r_m": 0.02,
+   "post_pitch_m": 1.5,
+   "hoops": false,
+   "camber_m": 0.0
+  },
+  "float": {
+   "deck": {
+    "new": "deck_new",
+    "weathered": "deck_pt"
+   },
+   "frame_mat": "wood_frame",
+   "pontoon": "poly",
+   "pontoon_mat": "poly_float",
+   "pontoon_r_m": 0.25,
+   "pontoon_pitch_m": 1.2,
+   "pontoon_draft_m": 0.3,
+   "plank_w_m": 0.14,
+   "plank_gap_m": 0.008,
+   "bumper": false
+  },
+  "dressing": []
+ },
+ "chain_link": {
+  "_ref": "K8, a galvanised chain-link fence (docs/sites/bar-harbor-waterfront.md item 14): the Shore Path's south end [S], the COA pier's rail infill. Commercial sizes: 2-3/8 in terminals, 1-7/8 in line posts at 3.05 m, 1-5/8 in top rail, 2 in mesh. Height and colour wait on a photo (V5.x); 6 ft is the usual height for a fence that closes a path.",
+  "fence": {
+   "h_m": 1.83,
+   "line_pitch_m": 3.05,
+   "pipe_mat": "galv_pipe",
+   "fabric_mat": "chain_link",
+   "footing_mat": "concrete_wall",
+   "band_mat": "galv",
+   "tie_mat": "alu",
+   "far_m": 60,
+   "cutoff_m": 1500
+  }
+ }
+}

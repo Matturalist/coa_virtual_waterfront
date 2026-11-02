@@ -1,0 +1,123 @@
+{
+ "_doc": "Pavement wear decals (tools/assets/decals/pavement.py). rect: u0, v0 (from the bottom, texture flipY), width, height in the atlas; aspect: width / height; size_m: the default height of the picture on the ground. Read by src/decals.js.",
+ "atlas": "textures/decals/pavement.png",
+ "size_px": 2048,
+ "source": "Matt's six cut-out PNGs of worn asphalt, attached in chat 19 Oct 2026 (provenance not stated); colours their own, fringes desaturated",
+ "ground": true,
+ "tint_lin": [
+  0.259,
+  0.227,
+  0.208
+ ],
+ "tint_source": "levels/downeast/tex/road_atlas.jpg tile 1 (asphalt, worn) mean / the set's mean, linear",
+ "items": [
+  {
+   "i": 0,
+   "kind": "crack",
+   "note": "long crack, broken out",
+   "size_m": 3.2,
+   "aspect": 2.76,
+   "rect": [
+    0.0,
+    0.26904,
+    0.5,
+    0.18115
+   ],
+   "mean_srgb": [
+    142,
+    134,
+    127
+   ]
+  },
+  {
+   "i": 1,
+   "kind": "pothole",
+   "note": "pothole with broken slabs",
+   "size_m": 1.4,
+   "aspect": 1.003,
+   "rect": [
+    0.0,
+    0.50098,
+    0.5,
+    0.49854
+   ],
+   "mean_srgb": [
+    125,
+    116,
+    108
+   ]
+  },
+  {
+   "i": 2,
+   "kind": "alligator",
+   "note": "alligator cracking",
+   "size_m": 2.2,
+   "aspect": 1.015,
+   "rect": [
+    0.5,
+    0.50391,
+    0.5,
+    0.49268
+   ],
+   "mean_srgb": [
+    119,
+    110,
+    100
+   ]
+  },
+  {
+   "i": 3,
+   "kind": "crack",
+   "note": "hairline crack with spalls",
+   "size_m": 3.4,
+   "aspect": 2.26,
+   "rect": [
+    0.5,
+    0.24902,
+    0.5,
+    0.22119
+   ],
+   "mean_srgb": [
+    84,
+    79,
+    74
+   ]
+  },
+  {
+   "i": 4,
+   "kind": "network",
+   "note": "weathered crack network, sealed",
+   "size_m": 3.6,
+   "aspect": 1.339,
+   "rect": [
+    0.10352,
+    0.0,
+    0.29297,
+    0.21875
+   ],
+   "mean_srgb": [
+    88,
+    80,
+    71
+   ]
+  },
+  {
+   "i": 5,
+   "kind": "network",
+   "note": "crack network, spalled",
+   "size_m": 3.6,
+   "aspect": 1.333,
+   "rect": [
+    0.604,
+    0.0,
+    0.2915,
+    0.21875
+   ],
+   "mean_srgb": [
+    78,
+    72,
+    64
+   ]
+  }
+ ]
+}

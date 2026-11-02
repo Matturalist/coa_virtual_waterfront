@@ -1,0 +1,105 @@
+{
+ "id": "atlantic_oceanside_pier",
+ "style": "private_pier",
+ "wear": 0.45,
+ "seed": 202,
+ "retires_osm": [
+  577712231
+ ],
+ "_doc": "Site 1 item 25, stretch 2, survey 2.02-2.04: the Atlantic Oceanside Hotel's pier, on the lidar's returns (ME_MidCoast 2021, flown at a tide of -1.34), not the chart's line, which lies 8 m west. Level metres. A 37 m walkway 2.4 m wide falling at 1:15 from +7.05 at the bank to +4.5, a 4 x 8 m head at +4.25 two steps down, a gangway of about 20 m, a float 5.3 x 31.5 m with a wing at its shore end (deck -0.7 at that tide: freeboard 0.64). Boats lay along both sides of the float in 2021; they are not part of this. The hotel's name for it, its timber or aluminium build and its colours wait on photo V2.2 (K6 timber, ASSUMED, as Maine's commonest). Whether the float comes in for the winter is unknown: summer_only ASSUMED, as the site's other private floats.",
+ "pier": {
+  "at": [
+   -1991.3,
+   221.1
+  ],
+  "heading_deg": 146.4,
+  "length_m": 37.0,
+  "width_m": 2.4,
+  "deck_navd_m": 4.5,
+  "height_m": 5.8,
+  "height_root_m": 5.55,
+  "profile": [
+   [
+    0,
+    7.05
+   ],
+   [
+    37,
+    4.5
+   ]
+  ],
+  "head": {
+   "w_m": 4.0,
+   "l_m": 8.0,
+   "drop_m": 0.25
+  },
+  "gangway": "end"
+ },
+ "ramps": [
+  {
+   "id": "gangway",
+   "from": "pier:ramp_hinge[end]",
+   "to": "F1",
+   "width_m": 0.9,
+   "summer_only": true
+  }
+ ],
+ "floats": [
+  {
+   "id": "F1",
+   "at": [
+    -1960.7,
+    176.4
+   ],
+   "heading_deg": 143.7,
+   "deck_y": 0.79,
+   "freeboard_m": 0.64,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_5.3x10.5"
+    },
+    {
+     "type": "float_5.3x10.5",
+     "join": "end"
+    },
+    {
+     "type": "float_5.3x10.5",
+     "join": "end"
+    }
+   ]
+  },
+  {
+   "id": "F2",
+   "at": [
+    -1964.8,
+    175.9
+   ],
+   "heading_deg": 53.7,
+   "deck_y": 0.79,
+   "freeboard_m": 0.64,
+   "cleat_pitch_m": 3.0,
+   "summer_only": true,
+   "modules": [
+    {
+     "type": "float_3x5"
+    }
+   ]
+  }
+ ],
+ "dressing": {
+  "items": [
+   {
+    "type": "life_ring",
+    "at": [
+     -1979.1,
+     199.6
+    ],
+    "y": 4.25,
+    "yaw_deg": 146.4
+   }
+  ]
+ },
+ "overrides": {}
+}

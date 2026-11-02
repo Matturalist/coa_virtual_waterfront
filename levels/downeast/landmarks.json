@@ -1,0 +1,7044 @@
+{
+ "_doc": "Landmark buildings (src/buildings.js landmark()): drawn from an architectural description instead of a footprint and a fitted roof, in place of the footprints they replace (by OSM / Microsoft id). Each landmark has a frame (origin in level metres, ang_deg: the direction of its u axis, degrees from +x toward +z); parts are in (u, v) metres in that frame, heights in metres above the ground at ground_at (local u, v). Part types: block (rect, walls y0..y1, roof hip/gable/deck/mansard/flat, dormers), arc (round bay: centre c, radius r, angles from -v clockwise; cap, rail), bays (pavilions along a wall with front gables and balconies), balconies, porch, rail, chimney, flagpole, bar (a long building along a polyline), seawall (level coordinates, follows the ground). story0 shifts a wall's window storeys (its first storey starts there). Colours are named from the palette, each sampled from a photograph (source and pixel listed).",
+ "version": 1,
+ "palette": {
+  "_method": "Pixel means (7x7) from Matt's photographs, divided by the photo's own white (the 99.5th-percentile brightest pixels on the white trim: photo 1 inn (223,228,233), lodge (210,225,235); photo 2 (238,240,236)) and scaled to 0.92 for white paint. Sunlit faces where there are any; shaded ones raised by the photo's own sun/shade ratio (1.8, the inn wall lit vs shaded).",
+  "inn_grey": {
+   "rgb": [
+    0.68,
+    0.73,
+    0.72
+   ],
+   "from": "photo 1 (Matt, 18 Oct: the Inn from the water at dusk, 1440x960) pixel (1150,420), sunlit main-inn clapboard, (164,180,182)"
+  },
+  "white_trim": {
+   "rgb": [
+    0.92,
+    0.92,
+    0.9
+   ],
+   "from": "photo 1 (Matt, 18 Oct: the Inn from the water at dusk, 1440x960) trim white reference"
+  },
+  "lodge_white": {
+   "rgb": [
+    0.9,
+    0.91,
+    0.9
+   ],
+   "from": "photo 1 (Matt, 18 Oct: the Inn from the water at dusk, 1440x960) lodge balcony bays, white reference (210,225,235)"
+  },
+  "inn_roof": {
+   "rgb": [
+    0.43,
+    0.48,
+    0.53
+   ],
+   "from": "photo 1 (Matt, 18 Oct: the Inn from the water at dusk, 1440x960) pixel (1110,402), sunlit main-inn roof, (105,119,135)"
+  },
+  "lodge_roof": {
+   "rgb": [
+    0.34,
+    0.33,
+    0.33
+   ],
+   "from": "photo 1 (Matt, 18 Oct: the Inn from the water at dusk, 1440x960) pixel (180,405), lodge roof, (74,70,68), neutralised"
+  },
+  "stone": {
+   "rgb": [
+    0.98,
+    0.92,
+    0.88
+   ],
+   "from": "photo 1 (Matt, 18 Oct: the Inn from the water at dusk, 1440x960) pixels (1010,498) (81,81,82) and (1070,495) (94,85,83): the granite plinth; a tint over the granite facade tile (tile 5), warm as the sample"
+  },
+  "brick": {
+   "rgb": [
+    1.0,
+    0.95,
+    1.0
+   ],
+   "from": "photo 1 (Matt, 18 Oct: the Inn from the water at dusk, 1440x960) pixel (891,388), chimney (67,44,50); a tint over the brick tile (tile 4), whose own colour matches it"
+  },
+  "newport_white": {
+   "rgb": [
+    0.93,
+    0.93,
+    0.91
+   ],
+   "from": "photo 2 (Matt, 18 Oct: aerial from the NE, 1162x904) the Newport building, white reference (238,240,236)"
+  },
+  "newport_roof": {
+   "rgb": [
+    0.46,
+    0.52,
+    0.58
+   ],
+   "from": "photo 2 (Matt, 18 Oct: aerial from the NE, 1162x904) pixels (250,425) (119,135,150) and (140,428) (117,130,148)"
+  },
+  "concrete": {
+   "rgb": [
+    0.7,
+    0.72,
+    0.72
+   ],
+   "from": "photo 2 (Matt, 18 Oct: aerial from the NE, 1162x904) pixels (250,496) (142,164,177) and (330,504) (131,157,171), the seawall panels; neutralised (the blue is sky in the shade)"
+  },
+  "granite_buff": {
+   "rgb": [
+    1.25,
+    1.18,
+    1.1
+   ],
+   "from": "Turrets photo 1 (Matt, 18 Oct: aerial of the west front, 1280x720; white ref the porch roof membrane (255,250,240)) pixels (1110,470) (222,207,188), (330,600) (219,203,178): sunlit pink-buff granite ashlar = 0.80,0.76,0.72 after white balance; stored as a tint over the granite tile (tile 5, base 0.58) so the product lands there"
+  },
+  "slate": {
+   "rgb": [
+    0.6,
+    0.62,
+    0.66
+   ],
+   "from": "Turrets photo 1 (Matt, 18 Oct: aerial of the west front, 1280x720; white ref (255,250,240)) pixels (620,300) (168,173,176), (980,280) (173,176,181): sunlit slate = 0.61,0.64,0.67 after white balance, used as is (Matt, 18 Oct: the raised value washed the sunlit slope out)"
+  },
+  "copper": {
+   "rgb": [
+    0.45,
+    0.62,
+    0.55
+   ],
+   "from": "Turrets photo 1 (Matt, 18 Oct: aerial of the west front, 1280x720; white ref the porch roof membrane (255,250,240)) pixel (1005,140) (142,155,161): the weathered copper finials, greened"
+  },
+  "membrane": {
+   "rgb": [
+    0.9,
+    0.9,
+    0.88
+   ],
+   "from": "Turrets photo 1 (Matt, 18 Oct: aerial of the west front, 1280x720; white ref the porch roof membrane (255,250,240)) the flat porch roof (the white reference)"
+  },
+  "kaelber_shingle": {
+   "rgb": [
+    0.88,
+    0.8,
+    0.72
+   ],
+   "from": "COA photo 3 (Matt, 18 Oct: aerial from the harbour, 800x534; white ref (253,253,252); haze lifts it, so values are dehazed toward the darkest pixels of the same surface) pixel (380,182) (148,131,119): weathered cedar shingle = 0.54,0.48,0.43; a tint over the silver-shingle tile (tile 1)"
+  },
+  "kaelber_roof": {
+   "rgb": [
+    0.42,
+    0.44,
+    0.46
+   ],
+   "from": "COA photo 3 (Matt, 18 Oct: aerial from the harbour, 800x534; white ref (253,253,252); haze lifts it, so values are dehazed toward the darkest pixels of the same surface) pixels (340,173) (172,177,183), (470,170): grey asphalt, dehazed"
+  },
+  "brick_kaelber": {
+   "rgb": [
+    1.0,
+    0.92,
+    0.9
+   ],
+   "from": "COA photo 3 (Matt, 18 Oct: aerial from the harbour, 800x534; white ref (253,253,252); haze lifts it, so values are dehazed toward the darkest pixels of the same surface) pixel (279,180) (189,168,161): the brick chimney, a tint over the brick tile"
+  },
+  "granite_trim": {
+   "rgb": [
+    0.74,
+    0.7,
+    0.64
+   ],
+   "from": "Turrets photo 1 (Matt, 18 Oct: aerial of the west front, 1280x720; white ref (255,250,240)) pixel (600,450) (192,192,166): the granite of the window heads and string courses, a shade greyer than the wall; drawn as trim (no tile)"
+  },
+  "slate_ridge": {
+   "rgb": [
+    0.45,
+    0.47,
+    0.5
+   ],
+   "from": "Turrets photo 1 (Matt, 18 Oct: aerial of the west front, 1280x720; white ref (255,250,240)) pixel (760,150) (129,132,131): ridge and hip caps"
+  },
+  "terracotta": {
+   "rgb": [
+    0.62,
+    0.4,
+    0.3
+   ],
+   "from": "chimney pots: Matt's photos show none clearly; generic red clay, to be checked"
+  },
+  "sage_frame": {
+   "rgb": [
+    0.75,
+    0.8,
+    0.69
+   ],
+   "from": "Turrets photo 1 (Matt, 18 Oct: aerial of the west front, 1280x720; white ref (255,250,240)) pixels (752,417) (209,217,181), (800,418) (220,220,185): the pale sage-green window frames and arches"
+  },
+  "lh_white": {
+   "material": "clapboard_white / brick_whitewashed",
+   "rgb": [
+    0.9,
+    0.9,
+    0.87
+   ],
+   "from": "provisional: white-painted brick (USCG scheme) until sampled from Matt's photographs"
+  },
+  "black_iron": {
+   "material": "cast_iron_painted_black",
+   "rgb": [
+    0.1,
+    0.1,
+    0.11
+   ],
+   "from": "provisional: black lantern ironwork (USCG scheme)"
+  },
+  "lantern_glass": {
+   "material": "lantern_glass",
+   "rgb": [
+    0.3,
+    0.36,
+    0.4
+   ],
+   "from": "provisional: the lantern's upper glazing band seen from outside"
+  },
+  "lh_roof": {
+   "material": "asphalt_shingle",
+   "rgb": [
+    0.3,
+    0.3,
+    0.31
+   ],
+   "from": "provisional: dark asphalt roofs of the keepers' houses"
+  },
+  "lh_brick": {
+   "material": "red_brick",
+   "rgb": [
+    1.0,
+    0.95,
+    0.95
+   ],
+   "from": "provisional: unpainted brick (a tint over the brick tile)"
+  },
+  "granite_grey": {
+   "material": "granite_ashlar_grey",
+   "rgb": [
+    1.08,
+    1.06,
+    1.02
+   ],
+   "from": "provisional: unpainted grey granite (a tint over the granite tile, base 0.58)"
+  },
+  "ledge_grey": {
+   "material": "granite_ledge",
+   "rgb": [
+    0.56,
+    0.55,
+    0.52
+   ],
+   "from": "provisional: bare granite ledge above the weed line"
+  },
+  "egg_roof": {
+   "rgb": [
+    0.75,
+    0.55,
+    0.4
+   ],
+   "from": "Egg Rock photo 1 (895x679, white (236,235,232)): roof field median (193,142,103), red asphalt under orange lichen"
+  },
+  "egg_roof_cap": {
+   "rgb": [
+    0.62,
+    0.44,
+    0.33
+   ],
+   "from": "Egg Rock photo 1: the hip lines, a shade darker than the field"
+  },
+  "egg_found": {
+   "rgb": [
+    0.4,
+    0.41,
+    0.39
+   ],
+   "from": "Egg Rock photo 1: foundation band median (102,105,101)"
+  },
+  "egg_fog_roof": {
+   "rgb": [
+    0.64,
+    0.57,
+    0.5
+   ],
+   "from": "Egg Rock photo 3 (1100x733, white (255,254,254)): fog-signal house roof median (176,158,139), lichened asphalt"
+  },
+  "gd_brick_tint": {
+   "rgb": [
+    0.86,
+    1.12,
+    1.28
+   ],
+   "from": "Great Duck photo (1024x704, white (241,244,244)): brick median (127,103,101) = 0.48,0.39,0.39; a tint over the brick tile (base 0.55,0.30,0.24) so the product lands there; held below the exact 0.87,1.30,1.62, which read pink in sunlight"
+  },
+  "gd_brick_trim": {
+   "rgb": [
+    0.5,
+    0.4,
+    0.39
+   ],
+   "from": "Great Duck photo: the brick, for courses and caps drawn as trim"
+  },
+  "gd_brick_roof": {
+   "rgb": [
+    0.62,
+    0.5,
+    0.47
+   ],
+   "from": "Great Duck photo: fog-house roof median (162,132,123), weathered red"
+  },
+  "gd_work_roof": {
+   "rgb": [
+    0.59,
+    0.42,
+    0.39
+   ],
+   "from": "Great Duck photo: workroom roof median (155,109,102)"
+  },
+  "gd_house": {
+   "rgb": [
+    0.74,
+    0.75,
+    0.75
+   ],
+   "from": "Great Duck photo: keeper's house clapboard median (194,197,196), weathered white"
+  },
+  "mdr_granite": {
+   "rgb": [
+    1.0,
+    0.84,
+    0.62
+   ],
+   "from": "Mount Desert Rock photo 4 (594x395, white (244,247,247)): sunlit tower median (165,130,87) = 0.62,0.49,0.33; a tint over the granite tile (base 0.58)"
+  },
+  "mdr_granite_dark": {
+   "rgb": [
+    0.45,
+    0.38,
+    0.3
+   ],
+   "from": "Mount Desert Rock photos: the cap and window heads, the tower's darker blocks"
+  },
+  "mdr_roof": {
+   "rgb": [
+    0.51,
+    0.54,
+    0.55
+   ],
+   "from": "Mount Desert Rock photo 3 (542x369, white (244,247,247)): house roof median (136,142,147)"
+  },
+  "mdr_roof_cap": {
+   "rgb": [
+    0.42,
+    0.45,
+    0.47
+   ],
+   "from": "Mount Desert Rock photo 1: ridge, darker than the field"
+  },
+  "mdr_boat_roof": {
+   "rgb": [
+    0.8,
+    0.83,
+    0.86
+   ],
+   "from": "Mount Desert Rock photo 1 (1100x733, white (221,225,225)): boathouse roof median (192,200,207), sunlit"
+  },
+  "mdr_rock": {
+   "rgb": [
+    0.69,
+    0.63,
+    0.57
+   ],
+   "from": "Mount Desert Rock photo 1: the granite slabs (166,152,136)"
+  },
+  "slip_wood": {
+   "rgb": [
+    0.62,
+    0.62,
+    0.4
+   ],
+   "from": "Mount Desert Rock photo 1: the slip planks, green-yellow weathered timber (170,154,107)"
+  },
+  "weathered_wood": {
+   "rgb": [
+    0.55,
+    0.52,
+    0.47
+   ],
+   "from": "provisional: grey weathered steps and porch floors"
+  },
+  "window_dark": {
+   "rgb": [
+    0.1,
+    0.11,
+    0.13
+   ],
+   "from": "Egg Rock photo 1: the dark shutters and openings (29,32,40)"
+  },
+  "solar_panel": {
+   "rgb": [
+    0.12,
+    0.16,
+    0.26
+   ],
+   "from": "provisional: blue-black solar cells"
+  },
+  "beacon_red": {
+   "rgb": [
+    0.8,
+    0.1,
+    0.08
+   ],
+   "from": "Great Duck photo: the red mast light"
+  },
+  "mdr_rock_tint": {
+   "rgb": [
+    1.19,
+    1.09,
+    0.98
+   ],
+   "from": "Mount Desert Rock photo 1: the slabs (166,152,136) = 0.69,0.63,0.57, as a tint over the granite tile (base 0.58)"
+  },
+  "asphalt_red": {
+   "rgb": [
+    0.56,
+    0.24,
+    0.2
+   ],
+   "material": "asphalt_shingle",
+   "from": "Commons reference photos (18 Oct): Bass Harbor's red roofs; provisional until a close photo"
+  },
+  "asphalt_grey": {
+   "rgb": [
+    0.44,
+    0.45,
+    0.46
+   ],
+   "material": "asphalt_shingle",
+   "from": "Commons reference photos (18 Oct): Winter Harbor's and Petit Manan's grey roofs"
+  },
+  "asphalt_charcoal": {
+   "rgb": [
+    0.24,
+    0.24,
+    0.25
+   ],
+   "material": "asphalt_shingle",
+   "from": "Commons reference photos (18 Oct): Prospect Harbor's, Isle au Haut's and Burnt Coat's charcoal roofs"
+  },
+  "cedar_shake_grey": {
+   "rgb": [
+    0.58,
+    0.58,
+    0.58
+   ],
+   "material": "cedar_shake",
+   "from": "Pumpkin Island photo (500x375, white (240,244,250)): roof median (153,152,156); Baker, Bear, Pumpkin roofs (roof atlas tile 2)"
+  },
+  "lichen_roof": {
+   "rgb": [
+    0.55,
+    0.52,
+    0.4
+   ],
+   "material": "asphalt_shingle",
+   "from": "Commons reference photos (18 Oct): Baker's oil house roof, mossy and lichened"
+  },
+  "peeling_whitewash": {
+   "rgb": [
+    1.38,
+    1.38,
+    1.36
+   ],
+   "material": "whitewash_on_rubble_stone",
+   "from": "Commons reference photos (18 Oct): Baker, Eagle Island, Burnt Coat towers: whitewash peeling to grey stone; a tint over the granite tile (base 0.58) so the courses show through, to 0.80"
+  },
+  "peeling_whitewash_trim": {
+   "rgb": [
+    0.8,
+    0.8,
+    0.78
+   ],
+   "material": "whitewash_on_rubble_stone",
+   "from": "the same, for sills and caps drawn as trim"
+  },
+  "foundation_granite": {
+   "rgb": [
+    0.48,
+    0.47,
+    0.44
+   ],
+   "material": "granite_ashlar_grey",
+   "from": "Commons reference photos (18 Oct): the granite under the keepers' houses (Baker, Bass Harbor)"
+  },
+  "red_brick_tint": {
+   "rgb": [
+    0.86,
+    1.12,
+    1.28
+   ],
+   "material": "red_brick",
+   "from": "the Great Duck brick (127,103,101), a tint over the brick tile: shared by every brick oil and fog house"
+  },
+  "red_brick_trim": {
+   "rgb": [
+    0.5,
+    0.32,
+    0.28
+   ],
+   "material": "red_brick",
+   "from": "chimney caps"
+  },
+  "shed_grey": {
+   "rgb": [
+    0.32,
+    0.35,
+    0.4
+   ],
+   "material": "clapboard_painted",
+   "from": "Commons reference photos (18 Oct): Winter Harbor's dark grey shed, Petit Manan's long grey building (grey clapboard tile 3)"
+  },
+  "granite_tan": {
+   "rgb": [
+    0.92,
+    0.8,
+    0.62
+   ],
+   "material": "granite_ashlar_tan",
+   "from": "Petit Manan photo (500x375, white (251,249,236)): tower median (156,125,82) = 0.57,0.46,0.30; a tint over the granite tile, held a little less saturated (the procedural grain exaggerates it)"
+  },
+  "granite_tan_trim": {
+   "rgb": [
+    0.5,
+    0.41,
+    0.29
+   ],
+   "material": "granite_ashlar_tan",
+   "from": "Petit Manan: window heads"
+  },
+  "granite_dark": {
+   "rgb": [
+    0.52,
+    0.52,
+    0.51
+   ],
+   "material": "granite_rubble_dark",
+   "from": "Saddleback Ledge photo (historic, white (233,233,233)): tower median (61,61,61); a tint over the granite tile"
+  },
+  "granite_dark_trim": {
+   "rgb": [
+    0.28,
+    0.28,
+    0.27
+   ],
+   "material": "granite_rubble_dark",
+   "from": "Saddleback Ledge: window heads"
+  },
+  "granite_grey_tint": {
+   "rgb": [
+    0.95,
+    0.85,
+    0.69
+   ],
+   "material": "granite_ashlar_tan",
+   "from": "Isle au Haut photo: base median (149,134,108); a tint over the granite tile"
+  },
+  "granite_grey_trim": {
+   "rgb": [
+    0.52,
+    0.47,
+    0.39
+   ],
+   "material": "granite_ashlar_tan",
+   "from": "Isle au Haut: the base's cap"
+  },
+  "ledge_granite_tint": {
+   "rgb": [
+    1.3,
+    1.27,
+    1.2
+   ],
+   "material": "granite_ledge",
+   "from": "provisional: bare grey ledge, a tint over the granite tile"
+  },
+  "trim_blue": {
+   "rgb": [
+    0.18,
+    0.24,
+    0.42
+   ],
+   "material": "paint",
+   "from": "Bear Island photo (500x375): the navy window trim"
+  },
+  "trim_dark": {
+   "rgb": [
+    0.12,
+    0.15,
+    0.13
+   ],
+   "material": "paint",
+   "from": "Prospect Harbor photo: the black-green window trim"
+  },
+  "barn_red": {
+   "rgb": [
+    0.5,
+    0.18,
+    0.15
+   ],
+   "material": "clapboard_painted",
+   "from": "Pumpkin Island photo: the small red shed"
+  },
+  "coa_teal": {
+   "rgb": [
+    0.31,
+    0.553,
+    0.627
+   ],
+   "from": "COA pier, Matt 19 Oct photos 1, 3, 4: sunlit teal-blue paint, mean sRGB (79, 141, 160)"
+  },
+  "coa_bench_lid": {
+   "rgb": [
+    0.62,
+    0.6,
+    0.55
+   ],
+   "from": "COA pier photo 1: the weathered grey timber of the deck and bench lids (184, 177, 162)"
+  },
+  "coa_globe": {
+   "rgb": [
+    0.32,
+    0.55,
+    0.59
+   ],
+   "from": "COA pier photo 1: the arch's globe lights (82, 141, 150)"
+  },
+  "sign_white": {
+   "rgb": [
+    0.9,
+    0.9,
+    0.88
+   ],
+   "from": "COA pier photo 3: the arch sign (white with navy lettering)"
+  },
+  "lamp_black": {
+   "rgb": [
+    0.07,
+    0.07,
+    0.07
+   ],
+   "from": "COA pier photo 3: the black bulkhead lamps on the rails"
+  },
+  "inn_walk_deck": {
+   "rgb": [
+    0.659,
+    0.612,
+    0.604
+   ],
+   "from": "docs/look/photo_inn_pier_porcupines.jpg: the walkway deck, sunlit (168, 156, 154)"
+  },
+  "inn_alu": {
+   "rgb": [
+    0.588,
+    0.608,
+    0.635
+   ],
+   "from": "same photo: rails and girders, between sunlit rail (165, 170, 178) and shaded girder (133, 135, 142)"
+  },
+  "inn_galv": {
+   "rgb": [
+    0.627,
+    0.667,
+    0.706
+   ],
+   "from": "same photo: the galvanised piles (160, 170, 180); sunlit faces carry the sky (161, 190, 209)"
+  },
+  "inn_booth": {
+   "rgb": [
+    0.714,
+    0.682,
+    0.675
+   ],
+   "from": "same photo: the booth's weathered shingle (182, 174, 172)"
+  },
+  "inn_booth_roof": {
+   "rgb": [
+    0.373,
+    0.388,
+    0.427
+   ],
+   "from": "same photo: the booth roof (95, 99, 109)"
+  },
+  "stew_cedar": {
+   "rgb": [
+    1.0,
+    0.95,
+    0.88
+   ],
+   "from": "Commons \"Bar Harbor, Maine, USA17.jpg\": the cedar shingle west wall (223, 185, 140), as a tint on facade tile 2 (brown cedar shingle)"
+  },
+  "stew_trim": {
+   "rgb": [
+    0.969,
+    0.965,
+    0.933
+   ],
+   "from": "USA17.jpg: the white window boards and balcony (247, 246, 238)"
+  },
+  "stew_roof": {
+   "rgb": [
+    0.6,
+    0.537,
+    0.439
+   ],
+   "from": "USA17.jpg: the asphalt roof (153, 137, 112)"
+  },
+  "stew_fence": {
+   "rgb": [
+    0.247,
+    0.224,
+    0.22
+   ],
+   "from": "USA17.jpg: the weathered board fence round the dining deck (63, 57, 56)"
+  },
+  "shack_yellow": {
+   "rgb": [
+    0.918,
+    0.839,
+    0.216
+   ],
+   "from": "Commons \"Bar Harbor, Maine, USA21.jpg\": the yellow shack (234, 214, 55)"
+  },
+  "shack_door_blue": {
+   "rgb": [
+    0.09,
+    0.306,
+    0.608
+   ],
+   "from": "USA21.jpg: its double doors (23, 78, 155)"
+  },
+  "shack_blue": {
+   "rgb": [
+    0.475,
+    0.78,
+    0.973
+   ],
+   "from": "USA21.jpg / USA18.jpg: the sky-blue shack (121, 199, 248)"
+  },
+  "shack_red": {
+   "rgb": [
+    0.576,
+    0.231,
+    0.196
+   ],
+   "from": "USA18.jpg: the red shack (92, 37, 31) in shade, x1.6 for sun"
+  },
+  "shack_roof": {
+   "rgb": [
+    0.745,
+    0.722,
+    0.655
+   ],
+   "from": "USA21.jpg: the shacks' grey asphalt roofs (190, 184, 167)"
+  },
+  "shack_trim_yellow": {
+   "rgb": [
+    0.918,
+    0.839,
+    0.216
+   ],
+   "from": "USA18.jpg: the blue shack's yellow corner boards"
+  },
+  "golden_anchor_roof": {
+   "rgb": [
+    0.749,
+    0.812,
+    0.812
+   ],
+   "from": "Assets: overcast aerial, pixel (930, 635), the Golden Anchor's flat roof (#bfcfcf)"
+  }
+ },
+ "landmarks": [
+  {
+   "id": "bar_harbor_inn",
+   "name": "Bar Harbor Inn \u2014 main inn",
+   "t": "hotel",
+   "replaces": [
+    369089643
+   ],
+   "_ref": "OSM way 369089643 (the round dining room is the arc at its north face); photos 1 and 2: granite plinth, a round glazed dining room with a railed deck above, a recessed round second storey, a front gable over it, a hip roof cut flat for the widow's walk and its flagpole, gable dormers, a brick chimney, a covered veranda on the west.",
+   "frame": {
+    "origin": [
+     -212.55,
+     1030.2
+    ],
+    "ang_deg": 3.3
+   },
+   "ground_at": [
+    0,
+    4
+   ],
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -13,
+      1,
+      13,
+      21
+     ],
+     "y0": 0,
+     "y1": 11.2,
+     "wall": "inn_grey",
+     "tile": 0,
+     "ground": 2.6,
+     "roof": {
+      "kind": "deck",
+      "pitch_deg": 34,
+      "inset_m": 6.5,
+      "rail": 1.0,
+      "col": "inn_roof"
+     },
+     "dormers": [
+      {
+       "side": "v-",
+       "at": [
+        -9.5,
+        9.5
+       ]
+      },
+      {
+       "side": "v+",
+       "at": [
+        -7,
+        0,
+        7
+       ]
+      }
+     ]
+    },
+    {
+     "type": "arc",
+     "c": [
+      0,
+      6.16
+     ],
+     "r": 11.96,
+     "from_deg": -59,
+     "to_deg": 59,
+     "y0": 0,
+     "y1": 1.6,
+     "wall": "stone",
+     "tile": 5
+    },
+    {
+     "type": "arc",
+     "c": [
+      0,
+      6.16
+     ],
+     "r": 11.96,
+     "from_deg": -59,
+     "to_deg": 59,
+     "y0": 1.6,
+     "y1": 5.2,
+     "wall": "inn_grey",
+     "tile": 0,
+     "win": 3,
+     "ground": 3.6,
+     "story0": 1.6,
+     "cap": true,
+     "cap_col": "inn_roof",
+     "rail": 1.0
+    },
+    {
+     "type": "arc",
+     "c": [
+      0,
+      6.16
+     ],
+     "r": 9.6,
+     "from_deg": -57.5,
+     "to_deg": 57.5,
+     "y0": 5.2,
+     "y1": 8.4,
+     "wall": "inn_grey",
+     "tile": 0,
+     "ground": 0,
+     "story0": 5.2,
+     "cap": true,
+     "cap_col": "inn_roof"
+    },
+    {
+     "type": "block",
+     "rect": [
+      -5.5,
+      -3.4,
+      5.5,
+      8
+     ],
+     "y0": 8.4,
+     "y1": 11.2,
+     "wall": "inn_grey",
+     "tile": 0,
+     "ground": 0,
+     "story0": 8.4,
+     "roof": {
+      "kind": "gable",
+      "ridge": "v",
+      "pitch_deg": 42,
+      "col": "inn_roof"
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      11.4,
+      13
+     ],
+     "y0": 9,
+     "y1": 17.6,
+     "s": 1.0,
+     "col": "brick"
+    },
+    {
+     "type": "flagpole",
+     "at": [
+      0,
+      11
+     ],
+     "y0": 15.6,
+     "h": 7.5
+    },
+    {
+     "type": "porch",
+     "rect": [
+      -19,
+      -1,
+      -12.6,
+      9
+     ],
+     "y0": 1.0,
+     "y1": 4.4,
+     "posts": 2.4,
+     "rail": 1.0,
+     "roof_pitch_deg": 14,
+     "roof_col": "inn_roof"
+    }
+   ]
+  },
+  {
+   "id": "bar_harbor_inn_lodge",
+   "name": "Bar Harbor Inn \u2014 Oceanfront Lodge",
+   "t": "hotel",
+   "replaces": [
+    369089643
+   ],
+   "_ref": "the east wing of OSM way 369089643; photo 1: three storeys in grey clapboard, nine white balcony bays on the water face, each with a front gable and balconies on three levels, a dark roof hipped at the east end",
+   "frame": {
+    "origin": [
+     -202.35,
+     1056.4
+    ],
+    "ang_deg": -10.77
+   },
+   "ground_at": [
+    35,
+    -5
+   ],
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      0,
+      -6.25,
+      70.3,
+      6.25
+     ],
+     "y0": 0,
+     "y1": 9.3,
+     "wall": "inn_grey",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "hip",
+      "ridge": "u",
+      "pitch_deg": 38,
+      "col": "lodge_roof"
+     }
+    },
+    {
+     "type": "bays",
+     "p": [
+      5,
+      -6.25
+     ],
+     "q": [
+      67,
+      -6.25
+     ],
+     "side": 1,
+     "n": 9,
+     "w": 4.6,
+     "depth": 1.0,
+     "y0": 0,
+     "y1": 9.3,
+     "wall": "lodge_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof_col": "lodge_roof",
+     "gable": {
+      "pitch_deg": 52,
+      "back": 3.5
+     },
+     "balconies": [
+      2.8,
+      5.7,
+      9.3
+     ],
+     "bal_depth": 1.1
+    }
+   ],
+   "ground_navd": 8.6,
+   "_ground": "ground floor at the lawn just above the main inn's granite plinth (photo 1); the survey under the wing reads 9.9-10.2, the building's own bulk in the surface"
+  },
+  {
+   "id": "bar_harbor_inn_newport",
+   "name": "Bar Harbor Inn \u2014 Newport building",
+   "t": "hotel",
+   "replaces": [
+    369089637
+   ],
+   "_ref": "OSM way 369089637; photo 2: a long white three-storey wing following the shore, continuous balconies on all three levels on the water face, a light grey hip roof",
+   "frame": {
+    "origin": [
+     0,
+     0
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    -100,
+    1135
+   ],
+   "parts": [
+    {
+     "type": "bar",
+     "line": [
+      [
+       -114,
+       1072.5
+      ],
+      [
+       -111.5,
+       1108.5
+      ],
+      [
+       -82,
+       1166
+      ],
+      [
+       -57.8,
+       1185
+      ]
+     ],
+     "w": 14,
+     "y0": 0,
+     "y1": 8.6,
+     "wall": "newport_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 24
+     },
+     "roof_col": "newport_roof",
+     "balconies": {
+      "side": 1,
+      "ys": [
+       0.35,
+       3.15,
+       5.95
+      ],
+      "depth": 1.8
+     }
+    }
+   ]
+  },
+  {
+   "id": "bar_harbor_inn_seawall",
+   "name": "Shore Path seawall at the Bar Harbor Inn",
+   "t": "wall",
+   "replaces": [],
+   "_ref": "photo 2: pale concrete retaining wall under the Shore Path from the Inn pier to the Newport building; line from OSM way 164089143 (Shore Path)",
+   "frame": {
+    "origin": [
+     0,
+     0
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    -160,
+    1013
+   ],
+   "fp": [
+    [
+     -161,
+     1014
+    ],
+    [
+     -159,
+     1014
+    ],
+    [
+     -159,
+     1016
+    ],
+    [
+     -161,
+     1016
+    ]
+   ],
+   "parts": [
+    {
+     "type": "seawall",
+     "line": [
+      [
+       -215.2,
+       1012.0
+      ],
+      [
+       -205.9,
+       1009.5
+      ],
+      [
+       -199.1,
+       1007.5
+      ],
+      [
+       -187.3,
+       1008.7
+      ],
+      [
+       -173.5,
+       1011.2
+      ],
+      [
+       -164.3,
+       1013.6
+      ],
+      [
+       -152.8,
+       1018.4
+      ],
+      [
+       -144.7,
+       1025.4
+      ],
+      [
+       -139.3,
+       1029.3
+      ],
+      [
+       -130.8,
+       1032.8
+      ],
+      [
+       -124.6,
+       1038.4
+      ],
+      [
+       -117.4,
+       1045.8
+      ],
+      [
+       -102.9,
+       1068.1
+      ],
+      [
+       -96.5,
+       1081.4
+      ],
+      [
+       -92.6,
+       1090.3
+      ],
+      [
+       -90.0,
+       1097.3
+      ],
+      [
+       -86.8,
+       1104.3
+      ],
+      [
+       -84.1,
+       1116.8
+      ],
+      [
+       -81.7,
+       1124.6
+      ],
+      [
+       -77.2,
+       1129.7
+      ],
+      [
+       -75.1,
+       1135.7
+      ],
+      [
+       -71.5,
+       1142.0
+      ],
+      [
+       -68.3,
+       1144.8
+      ],
+      [
+       -65.7,
+       1149.8
+      ],
+      [
+       -60.6,
+       1153.9
+      ],
+      [
+       -57.2,
+       1155.6
+      ],
+      [
+       -55.1,
+       1159.4
+      ],
+      [
+       -51.6,
+       1162.6
+      ],
+      [
+       -47.2,
+       1163.6
+      ],
+      [
+       -45.3,
+       1167.9
+      ],
+      [
+       -41.9,
+       1171.1
+      ],
+      [
+       -41.4,
+       1178.2
+      ],
+      [
+       -37.3,
+       1187.1
+      ]
+     ],
+     "col": "concrete",
+     "parapet": 0.7
+    }
+   ],
+   "_fp": "a token footprint: the wall follows the ground itself; a real one would keep trees off the whole Inn grounds",
+   "off": true,
+   "_off": "drawn as a structure now (structures.json, tools/structures.py)"
+  },
+  {
+   "id": "the_turrets",
+   "name": "The Turrets (College of the Atlantic)",
+   "t": "college",
+   "replaces_names": [
+    "The Turrets"
+   ],
+   "_ref": "OSM way 1162522084 (outline; its two arcs are the round towers, fitted: (-1586.0, 569.9) r 3.66 and (-1588.7, 591.1) r 3.06); lidar ridge 17.3 m over the lowest corner; Matt's photos (aerial of the west front, the sea front from the lawn). 1895 granite cottage: two storeys of rusticated pink-buff granite, a steep slate roof cut flat at the top, round towers with conical slate roofs and copper finials, a north wing set at an angle with its own hip roof, a flat-roofed entrance porch with a balustrade on the west, a veranda on a granite terrace toward the sea, granite chimneys, gable dormers.",
+   "frame": {
+    "origin": [
+     -1590.0,
+     580.0
+    ],
+    "ang_deg": -32.46
+   },
+   "ground_at": [
+    -12,
+    3
+   ],
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -7,
+      -3,
+      14,
+      18.5
+     ],
+     "y0": 0,
+     "y1": 7.6,
+     "wall": "granite_buff",
+     "tile": 5,
+     "ground": 3.4,
+     "roof": {
+      "kind": "deck",
+      "pitch_deg": 48,
+      "inset_m": 6.0,
+      "col": "slate",
+      "hip_caps": "slate_ridge",
+      "rail": 0.5,
+      "rail_col": "copper"
+     },
+     "dormers": [
+      {
+       "side": "u-",
+       "at": [
+        2,
+        9.5
+       ],
+       "surround": "granite_trim",
+       "finial": 0.7
+      },
+      {
+       "side": "u+",
+       "at": [
+        3,
+        12
+       ],
+       "surround": "granite_trim",
+       "finial": 0.7
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "c": [
+      -3.48,
+      -11.74
+     ],
+     "size": [
+      13.2,
+      13.0
+     ],
+     "rot_deg": -22.3,
+     "y0": 0,
+     "y1": 7.6,
+     "wall": "granite_buff",
+     "tile": 5,
+     "ground": 3.4,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 50,
+      "col": "slate",
+      "hip_caps": "slate_ridge"
+     },
+     "dormers": [
+      {
+       "side": "v-",
+       "at": [
+        0
+       ],
+       "surround": "granite_trim",
+       "finial": 0.7
+      }
+     ]
+    },
+    {
+     "type": "tower",
+     "c": [
+      -4.9,
+      10.0
+     ],
+     "r": 3.06,
+     "y0": 0,
+     "y1": 9.6,
+     "wall": "granite_buff",
+     "tile": 5,
+     "ground": 3.4,
+     "cone": {
+      "h": 6.5,
+      "col": "slate",
+      "flare": 1
+     },
+     "finial": 1.6
+    },
+    {
+     "type": "tower",
+     "c": [
+      8.8,
+      -6.4
+     ],
+     "r": 3.66,
+     "y0": 0,
+     "y1": 9.0,
+     "wall": "granite_buff",
+     "tile": 5,
+     "ground": 3.4,
+     "cone": {
+      "h": 7.0,
+      "col": "slate",
+      "flare": 1
+     },
+     "finial": 1.6
+    },
+    {
+     "type": "tower",
+     "c": [
+      9.5,
+      17.5
+     ],
+     "r": 2.6,
+     "y0": 0,
+     "y1": 9.2,
+     "wall": "granite_buff",
+     "tile": 5,
+     "ground": 3.4,
+     "cone": {
+      "h": 5.8,
+      "col": "slate",
+      "flare": 1
+     },
+     "finial": 1.4
+    },
+    {
+     "type": "tower",
+     "c": [
+      -7.4,
+      -3.2
+     ],
+     "r": 1.6,
+     "y0": 4.0,
+     "y1": 8.6,
+     "wall": "granite_buff",
+     "tile": 5,
+     "ground": 0,
+     "story0": 4.0,
+     "cone": {
+      "h": 4.2,
+      "col": "slate",
+      "flare": 1
+     },
+     "finial": 1.0
+    },
+    {
+     "type": "porch",
+     "rect": [
+      -14,
+      -1,
+      -7,
+      7
+     ],
+     "y0": 0.4,
+     "y1": 3.8,
+     "posts": 2.4,
+     "roof_kind": "flat",
+     "roof_col": "membrane",
+     "top_rail": 0.95,
+     "floor_col": "granite_trim",
+     "trim": "white_trim",
+     "pier": 0.6,
+     "pier_col": "granite_trim",
+     "arch_side": 3,
+     "rail_style": "balustrade",
+     "top_rail_col": "granite_trim",
+     "fascia_col": "granite_trim"
+    },
+    {
+     "type": "block",
+     "rect": [
+      14,
+      -2,
+      20,
+      13
+     ],
+     "y0": 0,
+     "y1": 0.3,
+     "wall": "granite_buff",
+     "tile": 5,
+     "roof": {
+      "kind": "flat",
+      "col": "granite_trim",
+      "hip_caps": "slate_ridge"
+     },
+     "deco": {
+      "stone": "granite_trim",
+      "cornice": {
+       "h": 0.3,
+       "out": 0.2
+      }
+     }
+    },
+    {
+     "type": "porch",
+     "rect": [
+      14,
+      0,
+      18,
+      11
+     ],
+     "y0": 0.3,
+     "y1": 3.8,
+     "posts": 2.4,
+     "rail": 1.0,
+     "roof_pitch_deg": 18,
+     "roof_col": "slate",
+     "floor_col": "granite_trim",
+     "pier": 0.4,
+     "pier_col": "granite_trim",
+     "rail_style": "balustrade",
+     "trim": "granite_trim"
+    },
+    {
+     "type": "chimney",
+     "at": [
+      3,
+      2
+     ],
+     "y0": 10,
+     "y1": 18.0,
+     "s": 1.3,
+     "col": "granite_buff",
+     "tile": 5,
+     "cap_col": "granite_trim"
+    },
+    {
+     "type": "chimney",
+     "at": [
+      10,
+      9
+     ],
+     "y0": 10,
+     "y1": 17.4,
+     "s": 1.1,
+     "col": "granite_buff",
+     "tile": 5,
+     "cap_col": "granite_trim"
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -9.5,
+      -10.5
+     ],
+     "y0": 9,
+     "y1": 16.2,
+     "s": 1.1,
+     "col": "granite_buff",
+     "tile": 5,
+     "cap_col": "granite_trim"
+    }
+   ],
+   "deco": {
+    "stone": "granite_trim",
+    "plinth": {
+     "h": 0.9,
+     "out": 0.2
+    },
+    "bands": "storeys",
+    "cornice": {
+     "h": 0.45,
+     "out": 0.35
+    },
+    "sills": true
+   },
+   "frame_col": "sage_frame"
+  },
+  {
+   "id": "kaelber_hall",
+   "name": "Kaelber Hall (College of the Atlantic)",
+   "t": "college",
+   "replaces_names": [
+    "Kaelber Hall"
+   ],
+   "_ref": "OSM way 1162522080 (28.6 x 16 m); lidar ridge 15.3 m over the lowest corner; Matt's harbour aerial: two storeys in weathered cedar shingle, grey hip roofs with gable dormers, a cedar-shingled gable pavilion on the sea front, the dining room glazed on the ground floor under a porch whose roof is a deck, a brick chimney, a stone terrace.",
+   "frame": {
+    "origin": [
+     -1669.6,
+     550.55
+    ],
+    "ang_deg": 58.66
+   },
+   "ground_at": [
+    0,
+    7
+   ],
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -14.3,
+      -8,
+      14.3,
+      8
+     ],
+     "y0": 0,
+     "y1": 7.2,
+     "wall": "kaelber_shingle",
+     "tile": 1,
+     "win": 3,
+     "ground": 3.6,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 33,
+      "col": "kaelber_roof"
+     },
+     "dormers": [
+      {
+       "side": "v-",
+       "at": [
+        -9,
+        9
+       ]
+      },
+      {
+       "side": "v+",
+       "at": [
+        -6,
+        6
+       ]
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "rect": [
+      -4,
+      -11,
+      4,
+      -7
+     ],
+     "y0": 0,
+     "y1": 7.2,
+     "wall": "kaelber_shingle",
+     "tile": 2,
+     "win": 3,
+     "ground": 3.6,
+     "roof": {
+      "kind": "gable",
+      "ridge": "v",
+      "pitch_deg": 45,
+      "col": "kaelber_roof"
+     }
+    },
+    {
+     "type": "porch",
+     "rect": [
+      -13,
+      -11.5,
+      -4,
+      -8
+     ],
+     "y0": 0,
+     "y1": 3.4,
+     "posts": 3.0,
+     "roof_kind": "flat",
+     "roof_col": "kaelber_roof",
+     "top_rail": 1.0,
+     "floor_col": "stone",
+     "trim": "white_trim"
+    },
+    {
+     "type": "porch",
+     "rect": [
+      4,
+      -11.5,
+      13,
+      -8
+     ],
+     "y0": 0,
+     "y1": 3.4,
+     "posts": 3.0,
+     "roof_kind": "flat",
+     "roof_col": "kaelber_roof",
+     "top_rail": 1.0,
+     "floor_col": "stone",
+     "trim": "white_trim"
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -12,
+      2
+     ],
+     "y0": 6,
+     "y1": 15.5,
+     "s": 1.0,
+     "col": "brick_kaelber"
+    }
+   ]
+  },
+  {
+   "id": "lh_bass_harbor_head",
+   "name": "Bass Harbor Head Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -10913.7,
+     19685.9
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 9.6,
+   "priority": true,
+   "status": "active",
+   "light": "Oc R 4s, 13 nm",
+   "_ref": "1858 (Commons photos and the historic aerial): a short white brick tower on the granite cliff, a wide solid black gallery with a round railing, an octagonal lantern with a red lens, a dome, ball and tall rod; a short gabled passage to the 1-1/2 storey keeper's house (red roof, dormers, granite foundation) and its ell; the bell house (hip roof) east; brick oil house and barn up the drive (OSM).",
+   "_sources": [
+    "https://www.history.uscg.mil/Browse-by-Topic/Assets/Land/All/Article/2009523/bass-harbor-head-light/",
+    "https://commons.wikimedia.org/wiki/Category:Bass_Harbor_Head_Light"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 1.65,
+     "y0": 0,
+     "y1": 6.9,
+     "wall": "lh_white",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "paint": true,
+     "slits": [
+      [
+       150,
+       4.2,
+       0.45,
+       0.8
+      ]
+     ],
+     "sill_col": "lh_white"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 6.9,
+     "r": 0.95,
+     "sides": 8,
+     "tower_r": 1.65,
+     "deck_r": 2.0,
+     "brackets": false,
+     "parapet": 0.9,
+     "glass_h": 1.5,
+     "roof_h": 0.85,
+     "ball": 0.28,
+     "rod": 1.5
+    },
+    {
+     "type": "block",
+     "rect": [
+      -1.1,
+      -4.6,
+      1.1,
+      -1.3
+     ],
+     "y0": 0,
+     "y1": 3.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_red",
+      "ridge": "v"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -8.0,
+      -12.0,
+      4.0,
+      -4.6
+     ],
+     "y0": 0,
+     "y1": 4.3,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 45,
+      "col": "asphalt_red",
+      "ridge": "u"
+     },
+     "dormers": [
+      {
+       "side": "v+",
+       "at": [
+        -5.0,
+        -0.5
+       ],
+       "w": 2.0,
+       "h": 2.2
+      },
+      {
+       "side": "v-",
+       "at": [
+        -2.0
+       ],
+       "w": 2.0,
+       "h": 2.2
+      }
+     ],
+     "deco": {
+      "stone": "foundation_granite",
+      "plinth": {
+       "h": 0.6,
+       "out": 0.06
+      }
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      4.0,
+      -11.5,
+      8.0,
+      -5.0
+     ],
+     "y0": 0,
+     "y1": 3.6,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_red",
+      "ridge": "v"
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -2.0,
+      -8.3
+     ],
+     "y0": 6.0,
+     "y1": 8.9,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "block",
+     "rect": [
+      8.3,
+      2.2,
+      14.1,
+      6.0
+     ],
+     "y0": 0,
+     "y1": 3.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 42,
+      "col": "asphalt_red"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -49.7,
+      -41.0,
+      -45.9,
+      -37.2
+     ],
+     "y0": 0,
+     "y1": 2.6,
+     "wall": "red_brick_tint",
+     "tile": 4,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 35,
+      "col": "asphalt_charcoal"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -30.3,
+      -57.2,
+      -24.0,
+      -51.4
+     ],
+     "y0": 0,
+     "y1": 3.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_red"
+     }
+    }
+   ]
+  },
+  {
+   "id": "lh_baker_island",
+   "name": "Baker Island Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     78.9,
+     17558.2
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 28.2,
+   "priority": true,
+   "status": "active",
+   "light": "Fl W 10s, 10 nm",
+   "_ref": "1855 tower (Commons photos): cylindrical, its whitewash peeling to grey stone, a bracketed black gallery with railing and an octagonal lantern, dome and ball; the 1-1/2 storey clapboard keeper's house a few metres away with a grey cedar roof, one front dormer, a centre chimney and a rear ell, on a granite foundation; the red-brick oil house with a lichened roof and a little ventilator cupola. Acadia National Park.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Baker_Island_Light",
+    "https://commons.wikimedia.org/wiki/Category:Baker_Island_Light"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 2.25,
+     "y0": 0,
+     "y1": 10.0,
+     "wall": "peeling_whitewash",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "tile": 5,
+     "r_top": 2.0,
+     "slits": [
+      [
+       200,
+       0.3,
+       0.95,
+       2.0
+      ],
+      [
+       150,
+       4.5,
+       0.5,
+       0.9
+      ],
+      [
+       160,
+       7.6,
+       0.5,
+       0.9
+      ]
+     ],
+     "sill_col": "peeling_whitewash_trim"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 10.0,
+     "r": 1.2,
+     "sides": 8,
+     "tower_r": 2.0,
+     "deck_r": 2.2,
+     "parapet": 0.95,
+     "glass_h": 1.5,
+     "roof_h": 1.0,
+     "ball": 0.32,
+     "rod": 0.9
+    },
+    {
+     "type": "block",
+     "y0": 0,
+     "y1": 4.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 42,
+      "col": "cedar_shake_grey",
+      "tile": 2
+     },
+     "dormers": [
+      {
+       "side": "v+",
+       "at": [
+        0
+       ],
+       "w": 1.8,
+       "h": 2.1
+      }
+     ],
+     "deco": {
+      "stone": "foundation_granite",
+      "plinth": {
+       "h": 0.7,
+       "out": 0.06
+      }
+     },
+     "c": [
+      7.6,
+      -5.9
+     ],
+     "size": [
+      10.5,
+      7.0
+     ],
+     "rot_deg": 30.3
+    },
+    {
+     "type": "block",
+     "y0": 0,
+     "y1": 3.2,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "cedar_shake_grey",
+      "tile": 2
+     },
+     "c": [
+      2.7,
+      -9.5
+     ],
+     "size": [
+      4.5,
+      4.0
+     ],
+     "rot_deg": 30.3
+    },
+    {
+     "type": "chimney",
+     "at": [
+      6.2,
+      -6.7
+     ],
+     "y0": 6.2,
+     "y1": 8.4,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "block",
+     "rect": [
+      -12,
+      6,
+      -9,
+      9
+     ],
+     "y0": 0,
+     "y1": 2.4,
+     "wall": "red_brick_tint",
+     "tile": 4,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "lichen_roof"
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      -10.5,
+      7.5
+     ],
+     "y0": 3.1,
+     "size": [
+      0.6,
+      0.75,
+      0.6
+     ],
+     "col": "lh_white"
+    }
+   ]
+  },
+  {
+   "id": "lh_bear_island",
+   "name": "Bear Island Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -5559.9,
+     12890.0
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 24.25,
+   "priority": true,
+   "status": "active",
+   "light": "Fl W 5s, 10 nm",
+   "_ref": "1889 (Commons photos): a short white tower on the cliff top over Northeast Harbor, black gallery and ten-sided lantern with dome and ball, an attached gable workroom; the 1-1/2 storey keeper's house with a big grey cedar gambrel roof, a front dormer, two chimneys and navy-blue window trim; the barn up the path.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Bear_Island_Light",
+    "https://commons.wikimedia.org/wiki/Category:Bear_Island_Light_Station"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 1.8,
+     "y0": 0,
+     "y1": 6.6,
+     "wall": "lh_white",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "paint": true,
+     "slits": [
+      [
+       200,
+       3.4,
+       0.45,
+       0.85
+      ]
+     ],
+     "sill_col": "lh_white"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 6.6,
+     "r": 0.95,
+     "sides": 10,
+     "tower_r": 1.75,
+     "deck_r": 2.05,
+     "parapet": 0.9,
+     "glass_h": 1.4,
+     "ball": 0.3
+    },
+    {
+     "type": "block",
+     "rect": [
+      1.2,
+      -1.3,
+      5.0,
+      1.3
+     ],
+     "y0": 0,
+     "y1": 3.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 38,
+      "col": "cedar_shake_grey",
+      "ridge": "u",
+      "tile": 2
+     }
+    },
+    {
+     "type": "block",
+     "y0": 0,
+     "y1": 3.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gambrel",
+      "pitch_deg": 42,
+      "col": "cedar_shake_grey",
+      "tile": 2
+     },
+     "dormers": [
+      {
+       "side": "v-",
+       "at": [
+        0
+       ],
+       "w": 2.2,
+       "h": 2.3
+      }
+     ],
+     "frame_col": "trim_blue",
+     "c": [
+      8.3,
+      -9.0
+     ],
+     "size": [
+      11.5,
+      9.5
+     ],
+     "rot_deg": 136.4
+    },
+    {
+     "type": "chimney",
+     "at": [
+      6.4,
+      -7.6
+     ],
+     "y0": 7.4,
+     "y1": 9.8,
+     "s": 0.6,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "chimney",
+     "at": [
+      10.2,
+      -10.4
+     ],
+     "y0": 7.4,
+     "y1": 9.8,
+     "s": 0.6,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "block",
+     "y0": 0,
+     "y1": 3.6,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "cedar_shake_grey",
+      "tile": 2
+     },
+     "c": [
+      34.0,
+      -10.1
+     ],
+     "size": [
+      8.0,
+      5.5
+     ],
+     "rot_deg": 75.4
+    }
+   ]
+  },
+  {
+   "id": "lh_winter_harbor",
+   "name": "Winter Harbor Light (Mark Island, Frenchman Bay)",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     8915.3,
+     4243.8
+    ],
+    "ang_deg": -140
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 6.6,
+   "priority": true,
+   "status": "inactive (1933), private",
+   "light": null,
+   "_ref": "1856 (Commons photos): on pink granite: a short white tower with a black lantern and railing at one end; a one-storey workroom, a 1-1/2 storey ell with a porch on its sea side, and the two-storey keeper's house with its gable to the sea and a centre chimney; grey roofs; a dark grey shed apart. Inactive since 1933, private.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Winter_Harbor_Light",
+    "https://commons.wikimedia.org/wiki/Category:Winter_Harbor_Light_Station"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 1.55,
+     "y0": 0,
+     "y1": 4.2,
+     "wall": "lh_white",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "paint": true,
+     "slits": [
+      [
+       180,
+       0.1,
+       0.8,
+       1.9
+      ]
+     ],
+     "sill_col": "lh_white"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 4.2,
+     "r": 0.9,
+     "sides": 8,
+     "tower_r": 1.5,
+     "active": false,
+     "brackets": false,
+     "deck_r": 1.85,
+     "parapet": 0.85,
+     "glass_h": 1.3,
+     "ball": 0.3
+    },
+    {
+     "type": "block",
+     "rect": [
+      1.5,
+      -1.6,
+      4.5,
+      1.6
+     ],
+     "y0": 0,
+     "y1": 3.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 35,
+      "col": "asphalt_grey",
+      "ridge": "u"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      4.5,
+      -2.5,
+      10.0,
+      2.5
+     ],
+     "y0": 0,
+     "y1": 4.2,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 42,
+      "col": "asphalt_grey",
+      "ridge": "u"
+     }
+    },
+    {
+     "type": "porch",
+     "rect": [
+      5.0,
+      -4.6,
+      9.6,
+      -2.5
+     ],
+     "y0": 0.5,
+     "y1": 2.8,
+     "posts": 1.6,
+     "rail": 0.9,
+     "roof_pitch_deg": 14,
+     "roof_col": "asphalt_grey",
+     "floor_col": "weathered_wood",
+     "trim": "lh_white"
+    },
+    {
+     "type": "block",
+     "rect": [
+      10.0,
+      -3.8,
+      17.0,
+      3.8
+     ],
+     "y0": 0,
+     "y1": 6.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 45,
+      "col": "asphalt_grey",
+      "ridge": "v"
+     },
+     "deco": {
+      "stone": "foundation_granite",
+      "plinth": {
+       "h": 0.6,
+       "out": 0.06
+      }
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      13.5,
+      0.6
+     ],
+     "y0": 8.0,
+     "y1": 10.6,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "block",
+     "rect": [
+      21.0,
+      -2.0,
+      26.0,
+      3.0
+     ],
+     "y0": 0,
+     "y1": 3.0,
+     "wall": "shed_grey",
+     "tile": 3,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_grey",
+      "ridge": "v"
+     }
+    }
+   ]
+  },
+  {
+   "id": "lh_deer_isle_thorofare",
+   "name": "Deer Isle Thorofare Light (Mark Island)",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -40028.0,
+     29372.0
+    ],
+    "ang_deg": -100
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 11.3,
+   "priority": true,
+   "status": "active",
+   "light": "Fl W 6s, 8 nm",
+   "_ref": "1857 (Commons photos): a square white brick tower with a square gallery and railing and an octagonal black lantern, on the wooded point of Mark Island; its keeper's house burned in 1959 and the rest was removed, so the tower stands alone.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Deer_Isle_Thorofare_Light",
+    "https://commons.wikimedia.org/wiki/Category:Deer_Island_Thorofare_Lighthouse"
+   ],
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -1.5,
+      -1.5,
+      1.5,
+      1.5
+     ],
+     "y0": 0,
+     "y1": 5.4,
+     "wall": "lh_white",
+     "paint": true,
+     "roof": {
+      "kind": "flat",
+      "col": "black_iron"
+     },
+     "deco": {
+      "stone": "lh_white",
+      "cornice": {
+       "h": 0.25,
+       "out": 0.12
+      }
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      1.52
+     ],
+     "y0": 0.0,
+     "size": [
+      0.9,
+      2.0,
+      0.06
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      -1.52
+     ],
+     "y0": 2.8,
+     "size": [
+      0.5,
+      0.85,
+      0.06
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "box",
+     "at": [
+      1.52,
+      0
+     ],
+     "y0": 3.6,
+     "size": [
+      0.06,
+      0.85,
+      0.5
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 5.4,
+     "r": 0.85,
+     "sides": 8,
+     "tower_r": 1.5,
+     "deck_shape": "square",
+     "deck_size": 3.5,
+     "parapet": 0.85,
+     "glass_h": 1.3,
+     "ball": 0.28
+    }
+   ]
+  },
+  {
+   "id": "lh_egg_rock",
+   "name": "Egg Rock Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     4926.0,
+     5059.1
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 8.6,
+   "priority": true,
+   "status": "active",
+   "light": "Fl R 5s, 18 nm",
+   "_ref": "1875 (photos 18 Oct): a square white tower rising out of the middle of a square 1-1/2 storey clapboard keeper's house on a grey granite foundation; the hip roof red-orange with lichen, on each face a wide dormer of four windows between two small gables; the square gallery with a square railing on the tower top, an octagonal black lantern on a tall black base, a conical dome and a large ball; front steps; a lean-to on the east; the white fog-signal house (1904) with a lichened hip roof on a concrete platform and a solar array beside it.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Egg_Rock_Light_(Maine)"
+   ],
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -5.6,
+      -5.6,
+      5.6,
+      5.6
+     ],
+     "y0": 0,
+     "y1": 3.8,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 4.0,
+     "deco": {
+      "stone": "egg_found",
+      "plinth": {
+       "h": 0.75,
+       "out": 0.08
+      },
+      "cornice": {
+       "h": 0.3,
+       "out": 0.22
+      }
+     },
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 33,
+      "col": "egg_roof",
+      "hip_caps": "egg_roof_cap"
+     },
+     "dormers": [
+      {
+       "w": 6.0,
+       "h": 1.35,
+       "bays": 4,
+       "rise": 0.3,
+       "setback": 0.35,
+       "surround": "lh_white",
+       "side": "v-",
+       "at": [
+        0
+       ]
+      },
+      {
+       "w": 1.3,
+       "h": 1.45,
+       "rise": 0.55,
+       "setback": 0.3,
+       "surround": "lh_white",
+       "side": "v-",
+       "at": [
+        -3.0,
+        3.0
+       ]
+      },
+      {
+       "w": 6.0,
+       "h": 1.35,
+       "bays": 4,
+       "rise": 0.3,
+       "setback": 0.35,
+       "surround": "lh_white",
+       "side": "v+",
+       "at": [
+        0
+       ]
+      },
+      {
+       "w": 1.3,
+       "h": 1.45,
+       "rise": 0.55,
+       "setback": 0.3,
+       "surround": "lh_white",
+       "side": "v+",
+       "at": [
+        -3.0,
+        3.0
+       ]
+      },
+      {
+       "w": 6.0,
+       "h": 1.35,
+       "bays": 4,
+       "rise": 0.3,
+       "setback": 0.35,
+       "surround": "lh_white",
+       "side": "u-",
+       "at": [
+        0
+       ]
+      },
+      {
+       "w": 1.3,
+       "h": 1.45,
+       "rise": 0.55,
+       "setback": 0.3,
+       "surround": "lh_white",
+       "side": "u-",
+       "at": [
+        -3.0,
+        3.0
+       ]
+      },
+      {
+       "w": 6.0,
+       "h": 1.35,
+       "bays": 4,
+       "rise": 0.3,
+       "setback": 0.35,
+       "surround": "lh_white",
+       "side": "u+",
+       "at": [
+        0
+       ]
+      },
+      {
+       "w": 1.3,
+       "h": 1.45,
+       "rise": 0.55,
+       "setback": 0.3,
+       "surround": "lh_white",
+       "side": "u+",
+       "at": [
+        -3.0,
+        3.0
+       ]
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "rect": [
+      -1.8,
+      -1.8,
+      1.8,
+      1.8
+     ],
+     "y0": 0,
+     "y1": 9.6,
+     "wall": "lh_white",
+     "paint": true,
+     "roof": {
+      "kind": "flat",
+      "col": "black_iron"
+     },
+     "deco": {
+      "stone": "lh_white",
+      "cornice": {
+       "h": 0.3,
+       "out": 0.12
+      }
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      -1.83
+     ],
+     "y0": 7.5,
+     "size": [
+      0.7,
+      0.95,
+      0.06
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      1.83
+     ],
+     "y0": 7.5,
+     "size": [
+      0.7,
+      0.95,
+      0.06
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 9.6,
+     "r": 1.05,
+     "sides": 8,
+     "tower_r": 1.8,
+     "deck_shape": "square",
+     "deck_size": 4.1,
+     "parapet": 1.05,
+     "glass_h": 1.35,
+     "roof_h": 0.95,
+     "ball": 0.34,
+     "rod": 0.5
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      -5.62
+     ],
+     "y0": 0.75,
+     "size": [
+      1.0,
+      2.05,
+      0.06
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      -6.35
+     ],
+     "y0": -0.5,
+     "size": [
+      1.6,
+      0.85,
+      1.3
+     ],
+     "col": "weathered_wood"
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      -6.95
+     ],
+     "y0": -0.5,
+     "size": [
+      1.6,
+      0.5,
+      0.4
+     ],
+     "col": "weathered_wood"
+    },
+    {
+     "type": "block",
+     "rect": [
+      5.6,
+      1.2,
+      8.0,
+      4.4
+     ],
+     "y0": 0,
+     "y1": 2.6,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 3.0,
+     "roof": {
+      "kind": "gable",
+      "ridge": "u",
+      "pitch_deg": 30,
+      "col": "egg_roof"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -15.0,
+      4.0,
+      -8.5,
+      10.5
+     ],
+     "y0": 0,
+     "y1": 3.3,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 3.4,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 30,
+      "col": "egg_fog_roof",
+      "hip_caps": "egg_fog_roof"
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      -11.75,
+      13.0
+     ],
+     "y0": -0.6,
+     "size": [
+      9.0,
+      1.0,
+      4.4
+     ],
+     "col": "concrete"
+    },
+    {
+     "type": "solar",
+     "at": [
+      -14.0,
+      12.6
+     ],
+     "w": 3.0,
+     "h": 2.2,
+     "tilt_deg": 55,
+     "y0": 0.6
+    }
+   ]
+  },
+  {
+   "id": "lh_great_duck",
+   "name": "Great Duck Island Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -3651.5,
+     28508.6
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 10.15,
+   "priority": true,
+   "status": "active",
+   "light": "Fl R 5s, 19 nm",
+   "_ref": "1890 (photos 18 Oct): a white cylindrical tower, a ten-sided black lantern on a bracketed gallery with a round railing and a red mast light; the white workroom west of it with a weathered red hip roof; the red-brick fog-signal house with a weathered red hip roof south of it; the 1890 keeper's house, 2-1/2 storeys of weathered white clapboard with its gable end to the sea, up the path to the north (OSM and the aerial); solar arrays east of the tower; a shed. COA's research station.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Great_Duck_Island_Light"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 2.0,
+     "y0": 0,
+     "y1": 10.2,
+     "wall": "lh_white",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "paint": true,
+     "r_top": 1.85
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 10.2,
+     "r": 1.0,
+     "sides": 10,
+     "tower_r": 1.85,
+     "deck_r": 1.95,
+     "mast": {
+      "h": 2.2,
+      "off": [
+       1.5,
+       0.4
+      ]
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -3.6,
+      -1.8,
+      0.4,
+      1.8
+     ],
+     "y0": 0,
+     "y1": 3.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 3.2,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 32,
+      "col": "gd_work_roof",
+      "hip_caps": "gd_work_roof"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -12.0,
+      21.5,
+      -1.6,
+      30.7
+     ],
+     "y0": 0,
+     "y1": 3.6,
+     "wall": "red_brick_tint",
+     "tile": 4,
+     "ground": 3.8,
+     "deco": {
+      "stone": "gd_brick_trim",
+      "cornice": {
+       "h": 0.25,
+       "out": 0.12
+      }
+     },
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 26,
+      "col": "gd_brick_roof",
+      "hip_caps": "gd_brick_roof"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -27.0,
+      -54.0,
+      -18.0,
+      -44.0
+     ],
+     "y0": 0,
+     "y1": 6.0,
+     "wall": "gd_house",
+     "tile": 0,
+     "ground": 2.9,
+     "roof": {
+      "kind": "gable",
+      "ridge": "v",
+      "pitch_deg": 45,
+      "col": "lh_roof"
+     },
+     "dormers": [
+      {
+       "side": "u-",
+       "at": [
+        -49.0
+       ],
+       "w": 2.4,
+       "h": 2.4
+      },
+      {
+       "side": "u+",
+       "at": [
+        -49.0
+       ],
+       "w": 2.4,
+       "h": 2.4
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "rect": [
+      -26.0,
+      -44.0,
+      -19.0,
+      -39.0
+     ],
+     "y0": 0,
+     "y1": 3.2,
+     "wall": "gd_house",
+     "tile": 0,
+     "ground": 3.2,
+     "roof": {
+      "kind": "gable",
+      "ridge": "v",
+      "pitch_deg": 38,
+      "col": "lh_roof"
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -22.5,
+      -52.0
+     ],
+     "y0": 7.0,
+     "y1": 11.3,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "gd_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "solar",
+     "at": [
+      7.5,
+      3.5
+     ],
+     "w": 3.4,
+     "h": 1.9,
+     "tilt_deg": 35,
+     "y0": 0.5
+    },
+    {
+     "type": "solar",
+     "at": [
+      11.5,
+      3.5
+     ],
+     "w": 3.4,
+     "h": 1.9,
+     "tilt_deg": 35,
+     "y0": 0.5
+    },
+    {
+     "type": "block",
+     "rect": [
+      38.7,
+      -10.5,
+      43.8,
+      -6.8
+     ],
+     "y0": 0,
+     "y1": 2.6,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 3.0,
+     "roof": {
+      "kind": "gable",
+      "ridge": "u",
+      "pitch_deg": 35,
+      "col": "gd_work_roof"
+     }
+    }
+   ]
+  },
+  {
+   "id": "lh_mount_desert_rock",
+   "name": "Mount Desert Rock Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     5700.0,
+     47700.0
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 5.6,
+   "priority": true,
+   "status": "active",
+   "light": "Fl W 15s, 20 nm",
+   "_ref": "1847 (photos 18 Oct): a conical granite tower in weathered brown-grey blocks with a flared cap under the gallery, a door and small windows; the bracketed gallery, round railing and black ten-sided lantern with a dome, ball and an antenna mast; the keeper's house (1892), 2-1/2 storeys of white clapboard with a grey gable roof, a front cross gable, a dormer and a brick chimney, a porch on its west end and front, a two-storey gable-fronted wing toward the tower with solar panels on its roof and a short covered way to the tower; a solar array east of the tower; on bare, slabby granite.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Mount_Desert_Light"
+   ],
+   "parts": [
+    {
+     "type": "outcrop",
+     "c": [
+      0,
+      0
+     ],
+     "r": 70,
+     "h": 6.0,
+     "sx": 1.7,
+     "sz": 0.7,
+     "col": "mdr_rock_tint",
+     "tile": 5
+    },
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 3.3,
+     "y0": 0,
+     "y1": 14.2,
+     "wall": "mdr_granite",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "mdr_granite_dark",
+     "tile": 5,
+     "r_top": 2.3,
+     "cornice": {
+      "out": 0.45,
+      "h": 0.7,
+      "col": "mdr_granite_dark"
+     },
+     "slits": [
+      [
+       200,
+       0.2,
+       0.95,
+       2.0
+      ],
+      [
+       165,
+       5.0,
+       0.5,
+       0.9
+      ],
+      [
+       205,
+       9.5,
+       0.5,
+       0.9
+      ],
+      [
+       20,
+       7.0,
+       0.5,
+       0.9
+      ]
+     ],
+     "sill_col": "mdr_granite_dark"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 14.2,
+     "r": 1.35,
+     "sides": 10,
+     "tower_r": 2.5,
+     "deck_r": 2.4,
+     "mast": {
+      "h": 3.4,
+      "off": [
+       0.7,
+       0.7
+      ],
+      "col": "black_iron"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -22.0,
+      -5.0,
+      -8.0,
+      4.0
+     ],
+     "y0": 0,
+     "y1": 5.8,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.9,
+     "roof": {
+      "kind": "gable",
+      "ridge": "u",
+      "pitch_deg": 42,
+      "col": "mdr_roof",
+      "hip_caps": "mdr_roof_cap"
+     },
+     "dormers": [
+      {
+       "side": "v-",
+       "at": [
+        -15.0
+       ],
+       "w": 2.6,
+       "h": 2.4
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "rect": [
+      -17.5,
+      2.0,
+      -12.5,
+      6.0
+     ],
+     "y0": 0,
+     "y1": 5.8,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.9,
+     "roof": {
+      "kind": "gable",
+      "ridge": "v",
+      "pitch_deg": 42,
+      "col": "mdr_roof"
+     }
+    },
+    {
+     "type": "porch",
+     "rect": [
+      -26.0,
+      -4.0,
+      -22.0,
+      4.0
+     ],
+     "y0": 0.45,
+     "y1": 3.0,
+     "posts": 2.0,
+     "rail": 1.0,
+     "roof_pitch_deg": 16,
+     "roof_col": "mdr_roof",
+     "floor_col": "weathered_wood",
+     "trim": "lh_white"
+    },
+    {
+     "type": "porch",
+     "rect": [
+      -22.0,
+      4.0,
+      -17.5,
+      6.6
+     ],
+     "y0": 0.45,
+     "y1": 3.0,
+     "posts": 2.0,
+     "rail": 1.0,
+     "roof_pitch_deg": 16,
+     "roof_col": "mdr_roof",
+     "floor_col": "weathered_wood",
+     "trim": "lh_white"
+    },
+    {
+     "type": "block",
+     "rect": [
+      -8.0,
+      -3.0,
+      -3.4,
+      3.2
+     ],
+     "y0": 0,
+     "y1": 5.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "ridge": "v",
+      "pitch_deg": 45,
+      "col": "mdr_roof"
+     }
+    },
+    {
+     "type": "solar",
+     "at": [
+      -5.7,
+      1.4
+     ],
+     "w": 3.6,
+     "h": 2.6,
+     "tilt_deg": 45,
+     "y0": 5.5,
+     "panel_col": "solar_panel",
+     "frame_col": "lh_white"
+    },
+    {
+     "type": "block",
+     "rect": [
+      -3.6,
+      -1.4,
+      -2.6,
+      1.4
+     ],
+     "y0": 0,
+     "y1": 3.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "roof": {
+      "kind": "gable",
+      "ridge": "u",
+      "pitch_deg": 35,
+      "col": "mdr_roof"
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -14.0,
+      0.0
+     ],
+     "y0": 7.5,
+     "y1": 11.0,
+     "s": 0.75,
+     "col": "brick",
+     "tile": 4,
+     "pots": 0
+    },
+    {
+     "type": "solar",
+     "at": [
+      9.0,
+      -4.0
+     ],
+     "w": 3.6,
+     "h": 2.6,
+     "tilt_deg": 60,
+     "y0": 0.6,
+     "ang_deg": 15
+    }
+   ]
+  },
+  {
+   "id": "lh_mount_desert_rock_boathouse",
+   "name": "Mount Desert Rock boathouse and slip",
+   "t": "lighthouse",
+   "replaces_within_m": 0,
+   "frame": {
+    "origin": [
+     5642.0,
+     47730.0
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 1.6,
+   "priority": true,
+   "status": "boathouse",
+   "light": null,
+   "_ref": "The white gable-fronted boathouse at the water's edge with its timber slip down the slabs below low water (photos 18 Oct). The slip is solid: a Zodiac lands on it (world.js W.slips; Boats: trim, skeg and prop, wind and stream).",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Mount_Desert_Light"
+   ],
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -3.0,
+      -4.0,
+      3.0,
+      4.0
+     ],
+     "y0": 0,
+     "y1": 3.6,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 4.5,
+     "roof": {
+      "kind": "gable",
+      "ridge": "v",
+      "pitch_deg": 45,
+      "col": "mdr_boat_roof"
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      4.02
+     ],
+     "y0": 0.0,
+     "size": [
+      2.6,
+      2.7,
+      0.06
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "slip",
+     "from": [
+      0.0,
+      4.2,
+      -0.15
+     ],
+     "to": [
+      -1.5,
+      21.0,
+      -4.4
+     ],
+     "w": 2.4,
+     "friction": 0.5
+    }
+   ]
+  },
+  {
+   "id": "lh_petit_manan",
+   "name": "Petit Manan Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     26695.0,
+     3585.0
+    ],
+    "ang_deg": 90
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 6.5,
+   "priority": false,
+   "status": "active",
+   "light": "Fl W 10s, 19 nm",
+   "_ref": "1855 (Commons photos): a very tall, slender conical tower of tan granite blocks with small windows up its height, a bracketed black gallery and lantern; a small white hip-roofed oil house at its foot, a flagpole; the white 1-1/2 storey keeper's house gable-on to the sea and a long low grey hip-roofed building along the island.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Petit_Manan_Light",
+    "https://commons.wikimedia.org/wiki/Category:Petit_Manan_Lighthouse"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 3.2,
+     "y0": 0,
+     "y1": 31.5,
+     "wall": "granite_tan",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "tile": 5,
+     "r_top": 2.15,
+     "slits": [
+      [
+       90,
+       0.2,
+       0.9,
+       2.0
+      ],
+      [
+       80,
+       5,
+       0.45,
+       0.9
+      ],
+      [
+       260,
+       10,
+       0.45,
+       0.9
+      ],
+      [
+       85,
+       15,
+       0.45,
+       0.9
+      ],
+      [
+       265,
+       20,
+       0.45,
+       0.9
+      ],
+      [
+       90,
+       25,
+       0.45,
+       0.9
+      ]
+     ],
+     "sill_col": "granite_tan_trim"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 31.5,
+     "r": 1.3,
+     "sides": 10,
+     "tower_r": 2.2,
+     "deck_r": 2.4,
+     "parapet": 1.0,
+     "glass_h": 1.8,
+     "roof_h": 1.1,
+     "ball": 0.32
+    },
+    {
+     "type": "block",
+     "rect": [
+      3.4,
+      -2.6,
+      6.6,
+      0.6
+     ],
+     "y0": 0,
+     "y1": 2.5,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 30,
+      "col": "asphalt_grey"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -46.0,
+      -6.0,
+      -38.0,
+      1.0
+     ],
+     "y0": 0,
+     "y1": 5.6,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 45,
+      "col": "asphalt_charcoal",
+      "ridge": "v"
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -42.0,
+      -1.0
+     ],
+     "y0": 7.5,
+     "y1": 10.0,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "block",
+     "rect": [
+      -80.0,
+      -6.0,
+      -64.0,
+      1.0
+     ],
+     "y0": 0,
+     "y1": 3.2,
+     "wall": "shed_grey",
+     "tile": 3,
+     "ground": 2.8,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 24,
+      "col": "asphalt_grey"
+     }
+    },
+    {
+     "type": "flagpole",
+     "at": [
+      9.0,
+      3.0
+     ],
+     "y0": 0,
+     "h": 9
+    }
+   ]
+  },
+  {
+   "id": "lh_prospect_harbor",
+   "name": "Prospect Harbor Point Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     14887.0,
+     -358.0
+    ],
+    "ang_deg": 0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 2.2,
+   "priority": false,
+   "status": "active",
+   "light": "Fl R 6s (chart: white), 9 nm",
+   "_ref": "1891 (Commons photos): a small conical white tower with a black gallery and octagonal lantern; the 1-1/2 storey keeper's house beside it with a charcoal roof, a cross gable and dormers, dark window trim, two red chimneys, an ell. Navy-owned.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Prospect_Harbor_Point_Light",
+    "https://commons.wikimedia.org/wiki/Category:Prospect_Harbor_Light_Station"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 1.55,
+     "y0": 0,
+     "y1": 8.6,
+     "wall": "lh_white",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "paint": true,
+     "r_top": 1.05,
+     "slits": [
+      [
+       200,
+       0.2,
+       0.8,
+       1.9
+      ],
+      [
+       180,
+       4.8,
+       0.45,
+       0.8
+      ]
+     ],
+     "sill_col": "lh_white"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 8.6,
+     "r": 0.85,
+     "sides": 8,
+     "tower_r": 1.15,
+     "deck_r": 1.6,
+     "parapet": 0.85,
+     "glass_h": 1.3,
+     "ball": 0.28
+    },
+    {
+     "type": "block",
+     "y0": 0,
+     "y1": 4.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 45,
+      "col": "asphalt_charcoal"
+     },
+     "dormers": [
+      {
+       "side": "v-",
+       "at": [
+        0
+       ],
+       "w": 2.6,
+       "h": 2.4
+      },
+      {
+       "side": "v+",
+       "at": [
+        0
+       ],
+       "w": 2.6,
+       "h": 2.4
+      }
+     ],
+     "frame_col": "trim_dark",
+     "c": [
+      -7.6,
+      -12.6
+     ],
+     "size": [
+      8.0,
+      9.5
+     ],
+     "rot_deg": -22.4
+    },
+    {
+     "type": "block",
+     "y0": 0,
+     "y1": 3.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_charcoal"
+     },
+     "frame_col": "trim_dark",
+     "c": [
+      -4.9,
+      -17.4
+     ],
+     "size": [
+      4.0,
+      4.5
+     ],
+     "rot_deg": -22.4
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -9.2,
+      -12.0
+     ],
+     "y0": 6.6,
+     "y1": 9.2,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -6.0,
+      -13.2
+     ],
+     "y0": 6.6,
+     "y1": 9.2,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    }
+   ]
+  },
+  {
+   "id": "lh_burnt_coat_harbor",
+   "name": "Burnt Coat Harbor Light (Hockamock Head)",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -19658.0,
+     29400.0
+    ],
+    "ang_deg": 170
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 5.1,
+   "priority": false,
+   "status": "active",
+   "light": "Oc W 4s, 9 nm",
+   "_ref": "1872 (Commons photos and the historic aerial): a square tower, its white paint weathering to grey, with a square gallery and railing and an octagonal lantern, joined by a covered walkway to the two-storey keeper's house (charcoal roof) and its ell; a brick oil house. Swans Island; the town keeps it.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Burnt_Coat_Harbor_Light",
+    "https://commons.wikimedia.org/wiki/Category:Burnt_Coat_Harbor_Lighthouse"
+   ],
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -1.6,
+      -1.6,
+      1.6,
+      1.6
+     ],
+     "y0": 0,
+     "y1": 7.0,
+     "wall": "peeling_whitewash",
+     "paint": false,
+     "roof": {
+      "kind": "flat",
+      "col": "black_iron"
+     },
+     "tile": 5,
+     "nowin": true,
+     "deco": {
+      "stone": "peeling_whitewash_trim",
+      "cornice": {
+       "h": 0.25,
+       "out": 0.14
+      }
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      -1.62
+     ],
+     "y0": 0.0,
+     "size": [
+      0.9,
+      2.0,
+      0.06
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "box",
+     "at": [
+      1.62,
+      0
+     ],
+     "y0": 3.2,
+     "size": [
+      0.06,
+      0.9,
+      0.5
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "box",
+     "at": [
+      0,
+      1.62
+     ],
+     "y0": 4.6,
+     "size": [
+      0.5,
+      0.9,
+      0.06
+     ],
+     "ang_deg": 0,
+     "col": "window_dark"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 7.0,
+     "r": 0.85,
+     "sides": 8,
+     "tower_r": 1.6,
+     "deck_shape": "square",
+     "deck_size": 3.7,
+     "parapet": 0.85,
+     "glass_h": 1.3,
+     "ball": 0.28
+    },
+    {
+     "type": "block",
+     "rect": [
+      1.6,
+      -0.8,
+      6.0,
+      0.8
+     ],
+     "y0": 0,
+     "y1": 2.6,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 35,
+      "col": "asphalt_charcoal",
+      "ridge": "u"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      6.0,
+      -4.5,
+      14.0,
+      4.5
+     ],
+     "y0": 0,
+     "y1": 6.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 42,
+      "col": "asphalt_charcoal",
+      "ridge": "v"
+     },
+     "deco": {
+      "stone": "foundation_granite",
+      "plinth": {
+       "h": 0.6,
+       "out": 0.06
+      }
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      10.0,
+      0.0
+     ],
+     "y0": 7.8,
+     "y1": 10.5,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "block",
+     "rect": [
+      14.0,
+      -2.5,
+      18.0,
+      2.5
+     ],
+     "y0": 0,
+     "y1": 3.6,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_charcoal",
+      "ridge": "u"
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      -9.0,
+      6.0,
+      -6.6,
+      8.4
+     ],
+     "y0": 0,
+     "y1": 2.2,
+     "wall": "red_brick_tint",
+     "tile": 4,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 35,
+      "col": "asphalt_charcoal"
+     }
+    }
+   ]
+  },
+  {
+   "id": "lh_blue_hill_bay",
+   "name": "Blue Hill Bay Light (Green Island)",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -23677.0,
+     16728.0
+    ],
+    "ang_deg": 110
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 3.0,
+   "priority": false,
+   "status": "inactive (1933), private",
+   "light": null,
+   "_ref": "1857: a short white brick tower with its attached keeper's house on tiny Green Island; decommissioned 1933, private (no photographs on Commons: from the description). The active light (Fl G 4s) is on a skeleton tower on the island.",
+   "_sources": [],
+   "parts": [
+    {
+     "type": "outcrop",
+     "c": [
+      0,
+      0
+     ],
+     "r": 25,
+     "h": 2.5,
+     "sx": 1,
+     "sz": 1,
+     "col": "ledge_granite_tint",
+     "tile": 5
+    },
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 1.5,
+     "y0": 0,
+     "y1": 4.8,
+     "wall": "lh_white",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "paint": true,
+     "slits": [
+      [
+       180,
+       0.1,
+       0.8,
+       1.9
+      ]
+     ]
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 4.8,
+     "r": 0.85,
+     "sides": 8,
+     "tower_r": 1.4,
+     "active": false,
+     "brackets": false,
+     "deck_r": 1.8,
+     "ball": 0.28
+    },
+    {
+     "type": "block",
+     "rect": [
+      2.5,
+      -4.0,
+      10.5,
+      4.0
+     ],
+     "y0": 0,
+     "y1": 5.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_charcoal",
+      "ridge": "v"
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      6.5,
+      0.5
+     ],
+     "y0": 7.0,
+     "y1": 9.4,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    }
+   ]
+  },
+  {
+   "id": "lh_eagle_island",
+   "name": "Eagle Island Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -45158.0,
+     20161.0
+    ],
+    "ang_deg": 120
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 19.85,
+   "priority": false,
+   "status": "active",
+   "light": "Fl W 4s, 9 nm",
+   "_ref": "1858 (Commons photos): a rough whitewashed rubble tower, slightly conical, a door up a short wooden stair, a black gallery and ten-sided lantern; the tall white pyramidal bell tower beside it. The keeper's house is gone. East Penobscot Bay.",
+   "_sources": [
+    "https://commons.wikimedia.org/wiki/Category:Eagle_Island_Lighthouse"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 2.0,
+     "y0": 0,
+     "y1": 6.6,
+     "wall": "peeling_whitewash",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "tile": 5,
+     "r_top": 1.65,
+     "slits": [
+      [
+       200,
+       1.4,
+       0.8,
+       1.9
+      ],
+      [
+       160,
+       4.4,
+       0.45,
+       0.8
+      ]
+     ],
+     "sill_col": "peeling_whitewash_trim"
+    },
+    {
+     "type": "box",
+     "at": [
+      -0.7,
+      2.6
+     ],
+     "y0": 0,
+     "size": [
+      1.0,
+      1.4,
+      1.6
+     ],
+     "ang_deg": 20,
+     "col": "weathered_wood"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 6.6,
+     "r": 0.95,
+     "sides": 10,
+     "tower_r": 1.65,
+     "deck_r": 1.95,
+     "parapet": 0.9,
+     "glass_h": 1.4,
+     "ball": 0.3
+    },
+    {
+     "type": "block",
+     "rect": [
+      -9.4,
+      -3.0,
+      -6.6,
+      -0.2
+     ],
+     "y0": 0,
+     "y1": 0.4,
+     "wall": "lh_white",
+     "paint": true,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 72,
+      "col": "lh_white"
+     }
+    }
+   ]
+  },
+  {
+   "id": "lh_saddleback_ledge",
+   "name": "Saddleback Ledge Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -41870.0,
+     42644.0
+    ],
+    "ang_deg": 110
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 3.2,
+   "priority": false,
+   "status": "active",
+   "light": "Fl W 6s, 9 nm",
+   "_ref": "1839 (Commons photos): a conical tower of dark rough granite on a bare ledge in Isle au Haut Bay, a bracketed gallery with railing and a lantern; the frame keeper's house that once leaned on it is gone.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Saddleback_Ledge_Light",
+    "https://commons.wikimedia.org/wiki/Category:Saddleback_Ledge_Light"
+   ],
+   "parts": [
+    {
+     "type": "outcrop",
+     "c": [
+      0,
+      0
+     ],
+     "r": 18,
+     "h": 3.0,
+     "sx": 1.4,
+     "sz": 0.8,
+     "col": "ledge_granite_tint",
+     "tile": 5
+    },
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 3.6,
+     "y0": 0,
+     "y1": 10.0,
+     "wall": "granite_dark",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "tile": 5,
+     "r_top": 2.4,
+     "slits": [
+      [
+       180,
+       0.4,
+       0.9,
+       1.9
+      ],
+      [
+       150,
+       4.5,
+       0.45,
+       0.8
+      ],
+      [
+       210,
+       7.4,
+       0.45,
+       0.8
+      ]
+     ],
+     "sill_col": "granite_dark_trim"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 10.0,
+     "r": 1.0,
+     "sides": 10,
+     "tower_r": 2.5,
+     "deck_r": 2.65,
+     "parapet": 0.9,
+     "glass_h": 1.4,
+     "ball": 0.3
+    }
+   ]
+  },
+  {
+   "id": "lh_isle_au_haut",
+   "name": "Isle au Haut Light (Robinson Point)",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -35895.0,
+     37078.0
+    ],
+    "ang_deg": -50
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 10.15,
+   "priority": false,
+   "status": "active",
+   "light": "Fl R 4s (W sector), 8 nm",
+   "_ref": "1907 (Commons photos): a 'sparkplug' tower: a granite base of dressed blocks to about 4.6 m with a white brick shaft above, a black gallery and octagonal lantern, reached from the shore by a long white wooden footbridge on posts; the Victorian keeper's house up the bank (white, charcoal roof, red chimney).",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Isle_au_Haut_Light",
+    "https://commons.wikimedia.org/wiki/Category:Isle_au_Haut_Light_(Maine)"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 2.2,
+     "y0": 0,
+     "y1": 4.6,
+     "wall": "granite_grey_tint",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "granite_grey_trim",
+     "tile": 5
+    },
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 1.75,
+     "y0": 4.6,
+     "y1": 11.0,
+     "wall": "lh_white",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "paint": true,
+     "slits": [
+      [
+       180,
+       4.7,
+       0.8,
+       1.9
+      ],
+      [
+       0,
+       7.0,
+       0.45,
+       0.8
+      ]
+     ],
+     "sill_col": "lh_white"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 11.0,
+     "r": 0.9,
+     "sides": 8,
+     "tower_r": 1.75,
+     "deck_r": 2.0,
+     "parapet": 0.9,
+     "glass_h": 1.35,
+     "ball": 0.28
+    },
+    {
+     "type": "walkway",
+     "from": [
+      0.0,
+      2.1,
+      4.6
+     ],
+     "to": [
+      0.0,
+      22.0,
+      2.0
+     ],
+     "w": 1.4,
+     "col": "lh_white"
+    },
+    {
+     "type": "block",
+     "rect": [
+      -6.0,
+      26.0,
+      4.0,
+      34.0
+     ],
+     "y0": 0,
+     "y1": 6.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 42,
+      "col": "asphalt_charcoal",
+      "ridge": "u"
+     },
+     "deco": {
+      "stone": "foundation_granite",
+      "plinth": {
+       "h": 0.6,
+       "out": 0.06
+      }
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      4.0,
+      28.0,
+      8.5,
+      33.0
+     ],
+     "y0": 0,
+     "y1": 4.0,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_charcoal",
+      "ridge": "u"
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      -1.0,
+      30.0
+     ],
+     "y0": 8.6,
+     "y1": 11.0,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    }
+   ]
+  },
+  {
+   "id": "lh_pumpkin_island",
+   "name": "Pumpkin Island Light",
+   "t": "lighthouse",
+   "replaces_within_m": 40,
+   "frame": {
+    "origin": [
+     -43178.7,
+     10043.4
+    ],
+    "ang_deg": -50
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 7.2,
+   "priority": false,
+   "status": "inactive (1933), private",
+   "light": null,
+   "_ref": "1854 (Commons photos): a short white tower with a black gallery and octagonal lantern, joined by a little hip-roofed link to the 1-1/2 storey cape (grey cedar roof, one front dormer, a red chimney) and its ell; a small red shed. Eggemoggin Reach; decommissioned 1933, private.",
+   "_sources": [
+    "https://en.wikipedia.org/wiki/Pumpkin_Island_Light",
+    "https://commons.wikimedia.org/wiki/Category:Pumpkin_Island_Lighthouse"
+   ],
+   "parts": [
+    {
+     "type": "tower",
+     "c": [
+      0,
+      0
+     ],
+     "r": 1.6,
+     "y0": 0,
+     "y1": 6.0,
+     "wall": "lh_white",
+     "cone": false,
+     "nowin": true,
+     "cap_col": "black_iron",
+     "paint": true,
+     "slits": [
+      [
+       180,
+       2.8,
+       0.45,
+       0.8
+      ]
+     ],
+     "sill_col": "lh_white"
+    },
+    {
+     "type": "lantern",
+     "c": [
+      0,
+      0
+     ],
+     "y0": 6.0,
+     "r": 0.9,
+     "sides": 8,
+     "tower_r": 1.55,
+     "active": false,
+     "deck_r": 1.9,
+     "parapet": 0.9,
+     "glass_h": 1.35,
+     "ball": 0.3
+    },
+    {
+     "type": "block",
+     "rect": [
+      1.6,
+      -1.2,
+      3.6,
+      1.2
+     ],
+     "y0": 0,
+     "y1": 2.8,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "hip",
+      "pitch_deg": 30,
+      "col": "cedar_shake_grey",
+      "tile": 2
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      3.6,
+      -3.6,
+      12.6,
+      3.6
+     ],
+     "y0": 0,
+     "y1": 4.2,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 42,
+      "col": "cedar_shake_grey",
+      "ridge": "u",
+      "tile": 2
+     },
+     "dormers": [
+      {
+       "side": "v-",
+       "at": [
+        8.1
+       ],
+       "w": 2.2,
+       "h": 2.2
+      }
+     ],
+     "deco": {
+      "stone": "foundation_granite",
+      "plinth": {
+       "h": 0.5,
+       "out": 0.06
+      }
+     }
+    },
+    {
+     "type": "block",
+     "rect": [
+      12.6,
+      -2.5,
+      16.0,
+      2.5
+     ],
+     "y0": 0,
+     "y1": 3.4,
+     "wall": "lh_white",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "cedar_shake_grey",
+      "ridge": "u",
+      "tile": 2
+     }
+    },
+    {
+     "type": "chimney",
+     "at": [
+      8.1,
+      0.8
+     ],
+     "y0": 6.8,
+     "y1": 9.0,
+     "s": 0.7,
+     "col": "red_brick_tint",
+     "tile": 4,
+     "cap_col": "red_brick_trim",
+     "pots": 0
+    },
+    {
+     "type": "block",
+     "rect": [
+      18.0,
+      8.0,
+      21.0,
+      11.0
+     ],
+     "y0": 0,
+     "y1": 2.4,
+     "wall": "barn_red",
+     "tile": 0,
+     "ground": 2.8,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 40,
+      "col": "asphalt_charcoal",
+      "ridge": "u"
+     },
+     "paint": true
+    }
+   ]
+  },
+  {
+   "id": "coa_pier",
+   "name": "College of the Atlantic pier",
+   "t": "pier",
+   "frame": {
+    "origin": [
+     -1598.0,
+     470.2
+    ],
+    "ang_deg": -52.088
+   },
+   "ground_at": [
+    10,
+    0
+   ],
+   "ground_navd": 4.85,
+   "eave": 3,
+   "fp": [
+    [
+     -1600.81,
+     470.55
+    ],
+    [
+     -1597.73,
+     466.6
+    ],
+    [
+     -1594.58,
+     469.06
+    ],
+    [
+     -1597.65,
+     473.01
+    ]
+   ],
+   "_ref": "Matt 19 Oct, four photographs; tools/coa_pier.py. The deck, piles, gangway and float are the dock (docks.json (coa_pier)); this is the teal rails, the arch, the benches and lamps on the fixed pier.",
+   "parts": [
+    {
+     "type": "beams",
+     "list": [
+      [
+       -0.7,
+       -1.1,
+       -0.25,
+       -0.7,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       1.68,
+       -1.1,
+       -0.25,
+       1.68,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       4.06,
+       -1.1,
+       -0.25,
+       4.06,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       6.44,
+       -1.1,
+       -0.25,
+       6.44,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       8.82,
+       -1.1,
+       -0.25,
+       8.82,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       11.2,
+       -1.1,
+       -0.25,
+       11.2,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       13.58,
+       -1.1,
+       -0.25,
+       13.58,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       15.96,
+       -1.1,
+       -0.25,
+       15.96,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       18.34,
+       -1.1,
+       -0.25,
+       18.34,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       20.72,
+       -1.1,
+       -0.25,
+       20.72,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       23.1,
+       -1.1,
+       -0.25,
+       23.1,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       25.48,
+       -1.1,
+       -0.25,
+       25.48,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       27.86,
+       -1.1,
+       -0.25,
+       27.86,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       30.24,
+       -1.1,
+       -0.25,
+       30.24,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       32.62,
+       -1.1,
+       -0.25,
+       32.62,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       35.0,
+       -1.1,
+       -0.25,
+       35.0,
+       -1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       -0.7,
+       -1.1,
+       1.02,
+       35.0,
+       -1.1,
+       1.02,
+       0.24,
+       0.12,
+       "coa_teal"
+      ],
+      [
+       -0.7,
+       -1.1,
+       0.52,
+       35.0,
+       -1.1,
+       0.52,
+       0.06,
+       0.06,
+       "coa_teal"
+      ],
+      [
+       -0.7,
+       -1.1,
+       0.06,
+       35.0,
+       -1.1,
+       0.06,
+       0.08,
+       0.08,
+       "coa_teal"
+      ],
+      [
+       -0.7,
+       1.1,
+       -0.25,
+       -0.7,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       1.68,
+       1.1,
+       -0.25,
+       1.68,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       4.06,
+       1.1,
+       -0.25,
+       4.06,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       6.44,
+       1.1,
+       -0.25,
+       6.44,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       8.82,
+       1.1,
+       -0.25,
+       8.82,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       11.2,
+       1.1,
+       -0.25,
+       11.2,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       13.58,
+       1.1,
+       -0.25,
+       13.58,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       15.96,
+       1.1,
+       -0.25,
+       15.96,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       18.34,
+       1.1,
+       -0.25,
+       18.34,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       20.72,
+       1.1,
+       -0.25,
+       20.72,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       23.1,
+       1.1,
+       -0.25,
+       23.1,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       25.48,
+       1.1,
+       -0.25,
+       25.48,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       27.86,
+       1.1,
+       -0.25,
+       27.86,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       30.24,
+       1.1,
+       -0.25,
+       30.24,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       32.62,
+       1.1,
+       -0.25,
+       32.62,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       35.0,
+       1.1,
+       -0.25,
+       35.0,
+       1.1,
+       0.98,
+       0.09,
+       0.09,
+       "coa_teal"
+      ],
+      [
+       -0.7,
+       1.1,
+       1.02,
+       35.0,
+       1.1,
+       1.02,
+       0.24,
+       0.12,
+       "coa_teal"
+      ],
+      [
+       -0.7,
+       1.1,
+       0.52,
+       35.0,
+       1.1,
+       0.52,
+       0.06,
+       0.06,
+       "coa_teal"
+      ],
+      [
+       -0.7,
+       1.1,
+       0.06,
+       35.0,
+       1.1,
+       0.06,
+       0.08,
+       0.08,
+       "coa_teal"
+      ],
+      [
+       -1.4,
+       -1.25,
+       -0.3,
+       -1.4,
+       -1.25,
+       2.7,
+       0.2,
+       0.2,
+       "coa_teal"
+      ],
+      [
+       -1.4,
+       1.25,
+       -0.3,
+       -1.4,
+       1.25,
+       2.7,
+       0.2,
+       0.2,
+       "coa_teal"
+      ],
+      [
+       -1.4,
+       -1.65,
+       2.6,
+       -1.4,
+       1.65,
+       2.6,
+       0.2,
+       0.2,
+       "coa_teal"
+      ],
+      [
+       -1.4,
+       -1.45,
+       2.7,
+       -1.4,
+       0.0,
+       3.45,
+       0.15,
+       0.15,
+       "coa_teal"
+      ],
+      [
+       -1.4,
+       1.45,
+       2.7,
+       -1.4,
+       0.0,
+       3.45,
+       0.15,
+       0.15,
+       "coa_teal"
+      ],
+      [
+       -1.4,
+       -0.5,
+       2.7,
+       -1.4,
+       -0.5,
+       3.191,
+       0.1,
+       0.1,
+       "coa_teal"
+      ],
+      [
+       -1.4,
+       0.5,
+       2.7,
+       -1.4,
+       0.5,
+       3.191,
+       0.1,
+       0.1,
+       "coa_teal"
+      ],
+      [
+       -1.4,
+       -0.42,
+       2.78,
+       -1.4,
+       0.42,
+       2.78,
+       0.03,
+       0.3,
+       "sign_white"
+      ],
+      [
+       -0.8,
+       -0.8,
+       0.0,
+       1.6,
+       -0.8,
+       0.0,
+       0.5,
+       0.4,
+       "coa_teal"
+      ],
+      [
+       -0.8,
+       -0.8,
+       0.4,
+       1.6,
+       -0.8,
+       0.4,
+       0.54,
+       0.05,
+       "coa_bench_lid"
+      ],
+      [
+       -0.8,
+       0.8,
+       0.0,
+       1.6,
+       0.8,
+       0.0,
+       0.5,
+       0.4,
+       "coa_teal"
+      ],
+      [
+       -0.8,
+       0.8,
+       0.4,
+       1.6,
+       0.8,
+       0.4,
+       0.54,
+       0.05,
+       "coa_bench_lid"
+      ],
+      [
+       -0.9,
+       -1.1,
+       1.08,
+       -0.65,
+       -1.1,
+       1.08,
+       0.16,
+       0.14,
+       "lamp_black"
+      ],
+      [
+       -0.9,
+       1.1,
+       1.08,
+       -0.65,
+       1.1,
+       1.08,
+       0.16,
+       0.14,
+       "lamp_black"
+      ]
+     ]
+    },
+    {
+     "type": "globe",
+     "list": [
+      [
+       -1.4,
+       -0.5,
+       2.4,
+       0.12
+      ],
+      [
+       -1.4,
+       0.5,
+       2.4,
+       0.12
+      ]
+     ],
+     "col": "coa_globe"
+    }
+   ]
+  },
+  {
+   "id": "stewmans_downtown",
+   "name": "Stewman's Downtown",
+   "t": "restaurant",
+   "replaces": [
+    295040243
+   ],
+   "frame": {
+    "origin": [
+     -469.0,
+     965.0
+    ],
+    "ang_deg": 90.0
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 4.5,
+   "eave": 3.6,
+   "fp": [
+    [
+     -475.0,
+     950.0
+    ],
+    [
+     -463.0,
+     950.0
+    ],
+    [
+     -463.0,
+     980.0
+    ],
+    [
+     -475.0,
+     980.0
+    ]
+   ],
+   "_ref": "tools/waterfront_photos.py: Commons \"Bar Harbor, Maine, USA17.jpg\" and \"USA20.jpg\"; lidar 2021; OSM 295040243",
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -15,
+      -6.0,
+      15,
+      6.0
+     ],
+     "y0": 0.05,
+     "y1": 3.6,
+     "wall": "stew_cedar",
+     "tile": 2,
+     "roof": {
+      "kind": "gable",
+      "ridge": "u",
+      "pitch_deg": 33,
+      "col": "stew_roof"
+     },
+     "dormers": [
+      {
+       "side": "v+",
+       "at": [
+        -9,
+        -3,
+        3
+       ]
+      }
+     ]
+    },
+    {
+     "type": "beams",
+     "list": [
+      [
+       9.0,
+       7.3,
+       3.0,
+       9.0,
+       7.3,
+       4.05,
+       0.08,
+       0.08,
+       "stew_trim"
+      ],
+      [
+       10.2,
+       7.3,
+       3.0,
+       10.2,
+       7.3,
+       4.05,
+       0.08,
+       0.08,
+       "stew_trim"
+      ],
+      [
+       11.4,
+       7.3,
+       3.0,
+       11.4,
+       7.3,
+       4.05,
+       0.08,
+       0.08,
+       "stew_trim"
+      ],
+      [
+       12.6,
+       7.3,
+       3.0,
+       12.6,
+       7.3,
+       4.05,
+       0.08,
+       0.08,
+       "stew_trim"
+      ],
+      [
+       13.8,
+       7.3,
+       3.0,
+       13.8,
+       7.3,
+       4.05,
+       0.08,
+       0.08,
+       "stew_trim"
+      ],
+      [
+       9.0,
+       7.3,
+       4.05,
+       13.8,
+       7.3,
+       4.05,
+       0.12,
+       0.08,
+       "stew_trim"
+      ],
+      [
+       9.0,
+       6.65,
+       2.9,
+       13.8,
+       6.65,
+       2.9,
+       1.3,
+       0.12,
+       "stew_trim"
+      ],
+      [
+       9.0,
+       6.0,
+       4.05,
+       9.0,
+       7.3,
+       4.05,
+       0.08,
+       0.08,
+       "stew_trim"
+      ],
+      [
+       13.8,
+       6.0,
+       4.05,
+       13.8,
+       7.3,
+       4.05,
+       0.08,
+       0.08,
+       "stew_trim"
+      ],
+      [
+       -18.0,
+       15.0,
+       0.0,
+       12.0,
+       15.0,
+       0.0,
+       0.06,
+       1.6,
+       "stew_fence"
+      ],
+      [
+       -18.0,
+       15.0,
+       0.0,
+       -18.0,
+       -2.0,
+       0.0,
+       0.06,
+       1.6,
+       "stew_fence"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "harborview_shacks",
+   "name": "Ticket shacks, Harborview Park",
+   "t": "shed",
+   "replaces": [],
+   "frame": {
+    "origin": [
+     -419.6,
+     966.6
+    ],
+    "ang_deg": -17.01
+   },
+   "ground_at": [
+    14,
+    4
+   ],
+   "eave": 2.6,
+   "fp": [
+    [
+     -417.6,
+     964.6
+    ],
+    [
+     -393.6,
+     957.6
+    ],
+    [
+     -392.6,
+     962.6
+    ],
+    [
+     -416.6,
+     969.6
+    ]
+   ],
+   "_ref": "tools/waterfront_photos.py: Commons \"Bar Harbor, Maine, USA18.jpg\" and \"USA21.jpg\"; OSM Harborview Park 1365123520. Places approximate.",
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      3.9,
+      1.0,
+      8.1,
+      6.0
+     ],
+     "y0": 0.05,
+     "y1": 2.5,
+     "wall": "shack_blue",
+     "paint": true,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 28,
+      "col": "shack_roof",
+      "ridge": "v"
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      3.9,
+      1.0
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.45,
+      0.12
+     ],
+     "col": "shack_trim_yellow"
+    },
+    {
+     "type": "box",
+     "at": [
+      3.9,
+      6.0
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.45,
+      0.12
+     ],
+     "col": "shack_trim_yellow"
+    },
+    {
+     "type": "box",
+     "at": [
+      8.1,
+      1.0
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.45,
+      0.12
+     ],
+     "col": "shack_trim_yellow"
+    },
+    {
+     "type": "box",
+     "at": [
+      8.1,
+      6.0
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.45,
+      0.12
+     ],
+     "col": "shack_trim_yellow"
+    },
+    {
+     "type": "block",
+     "rect": [
+      9.4,
+      1.0,
+      13.6,
+      6.0
+     ],
+     "y0": 0.05,
+     "y1": 2.5,
+     "wall": "shack_red",
+     "paint": true,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 28,
+      "col": "shack_roof",
+      "ridge": "v"
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      9.4,
+      1.0
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.45,
+      0.12
+     ],
+     "col": "stew_trim"
+    },
+    {
+     "type": "box",
+     "at": [
+      9.4,
+      6.0
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.45,
+      0.12
+     ],
+     "col": "stew_trim"
+    },
+    {
+     "type": "box",
+     "at": [
+      13.6,
+      1.0
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.45,
+      0.12
+     ],
+     "col": "stew_trim"
+    },
+    {
+     "type": "box",
+     "at": [
+      13.6,
+      6.0
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.45,
+      0.12
+     ],
+     "col": "stew_trim"
+    },
+    {
+     "type": "block",
+     "rect": [
+      17.7,
+      2.6,
+      24.3,
+      6.4
+     ],
+     "y0": 0.05,
+     "y1": 2.6,
+     "wall": "shack_yellow",
+     "paint": true,
+     "roof": {
+      "kind": "gable",
+      "pitch_deg": 28,
+      "col": "shack_roof",
+      "ridge": "u"
+     }
+    },
+    {
+     "type": "box",
+     "at": [
+      21.0,
+      6.430000000000001
+     ],
+     "y0": 0.05,
+     "size": [
+      1.6,
+      2.0,
+      0.06
+     ],
+     "col": "shack_door_blue"
+    },
+    {
+     "type": "box",
+     "at": [
+      17.7,
+      2.6
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.5500000000000003,
+      0.12
+     ],
+     "col": "stew_trim"
+    },
+    {
+     "type": "box",
+     "at": [
+      17.7,
+      6.4
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.5500000000000003,
+      0.12
+     ],
+     "col": "stew_trim"
+    },
+    {
+     "type": "box",
+     "at": [
+      24.3,
+      2.6
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.5500000000000003,
+      0.12
+     ],
+     "col": "stew_trim"
+    },
+    {
+     "type": "box",
+     "at": [
+      24.3,
+      6.4
+     ],
+     "y0": 0.05,
+     "size": [
+      0.12,
+      2.5500000000000003,
+      0.12
+     ],
+     "col": "stew_trim"
+    }
+   ]
+  },
+  {
+   "id": "bar_harbor_inn_pier",
+   "name": "Bar Harbor Inn pier (the Margaret Todd's pier)",
+   "t": "pier",
+   "frame": {
+    "origin": [
+     -217.4,
+     1012.2
+    ],
+    "ang_deg": -83.557
+   },
+   "ground_at": [
+    0.5,
+    0
+   ],
+   "ground_navd": 4.67,
+   "eave": 3,
+   "fp": [
+    [
+     -218.89,
+     1012.03
+    ],
+    [
+     -218.72,
+     1010.54
+    ],
+    [
+     -215.74,
+     1010.88
+    ],
+    [
+     -215.91,
+     1012.37
+    ]
+   ],
+   "_ref": "tools/inn_pier.py: USGS 3DEP lidar and Matt's photograph (docs/look/photo_inn_pier_porcupines.jpg). The gangway and floats are the dock (docks.json bar_harbor_ferry_pier); this is the fixed walkway, its piles and the booth.",
+   "parts": [
+    {
+     "type": "beams",
+     "list": [
+      [
+       0,
+       0,
+       -0.12,
+       49.01,
+       0,
+       -0.12,
+       2.5,
+       0.12,
+       "inn_walk_deck"
+      ],
+      [
+       0,
+       -1.2,
+       -0.75,
+       49.01,
+       -1.2,
+       -0.75,
+       0.1,
+       0.7,
+       "inn_alu"
+      ],
+      [
+       0,
+       1.2,
+       -0.75,
+       49.01,
+       1.2,
+       -0.75,
+       0.1,
+       0.7,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -2.3,
+       -0.12,
+       47.5,
+       -2.3,
+       -0.12,
+       2.3000000000000003,
+       0.12,
+       "inn_walk_deck"
+      ],
+      [
+       41.0,
+       -3.4,
+       -0.75,
+       47.5,
+       -3.4,
+       -0.75,
+       0.1,
+       0.7,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -3.4,
+       -0.75,
+       41.0,
+       -1.2,
+       -0.75,
+       0.1,
+       0.7,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -3.4,
+       -0.75,
+       47.5,
+       -1.2,
+       -0.75,
+       0.1,
+       0.7,
+       "inn_alu"
+      ],
+      [
+       0.6,
+       1.2,
+       0.0,
+       0.6,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       3.626,
+       1.2,
+       0.0,
+       3.626,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       6.651,
+       1.2,
+       0.0,
+       6.651,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       9.677,
+       1.2,
+       0.0,
+       9.677,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       12.702,
+       1.2,
+       0.0,
+       12.702,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       15.728,
+       1.2,
+       0.0,
+       15.728,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       18.754,
+       1.2,
+       0.0,
+       18.754,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       21.779,
+       1.2,
+       0.0,
+       21.779,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       24.805,
+       1.2,
+       0.0,
+       24.805,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       27.83,
+       1.2,
+       0.0,
+       27.83,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       30.856,
+       1.2,
+       0.0,
+       30.856,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       33.882,
+       1.2,
+       0.0,
+       33.882,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       36.907,
+       1.2,
+       0.0,
+       36.907,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       39.933,
+       1.2,
+       0.0,
+       39.933,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       42.958,
+       1.2,
+       0.0,
+       42.958,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       45.984,
+       1.2,
+       0.0,
+       45.984,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       49.01,
+       1.2,
+       0.0,
+       49.01,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       0.6,
+       1.2,
+       1.03,
+       49.01,
+       1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       0.6,
+       1.2,
+       0.68,
+       49.01,
+       1.2,
+       0.68,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       0.6,
+       1.2,
+       0.34,
+       49.01,
+       1.2,
+       0.34,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       0.6,
+       -1.2,
+       0.0,
+       0.6,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       3.708,
+       -1.2,
+       0.0,
+       3.708,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       6.815,
+       -1.2,
+       0.0,
+       6.815,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       9.923,
+       -1.2,
+       0.0,
+       9.923,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       13.031,
+       -1.2,
+       0.0,
+       13.031,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       16.138,
+       -1.2,
+       0.0,
+       16.138,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       19.246,
+       -1.2,
+       0.0,
+       19.246,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       22.354,
+       -1.2,
+       0.0,
+       22.354,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       25.462,
+       -1.2,
+       0.0,
+       25.462,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       28.569,
+       -1.2,
+       0.0,
+       28.569,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       31.677,
+       -1.2,
+       0.0,
+       31.677,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       34.785,
+       -1.2,
+       0.0,
+       34.785,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       37.892,
+       -1.2,
+       0.0,
+       37.892,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -1.2,
+       0.0,
+       41.0,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       0.6,
+       -1.2,
+       1.03,
+       41.0,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       0.6,
+       -1.2,
+       0.68,
+       41.0,
+       -1.2,
+       0.68,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       0.6,
+       -1.2,
+       0.34,
+       41.0,
+       -1.2,
+       0.34,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -1.2,
+       0.0,
+       41.0,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -3.4,
+       0.0,
+       41.0,
+       -3.4,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -1.2,
+       1.03,
+       41.0,
+       -3.4,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -1.2,
+       0.68,
+       41.0,
+       -3.4,
+       0.68,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -1.2,
+       0.34,
+       41.0,
+       -3.4,
+       0.34,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -3.4,
+       0.0,
+       41.0,
+       -3.4,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       44.25,
+       -3.4,
+       0.0,
+       44.25,
+       -3.4,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -3.4,
+       0.0,
+       47.5,
+       -3.4,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -3.4,
+       1.03,
+       47.5,
+       -3.4,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -3.4,
+       0.68,
+       47.5,
+       -3.4,
+       0.68,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       41.0,
+       -3.4,
+       0.34,
+       47.5,
+       -3.4,
+       0.34,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -3.4,
+       0.0,
+       47.5,
+       -3.4,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -1.2,
+       0.0,
+       47.5,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -3.4,
+       1.03,
+       47.5,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -3.4,
+       0.68,
+       47.5,
+       -1.2,
+       0.68,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -3.4,
+       0.34,
+       47.5,
+       -1.2,
+       0.34,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -1.2,
+       0.0,
+       47.5,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       49.01,
+       -1.2,
+       0.0,
+       49.01,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -1.2,
+       1.03,
+       49.01,
+       -1.2,
+       1.03,
+       0.07,
+       0.07,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -1.2,
+       0.68,
+       49.01,
+       -1.2,
+       0.68,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       47.5,
+       -1.2,
+       0.34,
+       49.01,
+       -1.2,
+       0.34,
+       0.045,
+       0.045,
+       "inn_alu"
+      ],
+      [
+       11.5,
+       -1.45,
+       -1.05,
+       11.5,
+       1.45,
+       -1.05,
+       0.3,
+       0.3,
+       "inn_galv"
+      ],
+      [
+       23.5,
+       -1.45,
+       -1.05,
+       23.5,
+       1.45,
+       -1.05,
+       0.3,
+       0.3,
+       "inn_galv"
+      ],
+      [
+       35.5,
+       -1.45,
+       -1.05,
+       35.5,
+       1.45,
+       -1.05,
+       0.3,
+       0.3,
+       "inn_galv"
+      ],
+      [
+       44.0,
+       -3.55,
+       -1.05,
+       44.0,
+       1.45,
+       -1.05,
+       0.3,
+       0.3,
+       "inn_galv"
+      ],
+      [
+       48.4,
+       -1.45,
+       -1.05,
+       48.4,
+       1.45,
+       -1.05,
+       0.3,
+       0.3,
+       "inn_galv"
+      ]
+     ]
+    },
+    {
+     "type": "beams",
+     "list": [
+      [
+       11.5,
+       -1.2,
+       -4.8,
+       11.5,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       11.5,
+       -1.2,
+       -4.8,
+       11.5,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       11.5,
+       1.2,
+       -4.83,
+       11.5,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       11.5,
+       1.2,
+       -4.83,
+       11.5,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       23.5,
+       -1.2,
+       -5.38,
+       23.5,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       23.5,
+       -1.2,
+       -5.38,
+       23.5,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       23.5,
+       1.2,
+       -5.33,
+       23.5,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       23.5,
+       1.2,
+       -5.33,
+       23.5,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       35.5,
+       -1.2,
+       -6.31,
+       35.5,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       35.5,
+       -1.2,
+       -6.31,
+       35.5,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       35.5,
+       1.2,
+       -6.27,
+       35.5,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       35.5,
+       1.2,
+       -6.27,
+       35.5,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       44.0,
+       -1.2,
+       -7.02,
+       44.0,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       44.0,
+       -1.2,
+       -7.02,
+       44.0,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       44.0,
+       1.2,
+       -6.98,
+       44.0,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       44.0,
+       1.2,
+       -6.98,
+       44.0,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       44.0,
+       -3.3,
+       -7.16,
+       44.0,
+       -3.3,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       44.0,
+       -3.3,
+       -7.16,
+       44.0,
+       -3.3,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       48.4,
+       -1.2,
+       -7.46,
+       48.4,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       48.4,
+       -1.2,
+       -7.46,
+       48.4,
+       -1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ],
+      [
+       48.4,
+       1.2,
+       -7.42,
+       48.4,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       0
+      ],
+      [
+       48.4,
+       1.2,
+       -7.42,
+       48.4,
+       1.2,
+       -0.75,
+       0.34,
+       0.34,
+       "inn_galv",
+       45
+      ]
+     ],
+     "solid": "piles"
+    },
+    {
+     "type": "box",
+     "at": [
+      43.1,
+      -2.275
+     ],
+     "y0": 0,
+     "size": [
+      3.0,
+      2.35,
+      1.75
+     ],
+     "col": "inn_booth"
+    },
+    {
+     "type": "box",
+     "at": [
+      43.1,
+      -2.275
+     ],
+     "y0": 2.35,
+     "size": [
+      3.5,
+      0.22,
+      2.25
+     ],
+     "col": "inn_booth_roof"
+    },
+    {
+     "type": "box",
+     "at": [
+      43.1,
+      -2.275
+     ],
+     "y0": 2.57,
+     "size": [
+      1.8599999999999999,
+      0.33,
+      0.9625000000000001
+     ],
+     "col": "inn_booth_roof"
+    }
+   ]
+  },
+  {
+   "id": "golden_anchor",
+   "name": "Former Golden Anchor restaurant",
+   "t": "restaurant",
+   "frame": {
+    "origin": [
+     -477.4,
+     907.17
+    ],
+    "ang_deg": 139.44
+   },
+   "ground_at": [
+    0,
+    0
+   ],
+   "ground_navd": 3.3,
+   "eave": 5.1,
+   "fp": [
+    [
+     -472.3,
+     888.6
+    ],
+    [
+     -458.2,
+     905.0
+    ],
+    [
+     -482.5,
+     925.8
+    ],
+    [
+     -496.6,
+     909.3
+    ]
+   ],
+   "_ref": "Assets, site 1 item 21 (survey 4.16): corners from the lidar and two aerials; floor +3.3 (level with the pier neck, ASSUMED), roof +8.4, plant +8.9; one storey, glazed walls in a white frame, a deep sloped fascia, a flat white roof. The former Golden Anchor restaurant (BDN 2011), not a glass pavilion. Harborside point (Assets, 1 Nov; tools/harborside_point.py)",
+   "parts": [
+    {
+     "type": "block",
+     "rect": [
+      -15.99,
+      -10.81,
+      15.99,
+      10.81
+     ],
+     "y0": 0.05,
+     "y1": 5.1,
+     "wall": "white_trim",
+     "tile": 7,
+     "win": 3,
+     "ground": 9,
+     "roof": {
+      "kind": "flat",
+      "col": "golden_anchor_roof"
+     }
+    },
+    {
+     "type": "beams",
+     "list": [
+      [
+       -16.49,
+       -11.31,
+       4.6,
+       16.49,
+       -11.31,
+       4.6,
+       0.12,
+       1.1,
+       "white_trim"
+      ],
+      [
+       -16.49,
+       11.31,
+       4.6,
+       16.49,
+       11.31,
+       4.6,
+       0.12,
+       1.1,
+       "white_trim"
+      ],
+      [
+       -16.49,
+       -11.31,
+       4.6,
+       -16.49,
+       11.31,
+       4.6,
+       0.12,
+       1.1,
+       "white_trim"
+      ],
+      [
+       16.49,
+       -11.31,
+       4.6,
+       16.49,
+       11.31,
+       4.6,
+       0.12,
+       1.1,
+       "white_trim"
+      ]
+     ]
+    },
+    {
+     "type": "block",
+     "rect": [
+      -3.0,
+      -2.0,
+      3.0,
+      2.0
+     ],
+     "y0": 5.1,
+     "y1": 5.6,
+     "wall": "golden_anchor_roof",
+     "tile": 7,
+     "roof": {
+      "kind": "flat",
+      "col": "golden_anchor_roof"
+     }
+    }
+   ]
+  }
+ ]
+}

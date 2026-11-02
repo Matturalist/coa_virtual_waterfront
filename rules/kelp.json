@@ -1,0 +1,67 @@
+{
+ "id": "kelp",
+ "name": "Kelp on the shallow rock",
+ "kind": "generator",
+ "paints": "weed",
+ "plain": "Kelp grows on rock below the low-tide line, down as deep as the light reaches; it is the green-brown patches you see through the water.",
+ "where": {
+  "habitat": {
+   "1": 1.0,
+   "2": 0.8,
+   "0": 0.6,
+   "8": 0.4
+  },
+  "height_mllw_m": [
+   [
+    -14,
+    0.0
+   ],
+   [
+    -9,
+    0.5
+   ],
+   [
+    -1.5,
+    1.0
+   ],
+   [
+    0.2,
+    0.0
+   ]
+  ],
+  "fetch_m": [
+   [
+    200,
+    0.3
+   ],
+   [
+    1200,
+    1.0
+   ]
+  ],
+  "substrate": {
+   "water": 1.0,
+   "bare rock": 1.0,
+   "fractured rock / cobble": 0.8,
+   "other": 0.2
+  }
+ },
+ "params": {
+  "mix": {
+   "saccharina": 1.0
+  },
+  "density": 0.6
+ },
+ "seed": "natural",
+ "confidence": "medium: curves from World's levels/downeast/coast_rules.json (21 Oct), checked against the Bar Harbor shore and cited above; Matt's field corrections still to come",
+ "sources": [
+  {
+   "cite": "Steneck, R.S. et al. (2002) Kelp forest ecosystems: biodiversity, stability, resilience and future. Environ. Conserv. 29: 436-459.",
+   "note": "Saccharina and Laminaria on Gulf of Maine subtidal rock to ~10-15 m, densest where waves keep urchins and silt off"
+  },
+  {
+   "cite": "docs/coast-generator.md (Matt, 20 Oct 2026)",
+   "note": "the rule's purpose, in his words"
+  }
+ ]
+}

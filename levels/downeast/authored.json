@@ -1,0 +1,107 @@
+{
+ "version": 1,
+ "_doc": "Hand edits over the generated level (docs/authored.md). Everything here survives regeneration. Coordinates: level metres, x east, z south.",
+ "buildings": [
+  {
+   "id": "422549225",
+   "tile": 3,
+   "tint": [
+    0.6,
+    0.66,
+    0.72
+   ],
+   "roof": "hip",
+   "note": "Harbor Place / Harbormaster on the pier: blue-grey clapboard, white trim, brown shingle hip roof, stands on piles at the pier edge"
+  },
+  {
+   "id": "369089643",
+   "tile": 0,
+   "tint": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "roof": "hip",
+   "eave": 8.5,
+   "ridge": 12.4,
+   "note": "Bar Harbor Inn: white clapboard, grey shingle hip roofs, long low wings; lidar read it as flat (the wings are), the main block is hip"
+  },
+  {
+   "id": "369087968",
+   "tile": 1,
+   "tint": [
+    0.74,
+    0.72,
+    0.68
+   ],
+   "note": "Harborside Hotel: weathered grey shingle, white trim, four storeys of gables and dormers along West Street; the procedural flat roof is wrong but the massing is right until Assets models it"
+  },
+  {
+   "id": "295040242",
+   "tile": 1,
+   "tint": [
+    0.7,
+    0.68,
+    0.64
+   ],
+   "note": "West Street Hotel: grey shingle, white trim, hip roof, four storeys"
+  },
+  {
+   "id": "369087967",
+   "tile": 0,
+   "tint": [
+    0.96,
+    0.95,
+    0.92
+   ],
+   "note": "Bar Harbor Club: white, long low wings round the pool, grey roof"
+  },
+  {
+   "id": "295040243",
+   "tile": 0,
+   "tint": [
+    0.95,
+    0.93,
+    0.88
+   ],
+   "note": "Stewman's Downtown: white clapboard over the water on piles"
+  },
+  {
+   "id": "813641221",
+   "tile": 6,
+   "tint": [
+    0.62,
+    0.6,
+    0.56
+   ],
+   "note": "harbour shed east of the pier: dark board walls, teal metal roof (roof colour not yet overridable)"
+  }
+ ],
+ "props": [],
+ "trees": [],
+ "brushes": [],
+ "roads": [],
+ "moorings": [],
+ "patches": [
+  {
+   "id": "g0001",
+   "shape": "circle",
+   "c": [
+    1180,
+    2110
+   ],
+   "r": 40,
+   "falloff": 12,
+   "seed": 3,
+   "sheeting": 0.3,
+   "zonation_dz": -0.3,
+   "disabled": true,
+   "note": "example (disabled): a smoother, lower-weed patch of shore; set disabled to false and move c to test. c here is near the east shore of Bar Island."
+  }
+ ],
+ "notes": [
+  "Town pier (Google Earth reference, 16 Oct): a FILLED pier, not piles \u2014 a paved parking lot with white bays on top, granite-block seawall faces, the Harbor Place building on piles at its north edge, two long float systems east of it, whale-watch catamarans and the ferry on the floats. The sim's chart draws it from S-57 SLCONS; a 'filled pier' profile (lot at +3 m, seawall, kerb) is wanted in roads/props.",
+  "Agamont Park shore west of the pier: pocket sand/cobble beach with a stone seawall and a lawn above; the Shore Path runs along a granite seawall from the Inn eastward.",
+  "Downtown roofs from above: mostly charcoal shingle; the commercial blocks on Main/Cottage are flat with pale membrane roofs; walls predominantly white, some grey shingle, red brick on a few Main Street blocks."
+ ]
+}

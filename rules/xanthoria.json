@@ -1,0 +1,135 @@
+{
+ "id": "xanthoria",
+ "name": "Xanthoria parietina / Caloplaca marina \u2014 the orange maritime lichens",
+ "kind": "lichen",
+ "affinity": {
+  "substrate": {
+   "bare rock": 1.0,
+   "fractured rock / cobble": 0.5,
+   "built": 0.15
+  },
+  "sun": [
+   [
+    0,
+    0
+   ],
+   [
+    0.35,
+    0
+   ],
+   [
+    0.6,
+    1
+   ],
+   [
+    1,
+    1
+   ]
+  ],
+  "salt": [
+   [
+    0,
+    0.45
+   ],
+   [
+    0.05,
+    0.8
+   ],
+   [
+    0.3,
+    1
+   ],
+   [
+    0.7,
+    1
+   ],
+   [
+    0.9,
+    0.3
+   ],
+   [
+    1,
+    0
+   ]
+  ],
+  "height_m": [
+   [
+    1.6,
+    0
+   ],
+   [
+    2.2,
+    0.6
+   ],
+   [
+    3.0,
+    1
+   ],
+   [
+    9,
+    1
+   ],
+   [
+    14,
+    0.4
+   ],
+   [
+    25,
+    0.15
+   ],
+   [
+    60,
+    0.1
+   ]
+  ],
+  "wet": [
+   [
+    0,
+    1
+   ],
+   [
+    0.6,
+    1
+   ],
+   [
+    0.85,
+    0.3
+   ],
+   [
+    1,
+    0
+   ]
+  ]
+ },
+ "seed": "natural",
+ "spread": {
+  "rate": 0.35,
+  "reach_m": 6,
+  "steps": 20,
+  "min_affinity": 0.25
+ },
+ "form": "rosette",
+ "represent": {
+  "cover": "cover_xanthoria.png",
+  "shader": "level.js: the orange band in the granite branch reads uCover.r as its amount; rosettes from the fine noise"
+ },
+ "confidence": "medium: zonation and substrate from the shore-ecology literature; the sun and wetness curves are the naturalist's calibration",
+ "sources": [
+  {
+   "cite": "Brodo, I.M., Sharnoff, S.D. & Sharnoff, S. (2001) Lichens of North America. Yale University Press.",
+   "note": "X. parietina on nutrient-enriched sunlit rock, especially near the sea and bird perches; orange foliose rosettes"
+  },
+  {
+   "cite": "Stephenson, T.A. & Stephenson, A. (1949) The universal features of zonation between tide-marks on rocky coasts. Journal of Ecology 37: 289\u2013305.",
+   "note": "the orange (Xanthoria/Caloplaca) belt lies above the black (Verrucaria) belt in the supralittoral, below the grey crustose lichens"
+  },
+  {
+   "cite": "Lewis, J.R. (1964) The Ecology of Rocky Shores. English Universities Press.",
+   "note": "the supralittoral fringe widens with exposure: the orange belt reaches higher on exposed headlands than in sheltered bays (the salt field)"
+  },
+  {
+   "cite": "Fletcher, A. (1973) The ecology of maritime (supralittoral) lichens on some rocky shores of Anglesey. Lichenologist 5: 401\u2013422.",
+   "note": "distribution of the orange supralittoral species against spray, aspect and nutrient enrichment"
+  }
+ ]
+}
