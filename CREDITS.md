@@ -14,7 +14,9 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | black_spruce_d | Realistic HD Black spruce (5/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-538-8ebbff34d0be40498308eeca5b6ddb2f |
 | black_spruce_e | Realistic HD Black spruce (1/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-138-352ae5c742bb4c2da7f76c9a6ed276ce |
 | black_spruce_f | Realistic HD Black spruce (31/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-3138-5223fb9947e345d9994147fe3cfae1a4 |
-| dinghy_skiff |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
+| dinghy_skiff |  | tools/assets/vessels/build.py (skiff.py; procedural) | CC0 |  |
+| dinghy_skiff_b |  | tools/assets/vessels/build.py (skiff.py; procedural) | CC0 |  |
+| dinghy_skiff_c |  | tools/assets/vessels/build.py (skiff.py; procedural) | CC0 |  |
 | dock_boarding_stair |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
 | dock_bollard_yellow |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
 | dock_box |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
@@ -53,6 +55,8 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | lobster_osmond |  | tools/assets/vessels/build.py (lobster.py, lob_hull.py, lob_top.py; procedural) | CC0 |  |
 | lobster_trap |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
 | lobster_wesmac |  | tools/assets/vessels/build.py (lobster.py, lob_hull.py, lob_top.py; procedural) | CC0 |  |
+| margaret_todd |  | tools/assets/vessels/build.py (mt.py; procedural) | CC0 |  |
+| margaret_todd_sailcloth |  | tools/assets/vessels/mt.py | CC0 |  |
 | ocean_buoy |  | Poly Haven | CC0-1.0 | https://polyhaven.com/a/ocean_buoy |
 | osprey |  | tools/assets/vessels/osprey.py, osprey_top.py, osprey_lines.py, osprey_rails.py, osprey_fore.py, osprey_aft.py, osprey_roof.py, osprey_tender.py via build.py (from Wesmac's and Matt's photos of her, docs/osprey.md) | CC0 |  |
 | osprey_wheelhouse |  | tools/assets/vessels/osprey_wh.py via build.py (procedural, from Matt's wheelhouse photos, 30 Oct 2026) | CC0 |  |

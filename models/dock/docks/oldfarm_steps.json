@@ -1,0 +1,412 @@
+{
+ "id": "oldfarm_steps",
+ "style": "west_street",
+ "wear": 0.5,
+ "seed": 29,
+ "_doc": "Site 1 item 28, second slice: the granite stair from the shore to Oldfarm, built by tools/assets/sites/oldfarm_steps.py from a 2015 photo; the line is the lidar's evenest, ASSUMED. See the survey's stretch 7.",
+ "steps": [
+  {
+   "id": "oldfarm_0",
+   "top_navd_m": 10.33,
+   "path": [
+    [
+     630.0,
+     2781.0,
+     10.33
+    ],
+    [
+     633.62,
+     2782.32,
+     8.79
+    ]
+   ],
+   "width_m": 2.2,
+   "rise_m": 0.22,
+   "max_block_m": 3.0,
+   "beam_m": 0.38,
+   "fill_mat": "leaf_litter",
+   "rough_m": 0.045,
+   "wander_m": 0.08,
+   "cheeks": "none",
+   "feather": false,
+   "fall": 0.008,
+   "bury_m": 0.25,
+   "stone_mat": "granite_weathered",
+   "far_m": 60,
+   "cutoff_m": 700
+  },
+  {
+   "id": "oldfarm_1",
+   "top_navd_m": 8.12,
+   "path": [
+    [
+     636.09,
+     2783.22,
+     8.12
+    ],
+    [
+     637.64,
+     2783.78,
+     7.46
+    ]
+   ],
+   "width_m": 2.2,
+   "rise_m": 0.22,
+   "max_block_m": 3.0,
+   "beam_m": 0.38,
+   "fill_mat": "leaf_litter",
+   "rough_m": 0.045,
+   "wander_m": 0.08,
+   "cheeks": "none",
+   "feather": false,
+   "fall": 0.008,
+   "bury_m": 0.25,
+   "stone_mat": "granite_weathered",
+   "far_m": 60,
+   "cutoff_m": 700
+  },
+  {
+   "id": "oldfarm_2",
+   "top_navd_m": 6.99,
+   "path": [
+    [
+     640.12,
+     2784.68,
+     6.99
+    ],
+    [
+     642.18,
+     2785.43,
+     6.11
+    ]
+   ],
+   "width_m": 2.2,
+   "rise_m": 0.22,
+   "max_block_m": 3.0,
+   "beam_m": 0.38,
+   "fill_mat": "leaf_litter",
+   "rough_m": 0.045,
+   "wander_m": 0.08,
+   "cheeks": "none",
+   "feather": false,
+   "fall": 0.008,
+   "bury_m": 0.25,
+   "stone_mat": "granite_weathered",
+   "far_m": 60,
+   "cutoff_m": 700
+  },
+  {
+   "id": "oldfarm_3",
+   "top_navd_m": 5.42,
+   "path": [
+    [
+     644.66,
+     2786.34,
+     5.42
+    ],
+    [
+     648.79,
+     2787.84,
+     3.66
+    ]
+   ],
+   "width_m": 2.2,
+   "rise_m": 0.22,
+   "max_block_m": 3.0,
+   "beam_m": 0.38,
+   "fill_mat": "leaf_litter",
+   "rough_m": 0.045,
+   "wander_m": 0.08,
+   "cheeks": "none",
+   "feather": false,
+   "fall": 0.008,
+   "bury_m": 0.25,
+   "stone_mat": "granite_weathered",
+   "far_m": 60,
+   "cutoff_m": 700
+  }
+ ],
+ "dressing": {
+  "id": "oldfarm_boulders",
+  "far_m": 100,
+  "cutoff_m": 300,
+  "items": [
+   {
+    "type": "erratic",
+    "at": [
+     631.78,
+     2779.03
+    ],
+    "y": 9.44,
+    "size": [
+     1.17,
+     0.74,
+     1.06
+    ],
+    "yaw_deg": 123.8,
+    "seed": 426,
+    "tint": [
+     0.81,
+     0.85,
+     0.81
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     633.5,
+     2778.39
+    ],
+    "y": 9.27,
+    "size": [
+     0.61,
+     0.43,
+     0.61
+    ],
+    "yaw_deg": 125.8,
+    "seed": 510,
+    "tint": [
+     0.83,
+     0.87,
+     0.83
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     632.17,
+     2785.56
+    ],
+    "y": 8.81,
+    "size": [
+     0.86,
+     0.61,
+     0.88
+    ],
+    "yaw_deg": 351.8,
+    "seed": 225,
+    "tint": [
+     0.88,
+     0.92,
+     0.88
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     634.7,
+     2786.21
+    ],
+    "y": 8.02,
+    "size": [
+     1.06,
+     0.67,
+     0.95
+    ],
+    "yaw_deg": 195.7,
+    "seed": 433,
+    "tint": [
+     0.86,
+     0.9,
+     0.86
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     637.0,
+     2786.03
+    ],
+    "y": 7.16,
+    "size": [
+     1.28,
+     0.7,
+     1.0
+    ],
+    "yaw_deg": 170.1,
+    "seed": 148,
+    "tint": [
+     0.88,
+     0.91,
+     0.88
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     639.23,
+     2787.8
+    ],
+    "y": 6.5,
+    "size": [
+     0.96,
+     0.63,
+     0.9
+    ],
+    "yaw_deg": 222.5,
+    "seed": 796,
+    "tint": [
+     0.86,
+     0.89,
+     0.86
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     642.93,
+     2782.31
+    ],
+    "y": 5.99,
+    "size": [
+     1.09,
+     0.76,
+     1.08
+    ],
+    "yaw_deg": 247.9,
+    "seed": 822,
+    "tint": [
+     0.88,
+     0.92,
+     0.88
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     644.13,
+     2783.11
+    ],
+    "y": 5.5,
+    "size": [
+     0.69,
+     0.45,
+     0.65
+    ],
+    "yaw_deg": 101.3,
+    "seed": 633,
+    "tint": [
+     0.86,
+     0.89,
+     0.86
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     645.01,
+     2783.9
+    ],
+    "y": 4.95,
+    "size": [
+     1.38,
+     0.75,
+     1.07
+    ],
+    "yaw_deg": 264.4,
+    "seed": 989,
+    "tint": [
+     0.86,
+     0.9,
+     0.86
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     646.28,
+     2783.65
+    ],
+    "y": 4.68,
+    "size": [
+     0.59,
+     0.39,
+     0.56
+    ],
+    "yaw_deg": 149.2,
+    "seed": 562,
+    "tint": [
+     0.87,
+     0.91,
+     0.87
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     647.16,
+     2784.45
+    ],
+    "y": 4.44,
+    "size": [
+     0.9,
+     0.51,
+     0.72
+    ],
+    "yaw_deg": 17.4,
+    "seed": 41,
+    "tint": [
+     0.78,
+     0.81,
+     0.78
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   },
+   {
+    "type": "erratic",
+    "at": [
+     646.78,
+     2789.27
+    ],
+    "y": 4.08,
+    "size": [
+     1.03,
+     0.78,
+     1.11
+    ],
+    "yaw_deg": 13.9,
+    "seed": 784,
+    "tint": [
+     0.84,
+     0.88,
+     0.84
+    ],
+    "mat": "granite_weathered",
+    "detail": 1,
+    "far": false
+   }
+  ]
+ }
+}

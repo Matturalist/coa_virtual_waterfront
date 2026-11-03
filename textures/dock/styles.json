@@ -882,6 +882,94 @@
    ],
    "roughness_target": 0.9,
    "colour_note": "the North Pier's north curb in sun: #7c7f78, median of (810,2560)-(880,2600) in the Bar Harbor Story's photo of the CAT, 22 Apr 2026 (not in the repo)"
+  },
+  "leaf_litter": {
+   "diff": "textures/terrain/dry_decay_leaves/colour.jpg",
+   "nor": "textures/terrain/dry_decay_leaves/normal.jpg",
+   "roughness": 0.95,
+   "span_m": 1.6,
+   "credit": "Poly Haven dry_decay_leaves CC0 (textures/terrain)",
+   "from": "#918b72, the median of the warm (leaf) pixels round the Oldfarm steps, Wandering House Publishing 31 May 2015 'A Stairway.JPG' (480 x 640), boxes (180,525)-(260,535), (190,475)-(300,485), (240,560)-(330,590), (120,590)-(200,600), (340,560)-(420,640), (0,520)-(90,640), R > B + 18, dappled shade; Poly Haven's leaves neutralised to it",
+   "color_lin": [
+    1.689,
+    3.479,
+    4.865
+   ]
+  },
+  "granite_weathered": {
+   "diff": "textures/terrain/seaside_rock/colour.jpg",
+   "nor": "textures/terrain/seaside_rock/normal.jpg",
+   "roughness": 0.95,
+   "span_m": 1.4,
+   "credit": "Poly Haven seaside_rock CC0 (textures/terrain)",
+   "from": "#76796e, the risers of the Oldfarm steps, Wandering House Publishing 31 May 2015 'A Stairway.JPG' (480 x 640), boxes (150,380)-(320,398), (130,445)-(340,468), (110,490)-(340,515), dappled shade; old split granite gone grey with lichen and weather, pitted, no cracks, which marble_rock_01 has too many of",
+   "color_lin": [
+    3.044,
+    3.729,
+    4.081
+   ]
+  },
+  "coa_truss_teal": {
+   "orm": "textures/dock/paint_chipped_orm.jpg",
+   "diff": "textures/dock/paint_chipped_diff.jpg",
+   "nor": "textures/dock/paint_chipped_nor.jpg",
+   "credit": "Poly Haven green_metal_rust CC0, neutralised",
+   "metric": true,
+   "tile_m": 1.0,
+   "mean": [
+    157,
+    156,
+    154
+   ],
+   "roughness": 1.0,
+   "paint_target": "#61adc6",
+   "color_lin": [
+    0.3545,
+    1.257,
+    1.7476
+   ],
+   "roughness_target": 0.65,
+   "colour_note": "the COA truss's teal paint in open overcast: median of (1107,560)-(1120,640), a vertical, docs/look/matt_3nov_coa_pier_head_ledge.jpg; the top chord at (1300,580)-(1380,590) reads the same"
+  },
+  "coa_abutment": {
+   "diff": "textures/dock/concrete_pavement_diff.jpg",
+   "nor": "textures/dock/concrete_pavement_nor.jpg",
+   "roughness": 1.0,
+   "mean": [
+    127,
+    117,
+    102
+   ],
+   "color_lin": [
+    1.6793,
+    1.7907,
+    1.8828
+   ],
+   "credit": "Poly Haven concrete_pavement CC0, tinted; each cast piece samples one paver's interior in ~1 m patches (src/docks.js concretePlatform pourUV), so no paver joints show",
+   "orm": "textures/dock/concrete_pavement_orm.jpg",
+   "roughness_target": 0.9,
+   "colour_note": "the COA abutment's wing: median of (1680,740)-(1740,770), docs/look/matt_3nov_coa_pier_head_ledge.jpg"
+  },
+  "coa_deck": {
+   "diff": "textures/dock/weathered_plank_siding_diff.jpg",
+   "nor": "textures/dock/weathered_plank_siding_nor.jpg",
+   "credit": "Poly Haven weathered_plank_siding CC0",
+   "rows": 8,
+   "span_m": 2.0,
+   "mean": [
+    76,
+    62,
+    51
+   ],
+   "orm": "textures/dock/weathered_plank_siding_orm.jpg",
+   "roughness_target": 0.762,
+   "roughness": 0.85,
+   "color_lin": [
+    6.6322,
+    9.1269,
+    10.914
+   ],
+   "colour_note": "COA pier deck, weathered grey timber: photo 1 of Matt's 19 Oct set, (184,177,162), recorded in tools/coa_pier.py"
   }
  },
  "town_pier": {
@@ -948,7 +1036,17 @@
    "pile_r_m": 0.15,
    "plank_w_m": 0.14,
    "rail": false,
-   "fender_piles": 0.25
+   "fender_piles": 0.25,
+   "truss_mat": "coa_truss_teal",
+   "concrete_mat": "coa_abutment",
+   "floor_mat": "steel_dark",
+   "cell_tint": [
+    0.48,
+    0.42,
+    0.4
+   ],
+   "far_m": 150,
+   "cutoff_m": 2500
   },
   "ramp": {
    "deck_mat": "teal_steel",

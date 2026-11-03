@@ -8,36 +8,36 @@
    "wet": 0.55,
    "top": [
     [
-     63,
-     56,
-     46
-    ],
-    [
-     82,
-     71,
-     57
-    ],
-    [
+     102,
      98,
-     86,
-     69
+     94
+    ],
+    [
+     157,
+     155,
+     153
+    ],
+    [
+     188,
+     185,
+     182
     ]
    ],
    "face": [
     [
-     45,
-     39,
-     34
+     60,
+     60,
+     62
     ],
     [
-     50,
-     44,
-     38
+     112,
+     110,
+     110
     ],
     [
-     56,
-     49,
-     41
+     173,
+     170,
+     170
     ]
    ],
    "lichen": [
@@ -57,7 +57,7 @@
      102
     ]
    ],
-   "source": "mean colour of luminance bands p5-25 / p40-60 / p75-95 of the scans (top: seaside_rock 0.7 + marble_rock_03 0.3; face: dark_rock_02 0.6 + dark_rock 0.4; lichen: mossy_rock 0.5)"
+   "source": "mean colour of luminance bands p5-25 / p40-60 / p75-95 of the scans (top: Matt's 3 Nov photo docs/look/matt_3nov_coa_rock_joints_flat.jpg, whole frame at 512 px, detail pixels (textures/rocks/ref/coa_bar_harbor_fm_top.jpg); face: Matt's 3 Nov photo docs/look/matt_3nov_coa_shore_ledges_autumn.jpg, (340,700)-(2500,940), the ledges above the water, detail pixels (textures/rocks/ref/coa_bar_harbor_fm_face.jpg); lichen: mossy_rock 0.5)"
   },
   "granites": {
    "name": "Granite",
