@@ -8800,22 +8800,22 @@
    "files": {
     "hd": {
      "file": "vessels/osprey_hd",
-     "tris": 150107,
-     "bytes": 8075936,
+     "tris": 163327,
+     "bytes": 8679592,
      "tex_mb": 8.3,
      "materials": 7
     },
     "mid": {
      "file": "vessels/osprey_mid",
-     "tris": 31167,
-     "bytes": 1989164,
+     "tris": 32615,
+     "bytes": 2109772,
      "tex_mb": 2.1,
      "materials": 5
     },
     "low": {
      "file": "vessels/osprey_low",
-     "tris": 4973,
-     "bytes": 262336,
+     "tris": 5535,
+     "bytes": 288504,
      "tex_mb": 0.0,
      "materials": 4
     }
@@ -8879,16 +8879,14 @@
     "hauler_hoses": "its two hydraulic hoses (hd only)",
     "aft_controls": "the after station's gear lever and throttle, on the box's top",
     "line_bin": "the black bin on the box's port face",
-    "broom": "the corn broom on the sill, loose",
-    "flood_port": "the after floodlight, port of the door, hung from the soffit (a light for Boats)",
+    "broom": "the corn broom, head up in its holder, loose",
+    "flood_port": "the after floodlight, on the wall's head, port of the door (a light for Boats); also carries the soffit's pad eyes",
     "flood_stbd": "the same, starboard",
     "loudhailer": "the white speaker box on the after wall",
     "amber_light": "the amber light on the roof's lip (a light for Boats)",
     "lifebuoy": "the ring buoy with its water-light, line and tags: a child of door_aft, so it slides with the door",
-    "jerry_cans": "two yellow cans by the sill, loose",
     "lazarette": "the round-cornered hatch on the after deck",
-    "deck_fills": "the six round fills on the after deck",
-    "port_stowage": "the pole holder, poles, oilskin and deck hose at the port corner",
+    "deck_fills": "a pair of fills by the hatch, a bronze disc and two small stainless ones on the centreline",
     "bulwark_louvre": "the louvre in the starboard bulwark (hd only)",
     "davit": "the starboard davit: flat-bar uprights, hinged foot plate through-bolted to the side deck, boxed head, shackle, slotted link to the house",
     "wall_odds": "the window's decals, a plug and a small bracket (hd only)",
@@ -8904,7 +8902,6 @@
     "whip_mast": "the 2.8 m whip on the crossbar's starboard end",
     "whip_mounts": "the two poles' ratchet mounts",
     "whip_stub": "the short blue-capped stub by them",
-    "raft_sphere": "the spherical liferaft canister on its feet, lashed",
     "raft_canister": "the 20-person canister raft, athwart on two saddles, tapes, strap, labels",
     "roof_bracket": "the square stainless bracket round the roof's starboard after corner, and a rope's tail",
     "tender": "the grey inflatable on the after deck, lashed, not fixed: tube, strakes, floor, transom, thwart, tank, handles, name",
@@ -8914,7 +8911,32 @@
     "hitch_stbd": "the length hitched on the starboard rail",
     "coil_davit": "the heap of line at the davit's foot and the falls up it",
     "cleat_transom_port": "an 8 inch stainless horn cleat on the port wing of the transom, four bolts (ASSUMED, Matt's ask; O10)",
-    "cleat_transom_stbd": "the same on the starboard wing"
+    "cleat_transom_stbd": "the same on the starboard wing",
+    "raft_after": "the long liferaft canister, fore and aft on four feet, hoops, lashings, labels (O9 twelfth slice: house_aft saw only its end)",
+    "compass_pod": "the long satellite-compass pod and white stack on the mast's cap",
+    "mast_plaque": "the white plaque and horn on the mast below the crossbar",
+    "roof_inflatable": "a rolled inflatable lashed on the roof, its canvas, strakes and ties (loose gear; visible)",
+    "outboard_cover": "a pale canvas cover on a stand on the after deck to starboard (what's under it is assumed: an outboard)",
+    "fender_1": "a navy-ended cylinder fender on the starboard washboard, aft",
+    "fender_2": "the same, forward",
+    "fender_lines": "the fenders' lines to the roof rail, hd only",
+    "side_coil": "a long flat coil on the starboard side deck by the door",
+    "air_box": "the moulded diagonal from the port bulwark to the door's frame (bonded)",
+    "louvre_port": "the ENG RM AIR louvre on it",
+    "bay_odds": "the oval plate and two old cords in the port bay (hd only)",
+    "cleat_bulwark_port": "the big horn cleat on the port bulwark's inner face, through-bolted",
+    "deck_mat": "a black rubber mat stood against the port rail, loose",
+    "blue_can": "a blue can in the port bay, loose",
+    "panel_lean": "a white panel leaning on the louvre, loose",
+    "broom_holder": "the white tube the broom stands in",
+    "oar": "a bare pole leaning in the port corner, loose",
+    "mop": "the mop and its sponge, loose",
+    "scrubber": "the deck scrubber's black frame (hd only)",
+    "wing_coil": "a long white coil on an eye on the port wing (hd only)",
+    "deck_hose": "the canvas deck hose, from a coupling on the door's frame round the deck's edge to the notch",
+    "gate_rope_fwd": "two white lifelines from the rail's forward post to the wing",
+    "gate_rope_notch": "two white lifelines across the notch",
+    "deck_plate": "the steel plate on the after deck's centreline"
    },
    "license": "CC0",
    "author": "tools/assets/vessels/osprey.py, osprey_top.py, osprey_lines.py, osprey_rails.py, osprey_fore.py, osprey_aft.py, osprey_roof.py, osprey_tender.py via build.py (from Wesmac's and Matt's photos of her, docs/osprey.md)",
@@ -9799,9 +9821,6 @@
       0.822,
       -0.467,
       6.987,
-      2.167,
-      0.517,
-      6.23,
       2.22,
       1.125,
       6.54,
@@ -9829,9 +9848,6 @@
       1.84,
       1.122,
       5.979,
-      -2.167,
-      0.517,
-      6.23,
       0.16,
       -0.604,
       6.139,
@@ -9840,7 +9856,13 @@
       6.987,
       0.488,
       -0.522,
-      5.979
+      5.979,
+      -0.488,
+      -0.522,
+      5.979,
+      0.16,
+      -0.625,
+      6.635
      ]
     },
     {
@@ -10946,19 +10968,19 @@
       0.545,
       5.899,
       1.881,
-      2.788,
+      2.727,
       4.545,
       -0.936,
-      2.74,
+      2.735,
       4.334,
       1.812,
       0.545,
       5.899,
       0.369,
-      2.862,
+      2.773,
       5.899,
       -1.851,
-      2.765,
+      2.68,
       5.899,
       -0.87,
       0.555,
@@ -10967,25 +10989,25 @@
       1.091,
       4.62,
       0.515,
-      2.74,
+      2.68,
       4.318,
       1.821,
-      2.797,
+      2.736,
       5.899,
       -1.83,
       1.091,
       4.62,
       -0.723,
-      2.854,
+      2.769,
       5.899,
       -1.894,
-      2.765,
+      2.68,
       4.598,
       0.99,
-      2.846,
+      2.764,
       4.91,
       -0.458,
-      2.861,
+      2.773,
       4.883,
       -1.842,
       0.545,
@@ -10993,152 +11015,152 @@
       1.842,
       0.545,
       5.03,
-      -1.318,
-      2.831,
-      4.937,
-      1.022,
-      2.843,
-      5.899,
-      1.872,
-      2.74,
-      5.266,
+      1.483,
+      2.75,
+      5.325,
+      -1.491,
+      2.75,
+      5.092,
       -0.21,
-      2.74,
+      2.68,
       4.313,
       1.24,
-      2.74,
+      2.68,
       4.354,
-      0.122,
-      2.865,
-      4.877,
-      -0.105,
-      2.865,
-      5.679,
-      -1.472,
-      2.821,
-      5.661,
-      -1.11,
-      2.839,
+      0.98,
+      2.764,
       5.899,
+      0.122,
+      2.775,
+      4.877,
+      -1.037,
+      2.763,
+      4.913,
+      -0.286,
+      2.774,
+      5.683,
+      -1.472,
+      2.75,
+      5.661,
+      1.872,
+      2.68,
+      5.266,
       0.152,
-      2.865,
+      2.775,
       4.342,
-      -0.572,
-      2.859,
-      4.35,
       0.876,
-      2.85,
+      2.766,
       4.362,
-      -1.296,
-      2.832,
-      4.388,
       -1.852,
-      2.797,
+      2.736,
       4.96,
-      1.884,
-      2.74,
-      4.903
+      -1.298,
+      2.68,
+      4.358,
+      -0.572,
+      2.771,
+      4.35
      ]
     },
     {
      "name": "upper_1",
      "pts": [
-      -1.762,
-      0.545,
-      7.485,
-      1.843,
-      2.788,
-      5.899,
-      -1.11,
-      2.839,
-      5.899,
-      1.762,
-      0.545,
-      7.485,
-      0.336,
-      2.863,
-      7.485,
-      -1.799,
-      2.74,
-      7.485,
       -1.812,
       0.545,
       5.899,
+      1.791,
+      2.727,
+      7.485,
+      -1.412,
+      2.75,
+      7.485,
       1.812,
       0.545,
       5.899,
-      0.369,
-      2.862,
+      0.064,
+      2.775,
       5.899,
-      1.799,
-      2.74,
+      -1.851,
+      2.68,
+      5.899,
+      1.851,
+      2.68,
+      5.899,
+      -1.762,
+      0.545,
+      7.485,
+      1.762,
+      0.545,
+      7.485,
+      0.166,
+      2.775,
+      7.485,
+      -0.929,
+      2.765,
+      5.899,
+      0.98,
+      2.764,
+      5.899,
+      1.048,
+      2.761,
       7.485,
       -0.678,
-      2.854,
+      2.769,
       7.485,
-      -0.259,
-      2.864,
-      6.49,
-      1.435,
-      2.822,
-      6.776,
-      -1.434,
-      2.822,
-      6.822,
-      -1.851,
-      2.74,
-      5.899,
-      1.022,
-      2.843,
-      5.899,
-      0.954,
-      2.845,
-      7.485,
-      -0.394,
-      2.862,
-      5.899,
+      -0.329,
+      2.774,
+      6.495,
       0.319,
-      2.863,
+      2.774,
       6.494,
-      -0.223,
-      2.864,
-      7.485,
-      -1.415,
-      2.822,
-      7.402,
-      1.412,
-      2.822,
+      -1.453,
+      2.75,
+      6.242,
+      -0.413,
+      2.773,
+      5.899,
+      0.506,
+      2.772,
+      5.899,
+      -0.349,
+      2.774,
+      7.257,
+      -1.799,
+      2.68,
       7.485,
       1.472,
-      2.821,
+      2.75,
       5.899,
-      -1.494,
-      2.819,
-      5.899,
-      -0.92,
-      2.848,
-      6.169,
-      -0.723,
-      2.854,
-      5.899,
-      0.683,
-      2.855,
-      5.899,
-      0.064,
-      2.865,
-      5.899,
-      -0.975,
-      2.844,
+      1.412,
+      2.75,
       7.485,
-      1.426,
-      2.822,
-      7.066,
-      0.921,
-      2.848,
-      6.14,
-      0.713,
-      2.853,
-      7.485
+      -1.494,
+      2.749,
+      5.899,
+      0.349,
+      2.774,
+      7.245,
+      -0.156,
+      2.775,
+      7.485,
+      0.41,
+      2.773,
+      7.485,
+      -0.723,
+      2.769,
+      5.899,
+      -0.877,
+      2.766,
+      7.485,
+      -0.342,
+      2.774,
+      7.473,
+      -1.684,
+      2.742,
+      5.899,
+      -0.108,
+      2.775,
+      5.899
      ]
     },
     {
@@ -11148,19 +11170,19 @@
       0.545,
       9.072,
       1.791,
-      2.788,
+      2.727,
       7.485,
       -1.412,
-      2.822,
+      2.75,
       7.485,
       1.712,
       0.545,
       9.072,
       0.18,
-      2.864,
+      2.775,
       9.072,
       -1.747,
-      2.74,
+      2.68,
       9.072,
       -1.762,
       0.545,
@@ -11168,78 +11190,78 @@
       1.762,
       0.545,
       7.485,
-      1.747,
-      2.74,
-      9.072,
-      0.233,
-      2.864,
+      0.166,
+      2.775,
       7.485,
-      -0.618,
-      2.857,
-      8.321,
-      0.646,
-      2.856,
-      8.318,
+      1.747,
+      2.68,
+      9.072,
+      0.814,
+      2.767,
+      8.289,
+      -0.438,
+      2.773,
+      8.335,
       -1.775,
-      2.74,
+      2.68,
       8.226,
       -0.973,
-      2.843,
+      2.763,
       9.072,
+      1.048,
+      2.761,
+      7.485,
       -0.678,
-      2.854,
+      2.769,
       7.485,
       1.027,
-      2.841,
+      2.761,
       9.072,
-      0.954,
-      2.845,
-      7.485,
       1.777,
-      2.74,
+      2.68,
       8.168,
       -0.397,
-      2.861,
+      2.773,
       9.072,
-      0.105,
-      2.865,
-      8.35,
-      -0.223,
-      2.864,
-      7.485,
-      -1.367,
-      2.823,
-      8.848,
-      1.369,
-      2.823,
-      8.804,
-      -0.861,
-      2.849,
+      -1.377,
+      2.751,
+      8.563,
+      -1.396,
+      2.751,
       7.983,
+      1.397,
+      2.751,
+      7.936,
+      1.369,
+      2.751,
+      8.804,
       -1.799,
-      2.74,
+      2.68,
       7.5,
-      1.412,
-      2.822,
-      7.485,
-      1.735,
-      2.798,
-      8.529,
-      -1.733,
-      2.798,
-      8.587,
       -1.779,
-      2.788,
+      2.727,
       7.863,
-      -0.257,
-      2.864,
-      8.347,
+      1.412,
+      2.75,
+      7.485,
+      -0.175,
+      2.775,
+      7.543,
       1.789,
-      2.74,
+      2.68,
       7.805,
-      0.867,
-      2.849,
-      7.772
+      -1.265,
+      2.754,
+      9.072,
+      1.388,
+      2.751,
+      8.226,
+      0.74,
+      2.768,
+      9.072,
+      -0.682,
+      2.769,
+      9.072
      ]
     },
     {
@@ -11249,97 +11271,97 @@
       0.545,
       9.072,
       1.739,
-      2.788,
+      2.728,
       9.072,
-      -0.875,
-      2.847,
-      9.656,
+      -0.7,
+      2.769,
+      9.128,
       1.682,
       0.545,
       10.03,
       -1.545,
-      1.621,
-      10.658,
-      0.573,
-      2.849,
-      9.699,
-      1.545,
       1.679,
       10.658,
-      -1.747,
-      2.74,
-      9.072,
+      0.573,
+      2.698,
+      9.699,
+      1.563,
+      1.726,
+      10.57,
+      -1.739,
+      2.68,
+      9.314,
       -1.682,
       0.545,
       10.03,
       1.712,
       0.545,
       9.072,
-      -0.117,
-      2.865,
+      0.18,
+      2.775,
       9.072,
       1.296,
-      2.818,
+      2.689,
       9.642,
-      0.728,
-      2.853,
-      9.072,
       -0.152,
-      2.856,
+      2.701,
       9.708,
-      -0.973,
-      2.843,
+      1.027,
+      2.761,
       9.072,
-      -1.594,
-      2.798,
-      9.605,
-      1.196,
-      2.832,
+      -1.238,
+      2.689,
+      9.649,
+      -1.265,
+      2.754,
       9.072,
+      -0.875,
+      2.706,
+      9.656,
       0.933,
-      2.845,
+      2.706,
       9.652,
-      1.652,
-      2.771,
-      9.59,
       0.21,
-      2.864,
+      2.712,
       9.685,
       -0.515,
-      2.851,
+      2.699,
       9.7,
-      -1.236,
-      2.829,
-      9.627,
+      1.652,
+      2.663,
+      9.59,
+      -1.594,
+      2.684,
+      9.605,
+      -0.122,
+      2.775,
+      9.152,
       -1.614,
       1.683,
       10.359,
+      -0.411,
+      2.773,
+      9.145,
+      0.458,
+      2.772,
+      9.144,
+      0.74,
+      2.768,
+      9.072,
+      -0.973,
+      2.763,
+      9.072,
+      -1.534,
+      2.744,
+      9.072,
+      -1.747,
+      2.68,
+      9.072,
       1.614,
       1.683,
       10.359,
-      -0.411,
-      2.861,
-      9.145,
-      0.18,
-      2.864,
-      9.072,
-      -1.254,
-      2.829,
-      9.072,
-      -0.682,
-      2.854,
-      9.072,
-      0.458,
-      2.86,
-      9.144,
-      1.46,
-      2.816,
-      9.072,
-      -1.731,
-      2.788,
-      9.312,
       1.741,
-      2.74,
+      2.68,
       9.256
      ]
     },
@@ -11487,7 +11509,7 @@
      ],
      "search_mount": [
       0.0,
-      2.865,
+      2.775,
       9.0
      ],
      "helm_eye": [
@@ -11594,19 +11616,19 @@
     "whips": {
      "whip_port": {
       "base": [
-       1.58,
-       2.816,
-       4.88
+       1.66,
+       2.743,
+       5.62
       ],
-      "h": 5.2
+      "h": 4.73
      },
      "whip_port2": {
       "base": [
-       1.49,
-       2.821,
-       5.0
+       1.5,
+       2.747,
+       7.33
       ],
-      "h": 4.7
+      "h": 4.8
      },
      "whip_mast": {
       "base": [
@@ -12438,15 +12460,15 @@
    "files": {
     "hd": {
      "file": "vessels/margaret_todd_hd",
-     "tris": 56642,
-     "bytes": 2709644,
+     "tris": 57704,
+     "bytes": 2762584,
      "tex_mb": 4.7,
      "materials": 6
     },
     "mid": {
      "file": "vessels/margaret_todd_mid",
-     "tris": 3674,
-     "bytes": 236908,
+     "tris": 3856,
+     "bytes": 248284,
      "tex_mb": 0.5,
      "materials": 3
     },
@@ -12624,7 +12646,19 @@
        7.295,
        17.447
       ],
-      "boom": false
+      "boom": false,
+      "furl": [
+       [
+        0.0,
+        4.472,
+        22.219
+       ],
+       [
+        0.0,
+        4.188,
+        18.77
+       ]
+      ]
      }
     ],
     "lines": [
@@ -12738,7 +12772,7 @@
       "a": [
        1.25,
        17.933,
-       12.449
+       12.369
       ],
       "on": "boom",
       "t": 0.93,
@@ -12753,7 +12787,7 @@
       "a": [
        -1.25,
        17.933,
-       12.449
+       12.369
       ],
       "on": "boom",
       "t": 0.93,
@@ -12915,7 +12949,7 @@
       "a": [
        1.25,
        17.933,
-       5.397
+       5.317
       ],
       "on": "boom",
       "t": 0.93,
@@ -12930,7 +12964,7 @@
       "a": [
        -1.25,
        17.933,
-       5.397
+       5.317
       ],
       "on": "boom",
       "t": 0.93,
@@ -13092,7 +13126,7 @@
       "a": [
        1.25,
        17.933,
-       -1.745
+       -1.825
       ],
       "on": "boom",
       "t": 0.93,
@@ -13107,7 +13141,7 @@
       "a": [
        -1.25,
        17.933,
-       -1.745
+       -1.825
       ],
       "on": "boom",
       "t": 0.93,
@@ -13269,7 +13303,7 @@
       "a": [
        1.25,
        17.933,
-       -8.888
+       -8.968
       ],
       "on": "boom",
       "t": 0.93,
@@ -13284,7 +13318,7 @@
       "a": [
        -1.25,
        17.933,
-       -8.888
+       -8.968
       ],
       "on": "boom",
       "t": 0.93,
@@ -13402,12 +13436,12 @@
       "a": [
        0.0,
        27.971,
-       12.669
+       12.489
       ],
       "b": [
        0.0,
        30.571,
-       12.669
+       12.489
       ],
       "id": 0,
       "hoist": 1.9,
@@ -13418,12 +13452,12 @@
       "a": [
        0.0,
        27.971,
-       5.617
+       5.437
       ],
       "b": [
        0.0,
        30.571,
-       6.377
+       6.197
       ],
       "id": 1,
       "hoist": 1.9,
@@ -13434,12 +13468,12 @@
       "a": [
        0.0,
        27.971,
-       -1.525
+       -1.705
       ],
       "b": [
        0.0,
        30.571,
-       -1.075
+       -1.255
       ],
       "id": 2,
       "hoist": 1.9,
@@ -13450,12 +13484,12 @@
       "a": [
        0.0,
        27.971,
-       -8.668
+       -8.848
       ],
       "b": [
        0.0,
        30.571,
-       -8.068
+       -8.248
       ],
       "id": 3,
       "hoist": 1.9,
@@ -13479,9 +13513,9 @@
       40
      ],
      "gasket": [
-      146,
-      118,
-      88
+      160,
+      140,
+      108
      ]
     },
     "boom_len_m": {
@@ -13496,9 +13530,9 @@
      48
     ],
     "furled_colour": [
-     138,
-     70,
-     58
+     132,
+     62,
+     48
     ],
     "spar_colour": [
      186,
@@ -13529,7 +13563,7 @@
     "hd": {
      "file": "vessels/margaret_todd_sailcloth_hd",
      "tris": 2,
-     "bytes": 138048,
+     "bytes": 150960,
      "tex_mb": 8.0,
      "materials": 1
     }
@@ -13545,6 +13579,1641 @@
    "cutoff_m": 0,
    "sources": [
     "fabric_leather_02 scan (Poly Haven, CC0) for its grain; colour sampled from Wikimedia Commons 'Margaret Todd, four-master under sail (4005470327)'"
+   ],
+   "tex_doc": "tex_mb: GPU memory of the tier's textures with mips (width x height x 4 x 4/3); materials: draw calls when lod.js draws the tier (MODELS.bake merges by material)"
+  },
+  {
+   "id": "mary_day",
+   "role": "boat",
+   "kind": "schooner_md",
+   "name": "Mary Day",
+   "files": {
+    "hd": {
+     "file": "vessels/mary_day_hd",
+     "tris": 50398,
+     "bytes": 2554256,
+     "tex_mb": 10.0,
+     "materials": 6
+    },
+    "mid": {
+     "file": "vessels/mary_day_mid",
+     "tris": 3912,
+     "bytes": 272236,
+     "tex_mb": 1.0,
+     "materials": 3
+    },
+    "low": {
+     "file": "vessels/mary_day_low",
+     "tris": 722,
+     "bytes": 38316,
+     "tex_mb": 0.0,
+     "materials": 1
+    }
+   },
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "fit": "bottom",
+   "draft_m": 2.3,
+   "native_length_m": 36.86,
+   "length_m": 36.86,
+   "beam_m": 6.7,
+   "fars_m": {
+    "hd": 150,
+    "mid": 800,
+    "low": 3000,
+    "impostor": 6000
+   },
+   "cutoff_m": 6000,
+   "impostor": {
+    "size": 256,
+    "views": 8
+   },
+   "vertex_ao": true,
+   "no_cast": [],
+   "license": "CC0",
+   "author": "tools/assets/vessels/build.py (mary_day.py; procedural)",
+   "sources": [
+    "Artisan Boatworks, MARY DAY listing (artisanboatworks.com/?p=4041): particulars, construction, and every photograph she is measured and sampled from (docs/mary-day.md)",
+    "Maine Windjammer Association; schoonermaryday.com: history"
+   ],
+   "note": "the hull, standing rig and boats; booms, gaffs and sails are drawn by src/sails.js from `rig`. Node `yawl` is her yawl boat, in the davits; `yawl_mount_davits`, `yawl_mount_transom` are where it sits and pushes. Measured length is 36.86 m without the main boom, 37.2 m with it, against 38.1 m published",
+   "rig": {
+    "doc": "docs/mary-day.md: corners measured off a broadside photo; src/sails.js builds, swings, furls and loads them. +z forward, +x port, y up from the waterline.",
+    "atlas": [
+     4,
+     2
+    ],
+    "bunt_k": 0.8,
+    "spar_r": [
+     0.17,
+     0.11,
+     0.12,
+     0.07
+    ],
+    "sails": [
+     {
+      "id": "main",
+      "type": "gaff",
+      "mast": -2.458,
+      "tack": [
+       0.0,
+       3.0,
+       -2.737
+      ],
+      "throat": [
+       0.0,
+       14.8,
+       -2.924
+      ],
+      "peak": [
+       0.0,
+       20.27,
+       -6.947
+      ],
+      "clew": [
+       0.0,
+       4.159,
+       -15.518
+      ]
+     },
+     {
+      "id": "fore",
+      "type": "gaff",
+      "mast": 6.973,
+      "tack": [
+       0.0,
+       3.0,
+       6.692
+      ],
+      "throat": [
+       0.0,
+       14.2,
+       6.517
+      ],
+      "peak": [
+       0.0,
+       16.738,
+       2.534
+      ],
+      "clew": [
+       0.0,
+       3.669,
+       -1.016
+      ]
+     },
+     {
+      "id": "main_top",
+      "type": "stay",
+      "follows": 0,
+      "tack": [
+       0.0,
+       15.3,
+       -2.614
+      ],
+      "head": [
+       0.0,
+       25.4,
+       -2.585
+      ],
+      "clew": [
+       0.0,
+       20.12,
+       -6.747
+      ],
+      "boom": false,
+      "furl": [
+       [
+        0.25,
+        19.7,
+        -2.45
+       ],
+       [
+        0.25,
+        25.0,
+        -2.572
+       ]
+      ]
+     },
+     {
+      "id": "fore_top",
+      "type": "stay",
+      "follows": 1,
+      "tack": [
+       0.0,
+       14.7,
+       6.827
+      ],
+      "head": [
+       0.0,
+       23.7,
+       6.875
+      ],
+      "clew": [
+       0.0,
+       16.588,
+       2.734
+      ],
+      "boom": false,
+      "furl": [
+       [
+        0.25,
+        19.8,
+        6.979
+       ],
+       [
+        0.25,
+        23.3,
+        6.887
+       ]
+      ]
+     },
+     {
+      "id": "staysail",
+      "type": "stay",
+      "tack": [
+       0.0,
+       3.25,
+       13.75
+      ],
+      "head": [
+       0.0,
+       13.725,
+       7.988
+      ],
+      "clew": [
+       0.0,
+       3.2,
+       7.858
+      ],
+      "boom": true
+     },
+     {
+      "id": "jib",
+      "type": "stay",
+      "tack": [
+       0.0,
+       5.41,
+       19.547
+      ],
+      "head": [
+       0.0,
+       16.106,
+       8.075
+      ],
+      "clew": [
+       0.0,
+       6.338,
+       13.356
+      ],
+      "boom": false,
+      "furl": [
+       [
+        0.0,
+        3.441,
+        16.3
+       ],
+       [
+        0.0,
+        3.078,
+        13.4
+       ]
+      ]
+     },
+     {
+      "id": "flying",
+      "type": "stay",
+      "tack": [
+       0.0,
+       11.428,
+       15.651
+      ],
+      "head": [
+       0.0,
+       23.373,
+       7.512
+      ],
+      "clew": [
+       0.0,
+       13.953,
+       9.071
+      ],
+      "boom": false,
+      "furl": [
+       [
+        0.0,
+        4.129,
+        20.3
+       ],
+       [
+        0.0,
+        3.623,
+        17.4
+       ]
+      ]
+     }
+    ],
+    "lines": [
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       18.7,
+       -2.833
+      ],
+      "on": "gaff",
+      "t": 1.0,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       18.55,
+       -2.833
+      ],
+      "on": "gaff",
+      "t": 0.72,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03,
+       0.88
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       18.05,
+       -2.833
+      ],
+      "on": "gaff",
+      "t": 0.72,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       17.95,
+       -2.833
+      ],
+      "on": "gaff",
+      "t": 0.5,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03,
+       0.88
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       17.25,
+       -2.833
+      ],
+      "on": "gaff",
+      "t": 0.5,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       -0.05,
+       17.2,
+       -2.913
+      ],
+      "on": "gaff",
+      "t": 0.03,
+      "r": 0.013,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 0,
+      "a": [
+       0.05,
+       17.2,
+       -2.913
+      ],
+      "on": "gaff",
+      "t": 0.03,
+      "r": 0.013,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       1.3,
+       17.6,
+       -2.563
+      ],
+      "on": "boom",
+      "t": 0.93,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.72
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       -1.3,
+       17.6,
+       -2.563
+      ],
+      "on": "boom",
+      "t": 0.93,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.72
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       -0.05,
+       1.162,
+       -12.706
+      ],
+      "on": "boom",
+      "t": 0.78,
+      "r": 0.016,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       1.162,
+       -12.706
+      ],
+      "on": "boom",
+      "t": 0.78,
+      "r": 0.016,
+      "c": "rope",
+      "blocks": [
+       0.03,
+       0.97
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.05,
+       1.162,
+       -12.706
+      ],
+      "on": "boom",
+      "t": 0.78,
+      "r": 0.016,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       18.8,
+       6.595
+      ],
+      "on": "gaff",
+      "t": 1.0,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       18.65,
+       6.595
+      ],
+      "on": "gaff",
+      "t": 0.72,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03,
+       0.88
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       18.15,
+       6.595
+      ],
+      "on": "gaff",
+      "t": 0.72,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       18.05,
+       6.595
+      ],
+      "on": "gaff",
+      "t": 0.5,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03,
+       0.88
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       17.35,
+       6.595
+      ],
+      "on": "gaff",
+      "t": 0.5,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       -0.05,
+       17.3,
+       6.515
+      ],
+      "on": "gaff",
+      "t": 0.03,
+      "r": 0.013,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 1,
+      "a": [
+       0.05,
+       17.3,
+       6.515
+      ],
+      "on": "gaff",
+      "t": 0.03,
+      "r": 0.013,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       1.3,
+       17.7,
+       6.865
+      ],
+      "on": "boom",
+      "t": 0.93,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.72
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       -1.3,
+       17.7,
+       6.865
+      ],
+      "on": "boom",
+      "t": 0.93,
+      "r": 0.009,
+      "c": "wire",
+      "blocks": [
+       0.72
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       -0.05,
+       2.023,
+       0.68
+      ],
+      "on": "boom",
+      "t": 0.78,
+      "r": 0.016,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       2.023,
+       0.68
+      ],
+      "on": "boom",
+      "t": 0.78,
+      "r": 0.016,
+      "c": "rope",
+      "blocks": [
+       0.03,
+       0.97
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.05,
+       2.023,
+       0.68
+      ],
+      "on": "boom",
+      "t": 0.78,
+      "r": 0.016,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 4,
+      "a": [
+       -0.04,
+       1.641,
+       9.036
+      ],
+      "on": "boom",
+      "t": 0.8,
+      "r": 0.014,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 4,
+      "a": [
+       0.04,
+       1.641,
+       9.036
+      ],
+      "on": "boom",
+      "t": 0.8,
+      "r": 0.014,
+      "c": "rope",
+      "blocks": [
+       0.04,
+       0.96
+      ]
+     },
+     {
+      "s": 5,
+      "a": [
+       2.403,
+       2.451,
+       9.4
+      ],
+      "on": "boom",
+      "t": 1.0,
+      "r": 0.012,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 5,
+      "a": [
+       -2.403,
+       2.451,
+       9.4
+      ],
+      "on": "boom",
+      "t": 1.0,
+      "r": 0.012,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 6,
+      "a": [
+       2.928,
+       2.277,
+       6.6
+      ],
+      "on": "boom",
+      "t": 1.0,
+      "r": 0.012,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 6,
+      "a": [
+       -2.928,
+       2.277,
+       6.6
+      ],
+      "on": "boom",
+      "t": 1.0,
+      "r": 0.012,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     }
+    ],
+    "flags": [
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       26.2,
+       -2.565
+      ],
+      "b": [
+       0.0,
+       28.2,
+       -2.565
+      ],
+      "id": 2,
+      "hoist": 1.1,
+      "fly": 2.2
+     },
+     {
+      "s": 0,
+      "a": [
+       1.1,
+       1.96,
+       -13.58
+      ],
+      "b": [
+       1.1,
+       4.36,
+       -13.9
+      ],
+      "id": 3,
+      "hoist": 1.2,
+      "fly": 2.0
+     }
+    ],
+    "line_colours": {
+     "wire": [
+      58,
+      58,
+      60
+     ],
+     "rope": [
+      176,
+      150,
+      108
+     ],
+     "block": [
+      232,
+      226,
+      210
+     ],
+     "gasket": [
+      176,
+      150,
+      108
+     ]
+    },
+    "boom_len_m": {
+     "main": 13.73,
+     "fore": 8.53
+    },
+    "colour": [
+     222,
+     214,
+     200
+    ],
+    "furled_colour": [
+     190,
+     182,
+     160
+    ],
+    "spar_colour": [
+     192,
+     146,
+     80
+    ],
+    "spar_ends": [
+     232,
+     226,
+     210
+    ],
+    "tex": "mary_day_sailcloth",
+    "area_total_m2": 465,
+    "height_m": 26.3
+   },
+   "tex_doc": "tex_mb: GPU memory of the tier's textures with mips (width x height x 4 x 4/3); materials: draw calls when lod.js draws the tier (MODELS.bake merges by material)"
+  },
+  {
+   "id": "mary_day_sailcloth",
+   "role": "texture",
+   "kind": "sailcloth",
+   "files": {
+    "hd": {
+     "file": "vessels/mary_day_sailcloth_hd",
+     "tris": 2,
+     "bytes": 123608,
+     "tex_mb": 6.0,
+     "materials": 1
+    }
+   },
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "license": "CC0",
+   "author": "tools/assets/vessels/mary_day.py",
+   "note": "the sail cloth atlas: read by src/sails.js, never drawn itself",
+   "cutoff_m": 0,
+   "sources": [
+    "fabric_leather_02 scan (Poly Haven, CC0) for its grain; colour sampled from the Artisan Boatworks listing's broadside (docs/mary-day.md)"
+   ],
+   "tex_doc": "tex_mb: GPU memory of the tier's textures with mips (width x height x 4 x 4/3); materials: draw calls when lod.js draws the tier (MODELS.bake merges by material)"
+  },
+  {
+   "id": "schooner_coaster_small",
+   "role": "boat",
+   "kind": "schooner_lrf",
+   "name": "Lewis R. French",
+   "files": {
+    "hd": {
+     "file": "vessels/lewis_french_hd",
+     "tris": 55708,
+     "bytes": 2742352,
+     "tex_mb": 10.0,
+     "materials": 6
+    },
+    "mid": {
+     "file": "vessels/lewis_french_mid",
+     "tris": 4222,
+     "bytes": 270720,
+     "tex_mb": 1.0,
+     "materials": 3
+    },
+    "low": {
+     "file": "vessels/lewis_french_low",
+     "tris": 928,
+     "bytes": 50040,
+     "tex_mb": 0.0,
+     "materials": 1
+    }
+   },
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "fit": "bottom",
+   "draft_m": 2.3,
+   "native_length_m": 27.83,
+   "length_m": 27.83,
+   "beam_m": 5.7,
+   "fars_m": {
+    "hd": 150,
+    "mid": 800,
+    "low": 3000,
+    "impostor": 6000
+   },
+   "cutoff_m": 6000,
+   "impostor": {
+    "size": 256,
+    "views": 8
+   },
+   "vertex_ao": true,
+   "no_cast": [],
+   "license": "CC0",
+   "author": "tools/assets/vessels/build.py (lewis_french.py; procedural)",
+   "sources": [
+    "Wikipedia, Lewis R. French (schooner): particulars and sail plan",
+    "The Maine Magazine, 'French Lessons' (Peter Frost's photographs): the broadside she is measured from, deck, bow (docs/lewis-french.md)",
+    "Canadian Geographic, 'A tall ship from back in time' (Ben Keller, Aaron Frutman): under sail, from above; at anchor",
+    "Maine Boats, 'A Sturdy Maine Schooner' (Eaton): astern at anchor"
+   ],
+   "note": "the hull, standing rig and boats; booms, gaffs and sails are drawn by src/sails.js from `rig`. Node `yawl` is her yawl boat under the stern beam; `yawl_mount_davits`, `yawl_mount_transom` are where it sits and pushes. Native length runs from the bowsprit to the yawl boat, without the main boom; with the boom she is 30.35 m against 30.8 m published. Stands in for Stephen Taber and Ladona only with her name boards wrong",
+   "rig": {
+    "doc": "docs/lewis-french.md: corners measured off a broadside photo; src/sails.js builds, swings, furls and loads them. +z forward, +x port, y up from the waterline.",
+    "atlas": [
+     4,
+     2
+    ],
+    "bunt_k": 0.62,
+    "spar_r": [
+     0.14,
+     0.095,
+     0.1,
+     0.065
+    ],
+    "sails": [
+     {
+      "id": "main",
+      "type": "gaff",
+      "mast": -0.216,
+      "tack": [
+       0.0,
+       3.4,
+       -0.466
+      ],
+      "throat": [
+       0.0,
+       14.1,
+       -0.725
+      ],
+      "peak": [
+       0.0,
+       18.5,
+       -6.216
+      ],
+      "clew": [
+       0.0,
+       3.95,
+       -13.616
+      ]
+     },
+     {
+      "id": "fore",
+      "type": "gaff",
+      "mast": 5.676,
+      "tack": [
+       0.0,
+       3.7,
+       5.426
+      ],
+      "throat": [
+       0.0,
+       13.2,
+       5.199
+      ],
+      "peak": [
+       0.0,
+       16.4,
+       1.776
+      ],
+      "clew": [
+       0.0,
+       4.1,
+       0.776
+      ]
+     },
+     {
+      "id": "main_top",
+      "type": "stay",
+      "follows": 0,
+      "tack": [
+       0.0,
+       14.6,
+       -0.455
+      ],
+      "head": [
+       0.0,
+       23.5,
+       -0.525
+      ],
+      "clew": [
+       0.0,
+       18.38,
+       -6.016
+      ],
+      "boom": false,
+      "furl": [
+       [
+        0.22,
+        17.6,
+        -0.326
+       ],
+       [
+        0.22,
+        23.1,
+        -0.499
+       ]
+      ]
+     },
+     {
+      "id": "staysail",
+      "type": "stay",
+      "tack": [
+       0.0,
+       2.95,
+       9.35
+      ],
+      "head": [
+       0.0,
+       11.6,
+       6.8
+      ],
+      "clew": [
+       0.0,
+       3.4,
+       6.45
+      ],
+      "boom": true
+     },
+     {
+      "id": "jib",
+      "type": "stay",
+      "tack": [
+       0.0,
+       3.277,
+       13.9
+      ],
+      "head": [
+       0.0,
+       14.6,
+       6.15
+      ],
+      "clew": [
+       0.0,
+       4.7,
+       7.6
+      ],
+      "boom": false,
+      "furl": [
+       [
+        0.0,
+        3.127,
+        12.3
+       ],
+       [
+        0.0,
+        2.832,
+        10.5
+       ]
+      ]
+     },
+     {
+      "id": "jib_top",
+      "type": "stay",
+      "tack": [
+       0.0,
+       3.626,
+       15.9
+      ],
+      "head": [
+       0.0,
+       22.6,
+       6.0
+      ],
+      "clew": [
+       0.0,
+       9.2,
+       7.6
+      ],
+      "boom": false,
+      "furl": [
+       [
+        0.0,
+        3.666,
+        15.5
+       ],
+       [
+        0.0,
+        3.317,
+        13.5
+       ]
+      ]
+     }
+    ],
+    "lines": [
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       16.35,
+       -0.628
+      ],
+      "on": "gaff",
+      "t": 1.0,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       16.2,
+       -0.628
+      ],
+      "on": "gaff",
+      "t": 0.72,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03,
+       0.88
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       15.8,
+       -0.628
+      ],
+      "on": "gaff",
+      "t": 0.72,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       15.7,
+       -0.628
+      ],
+      "on": "gaff",
+      "t": 0.5,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03,
+       0.88
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       15.1,
+       -0.628
+      ],
+      "on": "gaff",
+      "t": 0.5,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       -0.05,
+       15.0,
+       -0.708
+      ],
+      "on": "gaff",
+      "t": 0.03,
+      "r": 0.012,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 0,
+      "a": [
+       0.05,
+       15.0,
+       -0.708
+      ],
+      "on": "gaff",
+      "t": 0.03,
+      "r": 0.012,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       1.2,
+       15.4,
+       -0.398
+      ],
+      "on": "boom",
+      "t": 0.93,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.72
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       -1.2,
+       15.4,
+       -0.398
+      ],
+      "on": "boom",
+      "t": 0.93,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.72
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       -0.05,
+       0.812,
+       -9.1
+      ],
+      "on": "boom",
+      "t": 0.657,
+      "r": 0.015,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 0,
+      "a": [
+       0.0,
+       0.812,
+       -9.1
+      ],
+      "on": "boom",
+      "t": 0.657,
+      "r": 0.015,
+      "c": "rope",
+      "blocks": [
+       0.03,
+       0.97
+      ]
+     },
+     {
+      "s": 0,
+      "a": [
+       0.05,
+       0.812,
+       -9.1
+      ],
+      "on": "boom",
+      "t": 0.657,
+      "r": 0.015,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       16.05,
+       5.279
+      ],
+      "on": "gaff",
+      "t": 1.0,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       15.9,
+       5.279
+      ],
+      "on": "gaff",
+      "t": 0.72,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03,
+       0.88
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       15.5,
+       5.279
+      ],
+      "on": "gaff",
+      "t": 0.72,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       15.4,
+       5.279
+      ],
+      "on": "gaff",
+      "t": 0.5,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03,
+       0.88
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       14.8,
+       5.279
+      ],
+      "on": "gaff",
+      "t": 0.5,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.03
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       -0.05,
+       14.7,
+       5.199
+      ],
+      "on": "gaff",
+      "t": 0.03,
+      "r": 0.012,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 1,
+      "a": [
+       0.05,
+       14.7,
+       5.199
+      ],
+      "on": "gaff",
+      "t": 0.03,
+      "r": 0.012,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       1.2,
+       15.1,
+       5.509
+      ],
+      "on": "boom",
+      "t": 0.93,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.72
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       -1.2,
+       15.1,
+       5.509
+      ],
+      "on": "boom",
+      "t": 0.93,
+      "r": 0.008,
+      "c": "wire",
+      "blocks": [
+       0.72
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       -0.05,
+       2.046,
+       2.078
+      ],
+      "on": "boom",
+      "t": 0.72,
+      "r": 0.015,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       2.046,
+       2.078
+      ],
+      "on": "boom",
+      "t": 0.72,
+      "r": 0.015,
+      "c": "rope",
+      "blocks": [
+       0.03,
+       0.97
+      ]
+     },
+     {
+      "s": 1,
+      "a": [
+       0.05,
+       2.046,
+       2.078
+      ],
+      "on": "boom",
+      "t": 0.72,
+      "r": 0.015,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 3,
+      "a": [
+       -0.04,
+       1.748,
+       7.03
+      ],
+      "on": "boom",
+      "t": 0.8,
+      "r": 0.013,
+      "c": "rope",
+      "blocks": []
+     },
+     {
+      "s": 3,
+      "a": [
+       0.04,
+       1.748,
+       7.03
+      ],
+      "on": "boom",
+      "t": 0.8,
+      "r": 0.013,
+      "c": "rope",
+      "blocks": [
+       0.04,
+       0.96
+      ]
+     },
+     {
+      "s": 4,
+      "a": [
+       2.178,
+       1.978,
+       5.6
+      ],
+      "on": "boom",
+      "t": 1.0,
+      "r": 0.011,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 4,
+      "a": [
+       -2.178,
+       1.978,
+       5.6
+      ],
+      "on": "boom",
+      "t": 1.0,
+      "r": 0.011,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 5,
+      "a": [
+       2.521,
+       1.797,
+       3.8
+      ],
+      "on": "boom",
+      "t": 1.0,
+      "r": 0.011,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     },
+     {
+      "s": 5,
+      "a": [
+       -2.521,
+       1.797,
+       3.8
+      ],
+      "on": "boom",
+      "t": 1.0,
+      "r": 0.011,
+      "c": "rope",
+      "blocks": [
+       0.04
+      ]
+     }
+    ],
+    "flags": [
+     {
+      "s": 1,
+      "a": [
+       0.0,
+       23.5,
+       5.418
+      ],
+      "b": [
+       0.0,
+       24.8,
+       5.418
+      ],
+      "id": 2,
+      "hoist": 0.85,
+      "fly": 1.3
+     },
+     {
+      "s": 0,
+      "a": [
+       0.9,
+       1.6,
+       -9.73
+      ],
+      "b": [
+       0.9,
+       3.8,
+       -10.05
+      ],
+      "id": 3,
+      "hoist": 1.1,
+      "fly": 1.8
+     }
+    ],
+    "line_colours": {
+     "wire": [
+      58,
+      58,
+      60
+     ],
+     "rope": [
+      176,
+      150,
+      108
+     ],
+     "block": [
+      176,
+      124,
+      66
+     ],
+     "gasket": [
+      176,
+      150,
+      108
+     ]
+    },
+    "boom_len_m": {
+     "main": 14.0,
+     "fore": 5.2
+    },
+    "colour": [
+     232,
+     226,
+     210
+    ],
+    "furled_colour": [
+     204,
+     196,
+     176
+    ],
+    "spar_colour": [
+     196,
+     146,
+     80
+    ],
+    "spar_ends": [
+     236,
+     234,
+     224
+    ],
+    "end_star": [
+     196,
+     30,
+     34
+    ],
+    "tex": "lewis_french_sailcloth",
+    "height_m": 24.5
+   },
+   "tex_doc": "tex_mb: GPU memory of the tier's textures with mips (width x height x 4 x 4/3); materials: draw calls when lod.js draws the tier (MODELS.bake merges by material)"
+  },
+  {
+   "id": "lewis_french_sailcloth",
+   "role": "texture",
+   "kind": "sailcloth",
+   "files": {
+    "hd": {
+     "file": "vessels/lewis_french_sailcloth_hd",
+     "tris": 2,
+     "bytes": 126552,
+     "tex_mb": 6.0,
+     "materials": 1
+    }
+   },
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "license": "CC0",
+   "author": "tools/assets/vessels/lewis_french.py",
+   "note": "the sail cloth atlas: read by src/sails.js, never drawn itself",
+   "cutoff_m": 0,
+   "sources": [
+    "fabric_leather_02 scan (Poly Haven, CC0) for its grain; colour by eye between two named photographs (docs/lewis-french.md)"
    ],
    "tex_doc": "tex_mb: GPU memory of the tier's textures with mips (width x height x 4 x 4/3); materials: draw calls when lod.js draws the tier (MODELS.bake merges by material)"
   }
@@ -15735,6 +17404,135 @@
      "fit_err": 0.177,
      "corr": 0.77
     }
+   },
+   {
+    "id": "bhf_coa_flat",
+    "name": "bhf_coa_flat",
+    "kind": "rock",
+    "reads_as": "flat joint face: crossing joints in bundles, flaky skins, grey-brown with purple and buff",
+    "tile_m": 1.4,
+    "files": {
+     "colour": "textures/terrain/bhf_coa_flat/colour.jpg",
+     "normal": "textures/terrain/bhf_coa_flat/normal.jpg",
+     "height": "textures/terrain/bhf_coa_flat/height.png",
+     "rough": "textures/terrain/bhf_coa_flat/rough.jpg",
+     "colour_height": "textures/terrain/bhf_coa_flat/colour_height.webp",
+     "normal_rough": "textures/terrain/bhf_coa_flat/normal_rough.webp"
+    },
+    "px": 1024,
+    "colour_mean_srgb": [
+     165,
+     162,
+     158
+    ],
+    "lum_p10_p50_p90": [
+     118,
+     165,
+     206
+    ],
+    "rough_mean": 0.908,
+    "height_range_src": [
+     0,
+     1
+    ],
+    "formations": [
+     8,
+     16
+    ],
+    "habitats": [
+     1
+    ],
+    "maine_fit": "this rock, this shore",
+    "source": "docs/look/matt_3nov_coa_rock_joints_flat.jpg",
+    "license": "Matt's own photo",
+    "author": "Matt Messina",
+    "from": "tools/assets/bhf_material.py"
+   },
+   {
+    "id": "bhf_coa_joints",
+    "name": "bhf_coa_joints",
+    "kind": "rock",
+    "reads_as": "bedding face cut by joints: parallel laminae, dark fissures",
+    "tile_m": 1.3,
+    "files": {
+     "colour": "textures/terrain/bhf_coa_joints/colour.jpg",
+     "normal": "textures/terrain/bhf_coa_joints/normal.jpg",
+     "height": "textures/terrain/bhf_coa_joints/height.png",
+     "rough": "textures/terrain/bhf_coa_joints/rough.jpg",
+     "colour_height": "textures/terrain/bhf_coa_joints/colour_height.webp",
+     "normal_rough": "textures/terrain/bhf_coa_joints/normal_rough.webp"
+    },
+    "px": 1024,
+    "colour_mean_srgb": [
+     136,
+     133,
+     127
+    ],
+    "lum_p10_p50_p90": [
+     82,
+     134,
+     186
+    ],
+    "rough_mean": 0.905,
+    "height_range_src": [
+     0,
+     1
+    ],
+    "formations": [
+     8,
+     16
+    ],
+    "habitats": [
+     1
+    ],
+    "maine_fit": "this rock, this shore",
+    "source": "docs/look/matt_3nov_coa_rock_joints_veins.jpg",
+    "license": "Matt's own photo",
+    "author": "Matt Messina",
+    "from": "tools/assets/bhf_material.py"
+   },
+   {
+    "id": "bhf_coa_blocks",
+    "name": "bhf_coa_blocks",
+    "kind": "rock",
+    "reads_as": "jointed blocks and square steps with white quartz veins",
+    "tile_m": 2.4,
+    "files": {
+     "colour": "textures/terrain/bhf_coa_blocks/colour.jpg",
+     "normal": "textures/terrain/bhf_coa_blocks/normal.jpg",
+     "height": "textures/terrain/bhf_coa_blocks/height.png",
+     "rough": "textures/terrain/bhf_coa_blocks/rough.jpg",
+     "colour_height": "textures/terrain/bhf_coa_blocks/colour_height.webp",
+     "normal_rough": "textures/terrain/bhf_coa_blocks/normal_rough.webp"
+    },
+    "px": 1024,
+    "colour_mean_srgb": [
+     147,
+     142,
+     134
+    ],
+    "lum_p10_p50_p90": [
+     40,
+     152,
+     222
+    ],
+    "rough_mean": 0.888,
+    "height_range_src": [
+     0,
+     1
+    ],
+    "formations": [
+     8,
+     16
+    ],
+    "habitats": [
+     1
+    ],
+    "maine_fit": "this rock, this shore",
+    "source": "docs/look/matt_3nov_coa_rock_joints_veins.jpg",
+    "license": "Matt's own photo",
+    "author": "Matt Messina",
+    "from": "tools/assets/bhf_material.py"
    }
   ],
   "_packed_doc": "files.colour_height (RGB colour, A height) and files.normal_rough (RGB normal, A roughness), WebP, alpha exact: what the page reads (level.js, ledge.js, plants.js). colour/height/normal/rough stay for the tools. tools/assets/pack_materials.py"
@@ -15748,22 +17546,22 @@
     "name": "Bar Harbor Formation",
     "face": [
      {
-      "m": "dark_rock_02",
-      "w": 0.6
+      "m": "bhf_coa_blocks",
+      "w": 0.55
      },
      {
-      "m": "dark_rock",
-      "w": 0.4
+      "m": "bhf_coa_joints",
+      "w": 0.45
      }
     ],
     "ledge": [
      {
-      "m": "seaside_rock",
-      "w": 0.7
+      "m": "bhf_coa_flat",
+      "w": 0.65
      },
      {
-      "m": "marble_rock_03",
-      "w": 0.3
+      "m": "bhf_coa_joints",
+      "w": 0.35
      }
     ],
     "rubble": [
@@ -15779,12 +17577,17 @@
      }
     ],
     "colour_target": {
-     "srgb": null,
-     "source": null,
-     "needs": "Matt's photos of the Shore Path, Bar Harbor (dry and wet, overcast, a grey card or white paper in frame if possible); until then the materials draw as photographed"
+     "srgb": [
+      112,
+      110,
+      110
+     ],
+     "source": "mid band of docs/look/matt_3nov_coa_shore_ledges_autumn.jpg, (340,700)-(2500,940) (textures/rocks/palettes.json face)",
+     "needs": null
     },
-    "status": "first: proposed, colour pending",
-    "note": "Thin-bedded, jagged, layered. Both face materials carry straight beds along the texture u axis: project faces with rotation 0 so beds lie level (the formation dips gently; a per-class dip of ~10 deg would be the next refinement). marble_rock_03 on ledges breaks the bedding into the jagged blocks the Shore Path shows. gray_rocks (angular platy) is the talus. Ledge tops scale 1.0, faces 0.6 (thinner beds than the 2 m tiles)."
+    "status": "from Matt's 3 Nov photos (tools/assets/bhf_material.py)",
+    "note": "Thin-bedded, jagged, layered. Both face materials carry straight beds along the texture u axis: project faces with rotation 0 so beds lie level (the formation dips gently; a per-class dip of ~10 deg would be the next refinement). marble_rock_03 on ledges breaks the bedding into the jagged blocks the Shore Path shows. gray_rocks (angular platy) is the talus. Ledge tops scale 1.0, faces 0.6 (thinner beds than the 2 m tiles).",
+    "shore_zones": true
    },
    {
     "class": 1,

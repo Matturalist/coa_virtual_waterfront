@@ -3253,7 +3253,7 @@ const MODELS = (() => {
      Cost, only on a boat that has been wired (an undamaged one never calls this): 4 node-texture reads per vertex + 1 state read on plates; 1 more
      sampler on the plates' materials; RGBA8 damage texture (16 MB at 2048, made on the first splat), 64x64 RGBA32F node texture (65 kB); one draw call
      per sidecar material (5) in place of nothing, her trimmed primitives keeping theirs. Numbers measured in docs/softbody.md S5. */
-  const SB_V = `uniform highp sampler2D uSbNodes; uniform highp sampler2D uSbStates; uniform mat4 uSbL2M; uniform mat4 uSbM2L;
+  const SB_V = `uniform highp sampler2D uSbNodes; uniform highp sampler2D uSbStates; uniform mat4 uSbL2M; uniform mat4 uSbM2L; uniform float uSbLipW;
     attribute vec4 _nodes; attribute vec4 _weights; attribute float _plate;
     #ifdef SB_INSIDE
     attribute vec3 _off;
@@ -3265,8 +3265,8 @@ const MODELS = (() => {
     /* a torn plate is bent, not a card: its roll (sbS3: hinge axis, kap rad/m), rolling up with distance from the hinge, a little more at one end of it than the other. Only the vertices of a loose plate come here. */
     float sbRoll(vec3 p) { float g = dot(p, sbS3.xyz); if (sbS1.w != 0.0) return length(p - sbS3.xyz * g) * sbS3.w * (1.0 + 0.3 * sin(dot(p + sbS0.xyz, sbS3.xyz) * 1.1));   /* a lip (sbS1.w 1): same roll for every shard along the line, so they stay one sheet */
       return length(p - sbS3.xyz * g) * sbS3.w * (1.0 + 0.35 * sin(g * 2.3 + sbS0.x * 7.0)); }
-    /* a lip is creased into the plate it never parted from (S10, twentieth slice). Near its outer edge it follows the lattice as that plate does, sharing the very nodes, and only further in does it take the bend: so nothing steps at the crease, and the ragged edge its shard was cut with stays flush with the plate above. Its arm is across the hinge in her skin: hinge x outward normal. How far the bend takes to come on: */
-    float sbLipK(vec3 m, vec3 nr) { return sbS1.w == 0.0 ? 1.0 : smoothstep(0.0, 0.4, dot(m, cross(sbS3.xyz, nr))); }
+    /* a lip is creased into the plate it never parted from (S10, twentieth slice). Near its outer edge it follows the lattice as that plate does, sharing the very nodes, and only further in does it take the bend: so nothing steps at the crease, and the ragged edge its shard was cut with stays flush with the plate above. Its arm is across the hinge in her skin: hinge x outward normal. How far the bend takes to come on: over at least two rows of her triangles (S10, twenty-third slice; solver.lipW, 0.9 m for her 0.35 m shell), or a row spans it and every triangle stands up as a tooth or a diamond: */
+    float sbLipK(vec3 m, vec3 nr) { return sbS1.w == 0.0 ? 1.0 : smoothstep(0.0, uSbLipW, dot(m, cross(sbS3.xyz, nr))); }
     vec3 sbCurl(vec3 p) { float g = dot(p, sbS3.xyz), h = 0.5 * sbRoll(p); if (abs(h) < 1e-4) return p; vec3 q = p - sbS3.xyz * g; return sbS3.xyz * g + sbRot(sbS3.xyz * h, q) * sin(h) / h; }
     void sbFetch() { if (sbDone) return; sbDone = true; sbD = vec3(0.0); sbR = vec3(0.0);
       for (int k = 0; k < 4; k++) { float w = _weights[k]; if (w > 0.0) { int n = int(_nodes[k]); vec4 t = texelFetch(uSbNodes, ivec2(n & SB_MASK, n >> SB_BITS), 0); sbD += w * t.xyz; sbR += w * sbRv(t.w); } }
@@ -3280,7 +3280,7 @@ const MODELS = (() => {
   const SB_MOVE = `#include <begin_vertex>
     sbFetch();
     #ifdef SB_PAINT
-    vSbRest = transformed; vSbUv = uv2; vSbCrush = smoothstep(0.015, 0.09, length(sbD)); vSbIn = sbS0.w > 0.5 ? 1.0 : mix(0.32, 1.0, smoothstep(0.03, 0.3, length(sbD)));   /* the inside of a hull that has not moved is in the dark; a torn or folded-out plate is in the light */
+    vSbRest = transformed; vSbUv = uv2; vSbCrush = smoothstep(0.015, 0.09, length(sbD)); if (sbS0.w > 0.5 && sbS0.w < 1.5 && sbS1.w != 0.0) vSbCrush *= smoothstep(0.9, 1.0, sbLipK((uSbL2M * vec4(transformed, 1.0)).xyz - sbS0.xyz, normalize(mat3(uSbL2M) * normal)));   /* a lip's crease is a rolled band, a metre wide, with smooth shading: facets there are only how the mesh happened to fall */ vSbIn = sbS0.w > 0.5 ? 1.0 : mix(0.32, 1.0, smoothstep(0.03, 0.3, length(sbD)));   /* the inside of a hull that has not moved is in the dark; a torn or folded-out plate is in the light */
     #endif
     #ifdef SB_INSIDE
     #ifdef SB_TRIP
@@ -3297,7 +3297,7 @@ const MODELS = (() => {
     else transformed += mat3(uSbM2L) * sbD;
     #endif
     #endif`;
-  const SB_F = `uniform sampler2D uSbPaint; uniform vec3 uSbBare; uniform float uSbBareM; uniform float uSbShell; uniform float uSbCreaseK; uniform float uSbFacet; uniform float uSbSmear; uniform float uSbFibre; varying vec3 vSbRest; varying vec2 vSbUv; varying float vSbCrush; varying float vSbIn; float sbBareA = 0.0; float sbGrain = 0.0; float sbCrease = 0.0; vec4 sbPaint;
+  const SB_F = `uniform sampler2D uSbPaint; uniform vec3 uSbBare; uniform float uSbBareM; uniform float uSbShell; uniform float uSbCreaseK; uniform float uSbFacet; uniform float uSbSmear; uniform float uSbFibre; uniform float uSbTrack; varying vec3 vSbRest; varying vec2 vSbUv; varying float vSbCrush; varying float vSbIn; float sbBareA = 0.0; float sbDull = 0.0; float sbGrain = 0.0; float sbCrease = 0.0; vec4 sbPaint;
     float sbH(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
     float sbNs(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
       return mix(mix(mix(sbH(i), sbH(i + vec3(1, 0, 0)), f.x), mix(sbH(i + vec3(0, 1, 0)), sbH(i + vec3(1, 1, 0)), f.x), f.y), mix(mix(sbH(i + vec3(0, 0, 1)), sbH(i + vec3(1, 0, 1)), f.x), mix(sbH(i + vec3(0, 1, 1)), sbH(i + vec3(1, 1, 1)), f.x), f.y), f.z); }
@@ -3317,13 +3317,16 @@ const MODELS = (() => {
     else { vec3 sbF0 = normalize(cross(dFdx(vViewPosition), dFdy(vViewPosition))); sbCrease = vSbCrush * (1.0 - abs(dot(normalize(vNormal), sbF0)));   /* how far this facet has turned from her smooth surface: a fold */
       float sbK = smoothstep(0.05, 0.3, sbCrease) * uSbCreaseK;   /* how readily paint cracks on a fold: the file's solver.creaseBare (steel's paint stays on a fold far better than on 5083) */
       if (sbPaint.r + sbPaint.b + sbK + sbTear > 0.004) { sbGrain = sbNs(vSbRest * 90.0) * 0.6 + sbNs(vSbRest * 26.0) * 0.4;
-        sbBareA = smoothstep(0.34, 0.5, max(sbPaint.r, sbK * 0.75) + (sbGrain - 0.5) * 0.55);   /* a chipped edge finer than the texture's 3 cm; paint cracks off along a fold */
+        if (uSbTrack > 0.5 && uSbFibre < 0.5) { float sbPx0 = length(fwidth(vSbRest)), sbTr = 0.5 + 0.62 * (sbNs(vSbRest * vec3(11.0, 11.0, 0.55)) - 0.5) + smoothstep(0.05, 0.015, sbPx0) * 0.5 * (sbNs(vSbRest * vec3(46.0, 46.0, 1.7) + 5.0) - 0.5) + smoothstep(0.012, 0.004, sbPx0) * 0.36 * (sbNs(vSbRest * vec3(190.0, 190.0, 6.0) + 9.0) - 0.5);   /* S10, twenty-third slice: what she slid on left tracks, not a stain: a stone's about 9 cm across and 2 m long, its edge, and fine scratches. Worked out here, a pixel at a time, as the texture is only good to 3 cm. Light rubbing marks only the tops of the pattern; hard rubbing joins them up to bare. Along her length, as the bare metal's scoring below */
+          sbBareA = max(smoothstep(0.55, 0.65, sbPaint.r + (sbTr - 0.5) * 1.1 + (sbGrain - 0.5) * 0.12), smoothstep(0.34, 0.5, sbK * 0.75 + (sbNs(vSbRest * 13.0) * 0.5 + sbGrain * 0.5 - 0.5) * 0.9 - 0.12)); sbDull = smoothstep(0.02, 0.3, sbPaint.r) * (1.0 - sbBareA); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11))) * 0.93 + 0.03, 0.35 * sbDull); }   /* paint that was rubbed and not cut through goes matt and chalky (ASSUMED, by eye) */
+        else sbBareA = smoothstep(0.34, 0.5, max(sbPaint.r, sbK * 0.75) + (sbGrain - 0.5) * 0.55);   /* a chipped edge finer than the texture's 3 cm; paint cracks off along a fold */
         if (sbTear > (uSbFibre > 0.5 ? 0.58 : 0.7)) { sbGrain = sbNs(vSbRest * 90.0) * 0.6 + sbNs(vSbRest * 26.0) * 0.4; float sbT0 = uSbFibre > 0.5 ? 0.58 : 0.7; sbBareA = max(sbBareA, smoothstep(sbT0, sbT0 + 0.08, sbTear + (sbGrain - 0.5) * 0.12)); }   /* the gelcoat chipped back a little way from the break */
         if (uSbFibre < 0.5) { float sbPx = length(fwidth(vSbRest)), sbSt = 0.5 + smoothstep(0.02, 0.006, sbPx) * 0.55 * (sbNs(vSbRest * vec3(170.0, 170.0, 5.0)) - 0.5) + smoothstep(0.07, 0.02, sbPx) * 0.45 * (sbNs(vSbRest * vec3(48.0, 48.0, 1.6)) - 0.5); sbGrain = clamp((sbSt - 0.5) * 2.0 + 0.5, 0.0, 1.0); }   /* metal that has been dragged along something is scored the way she was going, along her, not mottled; its chipped edge above stays isotropic */
         diffuseColor.rgb = mix(diffuseColor.rgb, uSbBare * (uSbFibre > 0.5 ? 0.82 + 0.28 * sbGrain : 0.62 + 0.3 * sbGrain), sbBareA);
         diffuseColor.rgb *= 1.0 - uSbSmear * sbPaint.b; }                           /* the black smear rubbed aluminium leaves */
       if (uSbFibre > 0.5 && sbPaint.a > 0.01) { float cz = min(1.0, sbPaint.a / 0.6), pa = smoothstep(0.75, 0.3, sbNs(vSbRest * 3.1) + 0.55 * (1.0 - cz)) * cz; if (pa > 0.01) diffuseColor.rgb *= 1.0 - 0.36 * pa * sbCraze(vSbRest); } }`;
   const SB_ROUGH = `#include <roughnessmap_fragment>
+    if (sbDull > 0.0) roughnessFactor = mix(roughnessFactor, 0.85, 0.8 * sbDull);
     if (sbBareA > 0.0) roughnessFactor = mix(roughnessFactor, 0.55 + 0.35 * sbGrain, sbBareA);`;
   const SB_METAL = `#include <metalnessmap_fragment>
     if (sbBareA > 0.0) metalnessFactor = mix(metalnessFactor, uSbBareM, sbBareA);
@@ -3337,7 +3340,7 @@ const MODELS = (() => {
         vec3 R1 = cross(fy, normal), R2 = cross(normal, fx); float det = dot(fx, R1); det *= float(gl_FrontFacing) * 2.0 - 1.0;
         normal = normalize(abs(det) * normal - sign(det) * (dH.x * R1 + dH.y * R2)); } }`;
   const SB_SPLAT_V = `attribute vec2 uv2; uniform vec2 uOff; varying vec3 vP; void main() { vP = position; gl_Position = vec4(uv2 * 2.0 - 1.0 + uOff, 0.0, 1.0); }`;
-  const SB_SPLAT_F = `precision highp float; uniform vec3 uP, uN, uD; uniform vec4 uA; uniform float uK; uniform vec3 uSeg[48]; uniform float uSegN; varying vec3 vP;
+  const SB_SPLAT_F = `precision highp float; uniform vec3 uP, uN, uD; uniform vec4 uA; uniform float uK; uniform float uTr; uniform vec3 uSeg[48]; uniform float uSegN; varying vec3 vP;
     float H(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float Ns(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(H(i), H(i + vec2(1, 0)), f.x), mix(H(i + vec2(0, 1)), H(i + vec2(1, 1)), f.x), f.y); }
     void main() { if (uK > 4.5) { float b = 1e9; for (int i = 0; i < 24; i++) { if (float(i) >= uSegN) break; vec3 a = uSeg[2 * i], e = uSeg[2 * i + 1] - a, w = vP - a; float h = clamp(dot(w, e) / max(dot(e, e), 1e-8), 0.0, 1.0); w -= e * h; b = min(b, dot(w, w)); } float pr = 1.0 - sqrt(b) / uA.x; if (pr <= 0.0) discard; gl_FragColor = vec4(0.0, 0.0, 0.0, 0.8 + 0.2 * pr); return; }   /* a torn edge in glass (S11): how near this texel is to it, measured in the boat, in alpha 0.8 to 1: SB_COLOR makes the jagged edge from that */
@@ -3345,9 +3348,9 @@ const MODELS = (() => {
         vec2 uv = vec2(al, ac); float rr = length(vec2(max(abs(al) - uA.y, 0.0), ac)) / r, m = smoothstep(1.0, 0.45, rr + (Ns(uv * 6.0) - 0.5) * 0.7); if (m <= 0.0) discard; gl_FragColor = vec4(0.0, 0.0, 0.0, 0.6 * m * s); return; }
       if (uK > 2.5) { gl_FragColor = vec4(uA.x, uA.z, 0.25, 1.0); return; }   /* a torn edge */
       vec3 q = vP - uP; float nd = dot(q, uN), al = dot(q, uD), ac = dot(q, cross(uN, uD)), r = uA.x, tol = max(0.6 * r, 0.3), s = uA.z * smoothstep(tol, tol * 0.7, abs(nd)); if (s <= 0.0) discard;   /* only the plate it touched, not the far side of the hull */
-      float rr = length(vec2(max(abs(al) - uA.y, 0.0), ac)) / r; al += uA.w; float m = smoothstep(1.0, 0.6, rr + (Ns(vec2(al, ac) * 5.0) - 0.5) * 0.45 + (uK > 1.5 && uK < 2.5 ? (Ns(vec2(al, ac) * 19.0) - 0.5) * 0.5 : 0.0)); if (m <= 0.0) discard; vec3 o;   /* uA.w: how far along a track this splat lies, so its streaks run on from the last one's */
+      bool sbT = uTr > 0.5 && uK < 0.5; float rr = length(vec2(max(abs(al) - uA.y, 0.0) * (sbT ? 0.4 : 1.0), ac)) / r; al += uA.w; float m = smoothstep(1.0, sbT ? 0.1 : 0.6, rr + (Ns(vec2(al, ac) * 5.0) - 0.5) * 0.45 + (uK > 1.5 && uK < 2.5 ? (Ns(vec2(al, ac) * 19.0) - 0.5) * 0.5 : 0.0)); if (m <= 0.0) discard; vec3 o;   /* uA.w: how far along a track this splat lies, so its streaks run on from the last one's */
       if (uK < 0.5) { float a = Ns(vec2(ac * 75.0, al * 1.1)), b = Ns(vec2(ac * 21.0, al * 0.5 + 9.0)), v = smoothstep(0.34, 0.68, a * 0.55 + b * 0.55);   /* a scrape: streaks along its line */
-        o = vec3(m * v * s, m * a * a * s * 0.7, m * (1.0 - v) * b * 0.75 * s); }
+        float ms = sbT ? smoothstep(0.0, 0.8, m) * (0.75 + 0.25 * v) : m * v; o = vec3(ms * s, m * a * a * s * 0.7, m * (1.0 - v) * b * 0.75 * s); }   /* with SOFTBODY.tracks the texture holds how hard she was rubbed, smooth, with a soft edge and tapering out at its ends; the material draws the streaks, as they're finer than a texel (S10, twenty-third slice) */
       else if (uK < 1.5) { float c = clamp(1.0 - abs(ac) / r, 0.0, 1.0), rag = Ns(vec2(al * 9.0, ac * 40.0)); o = vec3(m * smoothstep(0.1, 0.45, c + rag * 0.2 - 0.1) * s, m * c * c * s, m * (1.0 - c) * 0.5 * s); }   /* a gouge: a cut with relief, smeared at its sides */
       else { vec2 uv = vec2(al, ac); float a = Ns(uv * 28.0), b = Ns(uv * 7.0 + 3.0), c = 1.0 - abs(2.0 * Ns(uv * 11.0 + 7.0) - 1.0), d = 1.0 - abs(2.0 * Ns(uv * 23.0 + 13.0) - 1.0), crack = smoothstep(0.84, 0.97, max(c, d * 0.96));   /* paint crazes where plate strains: a net of cracks, flecks gone along them, whole flakes only where it worked hardest */
         o = vec3(m * max(crack * 0.9, smoothstep(0.62, 0.72, a * 0.5 + b * 0.5 + (uA.z - 0.7) * 0.5)) * s, m * a * 0.15 * s, 0.0); }
@@ -3366,17 +3369,17 @@ const MODELS = (() => {
     const nodeTex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.FloatType); nodeTex.minFilter = nodeTex.magFilter = THREE.NearestFilter; nodeTex.generateMipmaps = false; nodeTex.needsUpdate = true;
     const ids = X.plates + X.shards + (X.fittings || 0), stData = new Float32Array(4 * 4 * ids), stTex = new THREE.DataTexture(stData, 4, ids, THREE.RGBAFormat, THREE.FloatType); stTex.minFilter = stTex.magFilter = THREE.NearestFilter; stTex.generateMipmaps = false; stTex.needsUpdate = true;
     const blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat); blank.needsUpdate = true;
-    const sbSV = S.solver || {}, uFib = { value: sbSV.fibre ? 1 : sbSV.jag === 0 ? 0 : 0.25 };   /* uSbFibre: 1 glass; metal 0.25 with jagged torn edges (S10, twentieth slice), 0 without (solver.jag 0: Le Lyrial, whose shell triangles are too coarse for it; SOFTBODY.jag) */
+    const sbSV = S.solver || {}, uTrk = { value: 1 }, uFib = { value: sbSV.fibre ? 1 : sbSV.jag === 0 ? 0 : 0.25 };   /* uSbFibre: 1 glass; metal 0.25 with jagged torn edges (S10, twentieth slice), 0 without (solver.jag 0: Le Lyrial, whose shell triangles are too coarse for it; SOFTBODY.jag) */
     const creaseK = (S.solver && S.solver.creaseBare != null) ? S.solver.creaseBare : 1, uPaint = { value: blank }, bareC = opt.bare || X.bare || [214, 217, 219], uBare = { value: new THREE.Vector3(...bareC.map(v => Math.pow(v / 255, 2.2))) };   /* the sidecar's own (Le Lyrial: steel, lyrial_plates.py), or her own bare 5083, mill finish: fv.py 'fv_deck', sampled from the side-deck and bow photos */
     const defs = { SB_MASK: size - 1, SB_BITS: bits };
     /* a material for one mesh of this boat: the same shader for all, its own frame matrices (a part's node may be turned from the model frame) */
     const skinned = (base, l2m, m2l, paint, shell, ins) => { const c = base.clone(), prev = base.onBeforeCompile, key = base.customProgramCacheKey ? base.customProgramCacheKey() : ''; c.defines = Object.assign({}, base.defines, defs); if (paint) c.defines.SB_PAINT = 1; if (ins) c.defines.SB_INSIDE = 1;
-      c.onBeforeCompile = function (sh, r) { if (prev) prev.call(this, sh, r); Object.assign(sh.uniforms, { uSbNodes: { value: nodeTex }, uSbStates: { value: stTex }, uSbL2M: { value: l2m }, uSbM2L: { value: m2l }, uSbPaint: uPaint, uSbBare: uBare, uSbBareM: { value: X.bare_metal != null ? X.bare_metal : 0.7 }, uSbShell: { value: +shell || 0 }, uSbCreaseK: { value: creaseK }, uSbFacet: { value: (S.solver && S.solver.facet) || 1 }, uSbFibre: uFib, uSbSmear: { value: S.solver && S.solver.smear != null ? S.solver.smear : 0.72 } });
+      c.onBeforeCompile = function (sh, r) { if (prev) prev.call(this, sh, r); Object.assign(sh.uniforms, { uSbNodes: { value: nodeTex }, uSbStates: { value: stTex }, uSbL2M: { value: l2m }, uSbM2L: { value: m2l }, uSbPaint: uPaint, uSbBare: uBare, uSbBareM: { value: X.bare_metal != null ? X.bare_metal : 0.7 }, uSbShell: { value: +shell || 0 }, uSbCreaseK: { value: creaseK }, uSbFacet: { value: (S.solver && S.solver.facet) || 1 }, uSbFibre: uFib, uSbTrack: uTrk, uSbLipW: { value: sbSV.lipW || 0.9 }, uSbSmear: { value: S.solver && S.solver.smear != null ? S.solver.smear : 0.72 } });
         sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + SB_V + '\n#ifdef SB_PAINT\nattribute vec2 uv2; varying vec3 vSbRest; varying vec2 vSbUv; varying float vSbCrush; varying float vSbIn;\n#endif')
           .replace('#include <beginnormal_vertex>', SB_NORMAL).replace('#include <begin_vertex>', SB_MOVE);
         if (paint) sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + SB_F).replace('#include <color_fragment>', SB_COLOR).replace('#include <roughnessmap_fragment>', SB_ROUGH)
           .replace('#include <metalnessmap_fragment>', SB_METAL).replace('#include <normal_fragment_maps>', SB_NORMF).replace('#include <aomap_fragment>', SB_AO);
-        if (ins) sh.fragmentShader = sh.fragmentShader.replace('#include <aomap_fragment>', '#include <aomap_fragment>\n reflectedLight.indirectSpecular *= vColor.r * vColor.r;'); };
+        if (ins) { sh.fragmentShader = sh.fragmentShader.replace('#include <aomap_fragment>', '#include <aomap_fragment>\n reflectedLight.indirectSpecular *= vColor.r * vColor.r;'); sh.vertexShader = sh.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n#ifdef SB_BACK\n{ vec4 sbQ = projectionMatrix * vec4(mvPosition.xyz * (1.0 + SB_BACK / length(mvPosition.xyz)), 1.0); gl_Position.z = sbQ.z / sbQ.w * gl_Position.w; }\n#endif'); } };   /* SB_BACK: the inside is tested for depth this many metres further from the eye than it is drawn. Her shell is coarser than her lattice: a triangle running from a moved lip to still plate cuts in front of the frames between, and each stood through it as a hairline */
       c.customProgramCacheKey = () => key + '|sb' + bits + (paint ? 'p' : '') + (ins ? 'i' : ''); return c; };
     const depthOf = (l2m, m2l) => { const d = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }); d.defines = Object.assign({}, defs);
       d.onBeforeCompile = sh => { Object.assign(sh.uniforms, { uSbNodes: { value: nodeTex }, uSbStates: { value: stTex }, uSbL2M: { value: l2m }, uSbM2L: { value: m2l } }); sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + SB_V).replace('#include <begin_vertex>', SB_MOVE); };
@@ -3449,7 +3452,7 @@ const MODELS = (() => {
       const cell = new Map(), key = (a, b, c) => (a + 512) + (b + 512) * 1024 + (c + 512) * 1048576;
       for (let t = 0; t < tris; t++) { const a = ix[3 * t], b = ix[3 * t + 1], c = ix[3 * t + 2], k = key(Math.floor((ps[3 * a] + ps[3 * b] + ps[3 * c]) / 3), Math.floor((ps[3 * a + 1] + ps[3 * b + 1] + ps[3 * c + 1]) / 3), Math.floor((ps[3 * a + 2] + ps[3 * b + 2] + ps[3 * c + 2]) / 3)); let l = cell.get(k); if (!l) cell.set(k, l = []); l.push(t); }
       const sz = opt.paintSize || X.paint_size || 2048, rt = new THREE.WebGLRenderTarget(sz, sz, { format: THREE.RGBAFormat, type: THREE.UnsignedByteType, depthBuffer: false, stencilBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, generateMipmaps: false });
-      const uni = { uP: { value: new THREE.Vector3() }, uN: { value: new THREE.Vector3() }, uD: { value: new THREE.Vector3() }, uA: { value: new THREE.Vector4() }, uK: { value: 0 }, uOff: { value: new THREE.Vector2() }, uSeg: { value: new Float32Array(144) }, uSegN: { value: 0 } };
+      const uni = { uP: { value: new THREE.Vector3() }, uN: { value: new THREE.Vector3() }, uD: { value: new THREE.Vector3() }, uA: { value: new THREE.Vector4() }, uK: { value: 0 }, uTr: { value: 1 }, uOff: { value: new THREE.Vector2() }, uSeg: { value: new Float32Array(144) }, uSegN: { value: 0 } };
       const mat = new THREE.ShaderMaterial({ uniforms: uni, vertexShader: SB_SPLAT_V, fragmentShader: SB_SPLAT_F, depthTest: false, depthWrite: false, side: THREE.DoubleSide, blending: THREE.CustomBlending, blendEquation: THREE.MaxEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneFactor, toneMapped: false });
       const base = new THREE.BufferAttribute(ps, 3), buv = new THREE.BufferAttribute(uv, 2), geo = new THREE.BufferGeometry(); geo.setAttribute('position', base); geo.setAttribute('uv2', buv);
       const idx = new THREE.BufferAttribute(new Uint32Array(3 * 40000), 1); idx.setUsage(THREE.DynamicDrawUsage); geo.setIndex(idx); const mesh = new THREE.Mesh(geo, mat); mesh.frustumCulled = false;
@@ -3466,6 +3469,7 @@ const MODELS = (() => {
       const whole = (e, c) => { if (!L) return false; if (same.has(e)) return true; const f = v => (ps[3 * v] - L.mid[0]) * L.arm[0] + (ps[3 * v + 1] - L.mid[1]) * L.arm[1] + (ps[3 * v + 2] - L.mid[2]) * L.arm[2]; return f(c.a) + f(c.b) <= 0.5; };
       for (const [e, c] of own) if (c.n === 1 && !whole(e, c)) out.push(c.a, c.b); if (ownOnly) return; const s = shard.get(id); if (s) for (const [nb] of s.nb || []) walk(nb, (e, a, b) => { const c = own.get(e); if (c && c.n === 1 && !whole(e, c)) out.push(a, b); }); };
     sb.splat = function (s) { queue.push(s); };
+    sb.setTracks = function (v) { uTrk.value = v ? 1 : 0; };
     sb.setJag = function (v) { if (sbSV.fibre || sbSV.jag === 0) return; uFib.value = v ? 0.25 : 0; };
     /* a mark from a contact: the collider isn't her plate, so find the plate. The nearest triangle within SNAP_R that faces the way the contact does, taking its face as the mark's; none, and there's nothing there to mark */
     const SNAP_R = 1.2, snapTo = (s) => { const { ps, ix, cell, key } = P, p = s.p, N = s.n; let best = 1e9, q = null, tn = null; const eval1 = t => { const a = 3 * ix[3 * t], b = 3 * ix[3 * t + 1], c = 3 * ix[3 * t + 2], ax = ps[a], ay = ps[a + 1], az = ps[a + 2]; { const ox = ax - p[0], oy = ay - p[1], oz = az - p[2], lx = ps[b] - p[0], ly = ps[b + 1] - p[1], lz = ps[b + 2] - p[2], mx = ps[c] - p[0], my = ps[c + 1] - p[1], mz = ps[c + 2] - p[2], R = SNAP_R; if ((ox > R && lx > R && mx > R) || (ox < -R && lx < -R && mx < -R) || (oy > R && ly > R && my > R) || (oy < -R && ly < -R && my < -R) || (oz > R && lz > R && mz > R) || (oz < -R && lz < -R && mz < -R)) return; } const ux = ps[b] - ax, uy = ps[b + 1] - ay, uz = ps[b + 2] - az, vx = ps[c] - ax, vy = ps[c + 1] - ay, vz = ps[c + 2] - az; let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; const nl = Math.sqrt(nx * nx + ny * ny + nz * nz); if (nl < 1e-9) return; nx /= nl; ny /= nl; nz /= nl; let f = nx * N[0] + ny * N[1] + nz * N[2]; if (Math.abs(f) < 0.2) return; if (f < 0) { nx = -nx; ny = -ny; nz = -nz; f = -f; }
@@ -3478,7 +3482,7 @@ const MODELS = (() => {
       const a = P.idx.array, cap = a.length / 3; let m = 0;
       for (let i = Math.floor(s.p[0] - reach); i <= Math.floor(s.p[0] + reach) && m < cap; i++) for (let j = Math.floor(s.p[1] - reach); j <= Math.floor(s.p[1] + reach) && m < cap; j++) for (let k = Math.floor(s.p[2] - reach); k <= Math.floor(s.p[2] + reach) && m < cap; k++) { const l = P.cell.get(P.key(i, j, k)); if (l) for (const t of l) { if (m >= cap) break; a[3 * m] = P.ix[3 * t]; a[3 * m + 1] = P.ix[3 * t + 1]; a[3 * m + 2] = P.ix[3 * t + 2]; m++; } }
       if (!m) return; P.idx.updateRange.offset = 0; P.idx.updateRange.count = 3 * m; P.idx.needsUpdate = true; P.geo.setDrawRange(0, 3 * m); P.mesh.visible = true; P.line.visible = false;
-      const U = P.uni; U.uP.value.set(...s.p); U.uN.value.copy(n); U.uD.value.copy(d); U.uA.value.set(r, len / 2, s.strength != null ? s.strength : 1, s.al || 0); U.uK.value = { scrape: 0, gouge: 1, flake: 2, craze: 4 }[s.kind || 'scrape'] || 0; U.uOff.value.set(0, 0); renderer.render(P.scene, P.cam); };
+      const U = P.uni; U.uP.value.set(...s.p); U.uN.value.copy(n); U.uD.value.copy(d); U.uA.value.set(r, len / 2, s.strength != null ? s.strength : 1, s.al || 0); U.uK.value = { scrape: 0, gouge: 1, flake: 2, craze: 4 }[s.kind || 'scrape'] || 0; U.uTr.value = sbSV.fibre ? 0 : uTrk.value; U.uOff.value.set(0, 0); renderer.render(P.scene, P.cam); };
     /* glass (S11): one draw per torn shard, its triangles and its neighbours', its rim as segments in a uniform, so the band is a true distance in the boat: no gaps between offset lines, no bleeding across the atlas's 3 cm between charts */
     const TEAR_R = 0.16;
     const drawTears = (renderer, R, keep) => { const a = P.idx.array, cap = a.length / 3, U = P.uni; P.mesh.visible = true; P.line.visible = false; U.uK.value = 5; U.uA.value.x = R || TEAR_R; U.uOff.value.set(0, 0);
@@ -3500,7 +3504,7 @@ const MODELS = (() => {
       M_.forEach((m, i) => { const b = S.beams[m[0]], a = S.nodes[b.a].p, c = S.nodes[b.b].p; for (let k = 0; k < 3; k++) mx[3 * i + k] = (a[k] + c[k]) / 2; });
       const memberOf = new Map(M_.map((m, i) => [m[0], i]));
       /* a growing vertex store for one material */
-      const store = (name, base, env) => { const mt = skinned(base, id, id, false, 0, true); mt.vertexColors = true; mt.side = THREE.DoubleSide; mt.envMapIntensity = env; if (data.trip_rad != null) mt.defines.SB_TRIP = data.trip_rad.toFixed(3); const g = new THREE.BufferGeometry(), me = new THREE.Mesh(g, mt); me.name = 'sb_inside_' + name; me.frustumCulled = false; me.castShadow = false; me.receiveShadow = true; root.add(me);
+      const store = (name, base, env) => { const mt = skinned(base, id, id, false, 0, true); mt.vertexColors = true; mt.side = THREE.DoubleSide; mt.envMapIntensity = env; if (data.trip_rad != null) mt.defines.SB_TRIP = data.trip_rad.toFixed(3); if (data.back) mt.defines.SB_BACK = data.back.toFixed(3); const g = new THREE.BufferGeometry(), me = new THREE.Mesh(g, mt); me.name = 'sb_inside_' + name; me.frustumCulled = false; me.castShadow = false; me.receiveShadow = true; root.add(me);
         const B = { me, g, cap: 0, nv: 0, ni: 0, grow(n, ni) { if (B.nv + n <= B.cap && B.ni + ni <= B.icap) return; const c = Math.max(4096, 2 * (B.nv + n));
               const old = B.arr; B.arr = { p: new Float32Array(3 * c), n: new Int8Array(3 * c), uv: new Float32Array(2 * c), col: new Uint8Array(3 * c), nd: new Uint16Array(4 * c), w: new Uint8Array(4 * c), off: new Float32Array(3 * c), ix: new Uint32Array(3 * c) };
               if (old) for (const k in old) B.arr[k].set(old[k]); B.cap = c; B.icap = 3 * c; B.fresh = true; } };
@@ -5342,6 +5346,7 @@ const LEDGE = (() => {
       riser: (ov.riser_deg || st.riser_deg || 65) * d2r, round: R.rounding_m != null ? R.rounding_m : 0.1,
       joints: (R.joints || []).map(j => ({ az: j.strike_deg * d2r, sp: j.spacing_m || 4, sj: j.spacing_jitter || 0.4, pers: j.persistence == null ? 0.6 : j.persistence, w: j.weight == null ? 1 : j.weight })),
       boff: ov.jitter != null ? ov.jitter : jt.block_offset != null ? jt.block_offset : 0.4, wander: jt.edge_wander_m != null ? jt.edge_wander_m : 0.3,
+      cell: R.cell_m || 0, btilt: (jt.block_tilt_deg || 0) * d2r, crackT: jt.crack_depth_t != null ? jt.crack_depth_t : 0.25,   /* each joint block leans its own way; how deep a joint opens (x bed thickness) */
       maxD: ov.relief_m || (RULES && RULES.apply && RULES.apply.max_displacement_m) || 1.5,
       loose: (lb.per_100m2 == null ? 2 : lb.per_100m2) * (ov.broken == null ? 1 : ov.broken), size: lb.size_m || (style === 'sheeted' ? [0.6, 2.2] : [0.3, 1.2]),
       lip: ov.overhang != null ? ov.overhang : (oh.probability || 0), set: R.surface && R.surface.material_set };
@@ -5383,7 +5388,7 @@ const LEDGE = (() => {
     const p = rule.style ? rule : flat(rule, opt.ov); const seed = (opt.seed | 0) || 1;
     /* the region: the union of the dabs, with a ragged edge */
     let x0 = 1e9, z0 = 1e9, x1 = -1e9, z1 = -1e9; for (const s of stamps) { x0 = Math.min(x0, s.c[0] - s.r); z0 = Math.min(z0, s.c[1] - s.r); x1 = Math.max(x1, s.c[0] + s.r); z1 = Math.max(z1, s.c[1] + s.r); }
-    const area = (x1 - x0) * (z1 - z0), dx = Math.max(opt.dx || (p.style === 'sheeted' ? 0.25 : 0.15), Math.sqrt(area / (opt.maxCells || 160000)));
+    const area = (x1 - x0) * (z1 - z0), dx = Math.max(opt.dx || p.cell || (p.style === 'sheeted' ? 0.25 : 0.15), Math.sqrt(area / (opt.maxCells || 160000)));
     const nx = Math.ceil((x1 - x0) / dx) + 1, nz = Math.ceil((z1 - z0) / dx) + 1, n = nx * nz;
     const G = new Float32Array(n), H = new Float32Array(n), M = new Float32Array(n), CL = new Float32Array(n);   /* CL: how much of the cell is cliff (granite) */
     /* stamps bucketed coarsely so a long stroke isn't O(cells x dabs) */
@@ -5402,12 +5407,13 @@ const LEDGE = (() => {
     const J = p.joints.slice(0, 3), wander = p.wander;
     const blockAt = (x, z, out) => {
       const wx = (fbm(x * 0.35, z * 0.35, seed + 11, 2) - 0.5) * 2 * wander, wz = (fbm(x * 0.35 + 9, z * 0.35, seed + 13, 2) - 0.5) * 2 * wander;
-      let id = seed, crack = 1e9;
+      let id = seed, crack = 1e9; out.a = out.b = 0;
       for (let q = 0; q < J.length; q++) { const jj = J[q], c = Math.cos(jj.az), s = Math.sin(jj.az);   /* strike (sin a, -cos a) -> across = (cos a, sin a) */
         const u = ((x + wx) * c + (z + wz) * s) / jj.sp, uj = u + jj.sj * (vn(u * 0.6, q * 7.3, seed + q) - 0.5);
         let k = Math.floor(uj); const fr = uj - k, d = Math.min(fr, 1 - fr) * jj.sp;
         const other = J[(q + 1) % J.length], ou = Math.floor(((x * Math.cos(other.az) + z * Math.sin(other.az)) / other.sp) * 0.5);
         if (hash2(k, ou, seed + 101 * q) > jj.pers) { k = k >> 1; } else if (d < crack) crack = d;
+        if (q === 0) out.a = (fr - 0.5) * jj.sp; else if (q === 1) out.b = (fr - 0.5) * jj.sp;   /* where in the block, for its lean */
         id = (Math.imul(id ^ (k + 7919 * q), 2654435761) >>> 0); }
       out.id = id; out.crack = crack; return out; };
     const tmp = { id: 0, crack: 0 };
@@ -5488,7 +5494,8 @@ const LEDGE = (() => {
         const s = G[k] - hp, gx = (G[k + (i < nx - 1 ? 1 : 0)] - G[k - (i > 0 ? 1 : 0)]) / dx + tanD * ddx, gz = (G[k + (j < nz - 1 ? nx : 0)] - G[k - (j > 0 ? nx : 0)]) / dx + tanD * ddz;
         const w = Math.min(0.92, Math.max(0.03, Math.hypot(gx, gz) / tanR));
         let h = quant(s + o + vw, w, roundK) + hp - o - vw;
-        h -= 0.25 * t * (1 - sstep(0, 0.06 + dx * 0.5, tmp.crack));   /* the cracks */
+        if (p.btilt > 0) { const ha = hash2(tmp.id & 0xffff, tmp.id >>> 16, seed + 29) - 0.5, hb = hash2(tmp.id >>> 16, tmp.id & 0xffff, seed + 31) - 0.5; h += Math.tan(p.btilt) * 2 * (ha * tmp.a + hb * tmp.b); }   /* the block leans: square steps at every joint, never a level terrace */
+        h -= p.crackT * t * (1 - sstep(0, 0.06 + dx * 0.5, tmp.crack));   /* the cracks */
         h += (fbm(x * 3.1, z * 3.1, seed + 17, 2) - 0.5) * 0.04 * t;     /* a little surface relief between texture and geometry */
         H[k] = h; }
     }
@@ -5623,7 +5630,7 @@ const LEDGE = (() => {
       /* a sampled Maine colour target, when the set has one: graded by target / the face material's mean (docs/terrain-materials.md) */
       const tgt = fs.colour_target && fs.colour_target.srgb, mf = byId.get((fs.face || [])[0] && fs.face[0].m);
       if (tgt && mf && mf.colour_mean_srgb) u.uGrade.value.set(...tgt.map((v, i) => Math.pow(v / 255, 2.2) / Math.max(1e-3, Math.pow(mf.colour_mean_srgb[i] / 255, 2.2))));
-      u.uOn.value = 1; S.mat.needsUpdate = S.matHd.needsUpdate = S.matLo.needsUpdate = true; S.ready = true; } catch (e) { console.warn('LEDGE: materials', e); } })();
+      u.uBand.value = fs.shore_zones ? 1 : 0; u.uOn.value = 1; S.mat.needsUpdate = S.matHd.needsUpdate = S.matLo.needsUpdate = true; S.ready = true; } catch (e) { console.warn('LEDGE: materials', e); } })();
     return S;
   }
   /* an image's RGBA exactly as stored, scaled to N x N, through WebGL2 (a 2D canvas would premultiply by the alpha, which here is
@@ -5657,7 +5664,7 @@ const LEDGE = (() => {
       uPT: { value: v3s() }, uPF: { value: v3s() }, uPL: { value: v3s() }, uAmt: { value: 0 }, uWet: { value: 0.55 },
       uLum: { value: Array.from({ length: 8 }, () => new THREE.Vector2(0.02, 0.3)) },
       uFace: { value: new THREE.Vector3(0, -1, 0) }, uLedge: { value: new THREE.Vector3(0, -1, 0) }, uLichen: { value: new THREE.Vector2(-1, 0) },
-      uGrade: { value: new THREE.Vector3(1, 1, 1) }, uMHW: { value: 1.52 }, uY0: { value: 0 } };
+      uGrade: { value: new THREE.Vector3(1, 1, 1) }, uMHW: { value: 1.52 }, uY0: { value: 0 }, uBand: { value: 0 } };
     const m = new THREE.MeshStandardMaterial({ color: 0x6b6258, roughness: 1, metalness: 0 });
     m.userData.u = u;
     m.onBeforeCompile = sh => { Object.assign(sh.uniforms, u, (typeof DOCKS !== 'undefined' && DOCKS.stainUniforms && DOCKS.stainUniforms()) || { uStTide: { value: -99 }, uStWetTop: { value: -99 } });   /* the tide and the drying line, shared with docks.js */
@@ -5670,12 +5677,13 @@ const LEDGE = (() => {
           lw = modelMatrix * lw; vLW = lw.xyz / ${U}.0; vLN = normalize(mat3(modelMatrix) * ln);`);
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
         precision highp sampler2DArray;
-        uniform sampler2DArray uA, uB; uniform float uOn, uTile[8], uMHW, uY0, uAmt, uWet, uStTide, uStWetTop; uniform vec3 uFace, uLedge, uGrade, uPT[3], uPF[3], uPL[3]; uniform vec2 uLichen, uLum[8];
+        uniform sampler2DArray uA, uB; uniform float uBand, uOn, uTile[8], uMHW, uY0, uAmt, uWet, uStTide, uStWetTop; uniform vec3 uFace, uLedge, uGrade, uPT[3], uPF[3], uPL[3]; uniform vec2 uLichen, uLum[8];
         vec3 lramp(vec3 s0, vec3 s1, vec3 s2, float t){ return t < 0.5 ? mix(s0, s1, t * 2.0) : mix(s1, s2, t * 2.0 - 1.0); }
         varying vec3 vLW; varying vec3 vLN;
         float lh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float lvn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(lh(i), lh(i+vec2(1,0)), f.x), mix(lh(i+vec2(0,1)), lh(i+vec2(1,1)), f.x), f.y); }
-        void ltri(float L, vec3 P, vec3 n, out vec4 ca, out vec4 nb, out float lt){ float s = 1.0 / uTile[int(L)]; vec3 w = pow(abs(n), vec3(4.0)); w /= dot(w, vec3(1.0));
+        void ltri(float L, vec3 P, vec3 n, out vec4 ca, out vec4 nb, out float lt){ float s = 1.0 / uTile[int(L)]; vec3 w = abs(n); w.y = smoothstep(0.55, 0.85, w.y); w = pow(w, vec3(4.0)) + 1e-4; w /= dot(w, vec3(1.0));   /* a riser is one cell wide, its normal half way to up: the top plane stays off it, or the scan stretches down the step */
+         
           vec4 a1 = texture(uA, vec3(P.zy*s, L)), a2 = texture(uA, vec3(P.xz*s, L)), a3 = texture(uA, vec3(P.xy*s, L));
           vec4 b1 = texture(uB, vec3(P.zy*s, L)), b2 = texture(uB, vec3(P.xz*s, L)), b3 = texture(uB, vec3(P.xy*s, L));
           ca = a1*w.x + a2*w.y + a3*w.z; nb.a = b1.a*w.x + b2.a*w.y + b3.a*w.z;
@@ -5702,6 +5710,13 @@ const LEDGE = (() => {
             alb *= mix(0.55, 1.0, smoothstep(0.04, 0.5, c.a));   /* crevice shading from the scan's own height map: cracks and pits darken (no AO map is shipped) */
             float wet = smoothstep(uMHW + 0.2, uMHW - 0.4, h);   /* below high water: darker, glossier (the weed and barnacle line) */
             alb *= mix(1.0, uWet, wet); lRough = mix(nb.a, 0.35, wet); lNW = normalize(nb.xyz);
+            /* the shore's zones, from Matt's 3 Nov photos (_coa_ledge_barnacles_eyebolts): a black band of tar lichen at the top of the tide, torn at its upper edge, and white barnacles
+               below it. Off when uBand = 0. Up close each barnacle is a dot in a 1.7 cm cell; away from it, the same share as a tint */
+            if (uBand > 0.5) { float bn = lvn(P.xz * 0.9 + P.y * 0.4) * 0.6 + lvn(P.xz * 4.1 + P.y * 3.0) * 0.4, dk = smoothstep(uMHW + 0.45 + bn * 0.7, uMHW + 0.2 + bn * 0.7, h) * smoothstep(uMHW - 0.5, uMHW - 0.05, h);
+              alb *= mix(1.0, 0.3, dk);
+              float zb = smoothstep(uMHW - 2.6, uMHW - 1.9, h) * smoothstep(uMHW - 0.1, uMHW - 0.5, h) * smoothstep(0.4, 0.62, lvn(P.xz * 1.3 + P.y * 1.3 + 5.0) * 0.7 + lvn(P.xz * 6.0 + P.y * 6.0) * 0.3);
+              if (zb > 0.01) { vec2 q = (abs(lN.y) > 0.7 ? P.xz : vec2(P.x + P.z, P.y)) / 0.017, ci = floor(q), cf = fract(q) - 0.5 + (vec2(lh(ci + 3.1), lh(ci + 7.7)) - 0.5) * 0.5; float dot0 = step(1.0 - 0.42 * zb, lh(ci)) * smoothstep(0.44, 0.22, length(cf));
+                float fw = clamp(length(fwidth(q)) * 0.9 - 0.15, 0.0, 1.0); alb = mix(alb, vec3(0.871, 0.838, 0.791), mix(dot0, 0.42 * zb * 0.45, fw)); } }   /* barnacle: sRGB (240,236,230), the brightest 3 % of (840,1030)-(1800,1110) in that photo */
             /* the sea's own wetting: under the water now, and damp where the falling tide left it, drying from the top (docks.js DOCKS.wetTop) */
             float sw = smoothstep(uStTide + 0.15, uStTide - 0.02, h), sd = (1.0 - sw) * smoothstep(uStWetTop + 0.1, uStWetTop - 0.35, h + (lvn(P.xz * 1.7) - 0.5) * 0.15);
             alb *= mix(1.0, 0.62, sw) * mix(1.0, 0.8, sd); lRough = mix(lRough, 0.25, max(sw, sd * 0.6));
@@ -5709,7 +5724,7 @@ const LEDGE = (() => {
         .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = roughness * lRough;')
         .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n if (uOn > 0.5) normal = normalize((viewMatrix * vec4(lNW, 0.0)).xyz);');
     };
-    m.customProgramCacheKey = () => 'ledge3';
+    m.customProgramCacheKey = () => 'ledge5';
     return m;
   }
   /* the rock surface of one stroke as a mesh (scene units, origin at the region's corner); step = 1 fine, 4 coarse */
@@ -5745,13 +5760,26 @@ const LEDGE = (() => {
       if (round) { const n = geo.attributes.normal, acc = new Map(); for (let i = 0; i < p.count; i++) { const a = acc.get(ks[i]) || [0, 0, 0]; a[0] += n.getX(i); a[1] += n.getY(i); a[2] += n.getZ(i); acc.set(ks[i], a); }
         for (let i = 0; i < p.count; i++) { const a = acc.get(ks[i]), l = Math.hypot(a[0], a[1], a[2]) || 1; n.setXYZ(i, a[0] / l, a[1] / l, a[2] / l); } }
       return geo; };
-    /* broken slabs: a skewed plan (no right angles) and one end thinner, the way a bed breaks */
-    const taper = (geo, seed) => { const p = geo.attributes.position, R = rng(seed + 5), sk = (R() - 0.5) * 0.5, th = 0.4 + 0.5 * R(), wz = (R() - 0.5) * 0.4;
-      for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); p.setXYZ(i, x + sk * z, y * (1 - (x + 0.5) * (1 - th) * 0.6), z * (1 + wz * x)); } geo.computeVertexNormals(); return geo; };
+    /* a piece of bedded rock as it breaks: a joint-cut plan (no right angles), 1-3 beds stacked with square steps where a bed has
+       come away, flat faces, hard edges (non-indexed). Unit box, base at y = -0.5, open underneath; `over` > 0 widens the top bed, a lip.
+       Triangles wind outward: dock_test's lesson, held by ledge_test. */
+    const jointBlock = (seed, beds, over) => { const R = rng(seed * 13 + 7), P = [], m = 5 + Math.floor(R() * 2);
+      let a0 = R() * 6.28; const plan = []; for (let i = 0; i < m; i++) { const a = a0 + (i + (R() - 0.5) * 0.55) * 6.283 / m, r = 0.38 + R() * 0.14; plan.push([Math.cos(a) * r, Math.sin(a) * r]); }
+      const cut = (pl, ax, ay, d) => { const out = []; for (let i = 0; i < pl.length; i++) { const p = pl[i], q = pl[(i + 1) % pl.length], dp = p[0] * ax + p[1] * ay - d, dq = q[0] * ax + q[1] * ay - d;
+          if (dp <= 0) out.push(p); if ((dp < 0) !== (dq < 0)) { const t = dp / (dp - dq); out.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]); } } return out; };
+      const tri = (a, b, c) => P.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
+      let pl = plan, y = -0.5; const lift = (p, h) => [p[0], h, p[1]];
+      for (let b = 0; b < beds; b++) { const h = y + (b === beds - 1 ? 0.5 - y : (1 / beds) * (0.75 + R() * 0.5)), lean = (R() - 0.5) * 0.12, tx = Math.cos(R() * 6.28) * lean, tz = Math.sin(R() * 6.28) * lean, top = p => [p[0], h + p[0] * tx + p[1] * tz, p[1]];
+        for (let i = 0; i < pl.length; i++) { const p = pl[i], q = pl[(i + 1) % pl.length]; const A = lift(p, y), B = lift(q, y), C = top(q), D = top(p); tri(A, D, B); tri(B, D, C); }
+        /* the tread of this bed, what the next bed leaves showing is under it, so the whole plan is capped: cheap and closed */
+        const T0 = top(pl[0]); for (let i = 1; i < pl.length - 1; i++) tri(T0, top(pl[i + 1]), top(pl[i]));
+        if (b < beds - 1) { const a = R() * 6.28, ax = Math.cos(a), ay = Math.sin(a); const nx = cut(pl, ax, ay, 0.04 + R() * 0.18); if (nx.length >= 3) pl = over ? nx.map(p => [p[0] * (1 + over), p[1] * (1 + over)]) : nx; y = h - 0.002; } }
+      const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(P), 3)); g.computeVertexNormals(); return g; };
+    L._jointBlock = jointBlock;   /* tests */
     for (const kind of ['slab', 'lip', 'boulder', 'sheet']) { SH[kind] = [];
       for (let v = 0; v < 4; v++) { const s = 17 + v * 31 + kind.length * 7;
         if (kind === 'boulder' || kind === 'sheet') SH[kind].push({ hd: chip(new THREE.IcosahedronGeometry(0.5, 2), s, 0.12, true), lo: chip(new THREE.IcosahedronGeometry(0.5, 0), s, 0.06, true) });
-        else SH[kind].push({ hd: taper(chip(new THREE.BoxGeometry(1, 1, 1, 5, 2, 4), s, 0.09, false), s), lo: taper(chip(new THREE.BoxGeometry(1, 1, 1), s, 0.08, false), s) });  if (late()) yield; } }
+        else SH[kind].push({ hd: jointBlock(s, 3, kind === 'lip' ? 0.14 : 0), lo: jointBlock(s, 1, 0) });  if (late()) yield; } }
     return (SHAPES = SH);
   }
   const CUT = { slab: 120, lip: 250, boulder: 250, sheet: 400 };   /* cutoff_m per piece kind (docs/terrain-materials.md, rock kit) */
@@ -5763,7 +5791,7 @@ const LEDGE = (() => {
   const ledgeBrushes = () => { const A = typeof LEVEL !== 'undefined' && LEVEL.authored; return A && A.brushes ? A.brushes.filter(b => b && b.kind === 'ledge' && b.c) : []; };
   const strokesOf = list => { const S = new Map(); for (const b of list) { const k = b.stroke || b.id; if (!S.has(k)) S.set(k, []); S.get(k).push(b); } return S; };
   function build(id, stamps, coarse) { return drainG(buildGen(id, stamps, coarse)); }
-  L._buildGen = (id, stamps, coarse) => buildGen(id, stamps, coarse); L._deadline = t => { DL = t; };   /* tests */
+  L._shapes = () => shapes(); L._buildGen = (id, stamps, coarse) => buildGen(id, stamps, coarse); L._deadline = t => { DL = t; };   /* tests */
   function* buildGen(id, stamps, coarse) {
     const st = stamps[0], ch = st.p && st.p.character != null ? +st.p.character : null, Y0 = (typeof LEVEL !== 'undefined' && LEVEL.Y0) || 0;
     const Fs = (RULES && RULES.formations) || [], R = ch != null ? (Fs.find(f => f.id === L.MIX_IDS[ch < 0.5 ? 0 : 1]) || ruleFor(st)) : ruleFor(st);
@@ -10889,7 +10917,7 @@ function makeMarine(scene, opt) {
      Each sail is a cambered thin wing of low aspect ratio. Its lift and drag come from the angle between the air and its chord (cl, cd below), at the dynamic pressure of the air it actually sees: a sail behind another when running is in that one's wind shadow. Its boom is a pendulum about the mast, driven by the moment of that force, damped, and stopped by its sheet and the shrouds. So nothing here is told which side to go to: a sail goes to leeward because the wind pushes it there, and a gybe slams across because nothing stops it until the sheet comes taut. Head sails do the same about their stays. Coefficients ASSUMED (typical soft-sail values from general references, unmeasured for this rig).
 
    WHAT YOU SEE
-     All of a rig's cloth and spars are one mesh and one draw call. The shader builds each sail from its four corners (uniforms, moved here) and bellies it to leeward, with its most depth forward of the middle; a sail near zero angle of attack loses its shape and shakes, the leech most. Furling lowers the gaff until it lies on the boom, and the cloth gathers into a fat bunt between them, tied down with gaskets; a head sail comes down its stay and bunches at the tack, its foot a twisted rope along the stay. The running rig is in the same mesh and follows the spars: peak and throat halyards, topping lifts, sheets and their tackles, with their blocks (rig.lines), and the flags at the trucks, which go up with the sails and fly down the apparent wind (rig.flags). Cost: 1 draw, 6.9k triangles near (0.44 MB of attributes), 0.3k far; about 40 uniform writes a frame, 0.007 ms a step in Node (F readout not yet taken: not in the game until World and Boats wire it). */
+     All of a rig's cloth and spars are one mesh and one draw call. The shader builds each sail from its four corners (uniforms, moved here) and bellies it to leeward, with its most depth forward of the middle; a sail near zero angle of attack loses its shape and shakes, the leech most. Furling lowers the gaff until it lies on the boom, and the cloth gathers into a rough heap between them, to one side, tied down with gaskets, with pouches hanging between the ties; a head sail comes down its stay and is lashed in a long bundle on its boom or, the jib, on the bowsprit (its `furl` ends). Cloth lets light through: with the sun behind it a sail glows at about a quarter of its sunlit brightness. The running rig is in the same mesh and follows the spars: peak and throat halyards, topping lifts, sheets and their tackles, with their blocks (rig.lines), and the flags at the trucks, which go up with the sails and fly down the apparent wind (rig.flags). Cost: 1 draw, 9.4k triangles near (0.56 MB of attributes), 0.3k far; about 40 uniform writes a frame, 0.007 ms a step in Node (F readout not yet taken: not in the game until World and Boats wire it). */
 const SAILS = (() => {
   const S = { on: true };
   const RHO = 1.225, D2R = Math.PI / 180;
@@ -10948,10 +10976,10 @@ const SAILS = (() => {
   S.create = function (entry, o) {
     o = o || {}; const rd = entry.rig, units = o.units || 1, sails = rd.sails.map(setup), N = sails.length, near = (o.detail || 'near') === 'near';
     /* ---- the mesh: each sail a grid, each spar a tube, all drawn from the corner uniforms ---- */
-    const nu = near ? 24 : 4, nv = near ? 16 : 5, P = [], Idx = [], Au = [], Ak = [], An = [], Uv = [], Col = [], I = [], Aa = [], Ab = [];
-    const cellW = 1 / 3, cellH = 1 / 2;
+    const nu = near ? 32 : 4, nv = near ? 18 : 5, P = [], Idx = [], Au = [], Ak = [], An = [], Uv = [], Col = [], I = [], Aa = [], Ab = [];
+    const AT = rd.atlas || [3, 2], cellW = 1 / AT[0], cellH = 1 / AT[1];   /* the cloth atlas: three cells by two unless the rig says otherwise (Mary Day has seven sails) */
     sails.forEach((s, k) => {
-      const b = Idx.length, cu = (k % 3) * cellW, row = Math.floor(k / 3);   /* glTF's v runs down the image */
+      const b = Idx.length, cu = (k % AT[0]) * cellW, row = Math.floor(k / AT[0]);   /* glTF's v runs down the image */
       for (let j = 0; j <= nv; j++) for (let i = 0; i <= nu; i++) { const u = i / nu, v = j / nv; P.push(0, 0, 0); Idx.push(k); Au.push(u, v); Ak.push(0, 0, 0); An.push(0, 0); Uv.push(cu + u * cellW * 0.985 + 0.002, (row + 1 - v * 0.985 - 0.005) * cellH); Col.push(1, 1, 1); Aa.push(0, 0, 0); Ab.push(0, 0, 0); }
       for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) { const a = b + j * (nu + 1) + i, c = a + 1, d = a + nu + 1, e = d + 1; I.push(a, c, e, a, e, d); }
     });
@@ -10964,15 +10992,19 @@ const SAILS = (() => {
       stops.forEach(([t, col]) => { const r = r0 + (r1 - r0) * t; for (let i = 0; i < seg; i++) { const a = i / seg * Math.PI * 2, cx = Math.cos(a), cy = Math.sin(a); pushV(k, s0 + (s1 - s0) * t, 0, kind, cx * r, cy * r, cx, cy, col, O3, O3); } });
       for (let j = 0; j < n - 1; j++) for (let i = 0; i < seg; i++) { const a = b + j * seg + i, c = b + j * seg + (i + 1) % seg, d = a + seg, e = c + seg; I.push(a, c, e, a, e, d); } };
     const banded = (m0, m1, L) => { const a = Math.min(0.45, m0 / L), z = Math.max(0.55, 1 - m1 / L); return near ? [[0, endC], [a, endC], [a, spC], [z, spC], [z, endC], [1, endC]] : [[0, spC], [1, spC]]; };
+    /* a spar's outer end, near only: a flat disc in the end colour, with rd.end_star a five-point star on it (Lewis R. French: red on white). Normal is the spar's up: it has no axis to point along here */
+    const StarC = rd.end_star ? lin(rd.end_star) : null;
+    const cap = (k, kind, s1, r, L) => { const b = Idx.length, seg = 12; pushV(k, s1, 0, kind, 0, 0, 0, 1, endC, O3, O3); for (let i = 0; i < seg; i++) { const a = i / seg * Math.PI * 2; pushV(k, s1, 0, kind, Math.cos(a) * r, Math.sin(a) * r, 0, 1, endC, O3, O3); I.push(b, b + 1 + i, b + 1 + (i + 1) % seg); }
+      if (!StarC) return; const c = Idx.length, sf = s1 + 0.004 / L; pushV(k, sf, 0, kind, 0, 0, 0, 1, StarC, O3, O3); for (let i = 0; i < 10; i++) { const a = Math.PI / 2 + i * Math.PI / 5, q = (i % 2 ? 0.28 : 0.72) * r; pushV(k, sf, 0, kind, Math.cos(a) * q, Math.sin(a) * q, 0, 1, StarC, O3, O3); I.push(c, c + 1 + i, c + 1 + (i + 1) % 10); } };
     sails.forEach((s, k) => {
-      if (s.gaff) { const bs = (rd.boom_len_m && rd.boom_len_m[s.id] ? rd.boom_len_m[s.id] / s.chord : 1.06), bL = bs * s.chord; tube(k, 1, 0.13, 0.085, -0.02, bs, banded(1.3, 1.2, bL)); tube(k, 2, 0.1, 0.06, -0.03, 1.05, banded(1.4, 0.7, s.gaffLen)); }
+      if (s.gaff) { const bs = (rd.boom_len_m && rd.boom_len_m[s.id] ? rd.boom_len_m[s.id] / s.chord : 1.06), bL = bs * s.chord; const R = rd.spar_r || [0.13, 0.085, 0.1, 0.06]; tube(k, 1, R[0], R[1], -0.02, bs, banded(1.3, 1.2, bL)); tube(k, 2, R[2], R[3], -0.03, 1.05, banded(1.4, 0.7, s.gaffLen)); if (near) { cap(k, 1, bs, R[1], bL); cap(k, 2, 1.05, R[3], s.gaffLen); } }
       else if (s.sd.boom) tube(k, 1, 0.09, 0.06, 0, 1.03, [[0, spC], [1, spC]]); });
     /* the running rig, near only: kind 3, a line from a fixed point (aA) to a spar (aN: 1 boom, 2 gaff, at t) */
     const line = (k, a, on, t, r, col, s0, s1, seg, blk) => { const b = Idx.length; for (const u of [s0, s1]) for (let i = 0; i < seg; i++) { const ang = i / seg * Math.PI * 2; pushV(k, u, 0, 3, Math.cos(ang) * r, Math.sin(ang) * r, on, t, col, a, blk || O3); }
       for (let i = 0; i < seg; i++) { const c = (i + 1) % seg, d = b + i, e = b + c, f = d + seg, h = e + seg; I.push(d, e, h, d, h, f); } };
     if (near) for (const l of rd.lines || []) { const on = l.on === 'gaff' ? 2 : 1, col = lc(l.c); line(l.s, l.a, on, l.t, l.r, col, 0, 1, 3); for (const f of l.blocks || []) line(l.s, l.a, on, l.t, 0.055, lc('block'), 0, 1, 5, [f, 0, 0.11]); }
     /* gaskets, kind 4: a band round the bunt at each place it's pinched, sunk inside the boom when the sail is set */
-    const GASK = 5; if (near) sails.forEach((s, k) => { if (!s.gaff) return; const col = lc('gasket'); for (let g = 1; g <= GASK; g++) { const b = Idx.length, u0 = g / (GASK + 1), du = 0.022 / (s.chord || 5), slant = 0.28 / (s.chord || 5), seg = 10;
+    const GASK = 7; if (near) sails.forEach((s, k) => { if (!s.gaff) return; const col = lc('gasket'); for (let g = 1; g <= GASK; g++) { const b = Idx.length, u0 = g / (GASK + 1), du = 0.024 / (s.chord || 5), slant = 0.28 / (s.chord || 5), seg = 10;
       for (const u of [u0 - du, u0 + du]) for (let i = 0; i <= seg; i++) pushV(k, u + slant * (i / seg - 0.5), i / seg, 4, 0, 0, 0, 0, col, O3, O3);
       for (let i = 0; i < seg; i++) { const a = b + i, c = a + 1, d = a + seg + 1, e = d + 1; I.push(a, c, e, a, e, d); } } });
     /* the flags and their staffs, near only. kind 5: a grid flown from the hoist (aA to aB); aS the sail it goes up with; aN its id and fly */
@@ -10993,23 +11025,40 @@ const SAILS = (() => {
       float gFold;
       /* furled: u along the boom, v once round the bunt. p.w: its radius; + a gaff sail, sitting on its boom, - a head sail, bunched at the tack with its foot a rope */
       vec3 buntPos(vec2 q, vec3 tk, vec3 cl, vec4 p, float infl) {
-        float u = q.x, a = q.y * 6.28318, R = abs(p.w), pr;
+        float u = q.x, a = q.y * 6.28318, R = abs(p.w) * 1.2, pr;
         vec3 dir = cl - tk, ax = normalize(dir), sd = normalize(cross(ax, vec3(0.0, 1.0, 0.0))), up = cross(sd, ax), c = tk + dir * (0.01 + 0.97 * u);
-        float pinch = 0.0;
-        if (p.w > 0.0) { pr = max(0.05, smoothstep(0.0, 0.03, u) * (1.0 - smoothstep(0.95, 1.0, u)) * (0.9 + 0.14 * smoothstep(0.65, 0.88, u))); c.y += 0.14 + R * 0.62 - 0.45 * R * smoothstep(0.76, 0.95, u); c += sd * R * 0.22 * sin(u * 5.0 + aS * 2.3); pinch = pow(abs(cos(u * 3.14159 * ${GASK + 1}.0)), 10.0); }
-        else { float b = 1.0 - smoothstep(0.05, 0.22, u); pr = max(0.05, mix(0.52, 1.0, b) * smoothstep(0.0, 0.03, u) * (1.0 - 0.85 * smoothstep(0.96, 1.0, u))); c.y += 0.1 + b * R * 1.3; }
+        float pinch = 0.0, spill = 0.0, up1 = sin(a);
+        if (p.w > 0.0) {
+          /* cloth dropped in a heap on the boom and tied: it sits to one side, pouches hang over the boom between the ties, and it is fattest and most bunched at the two ends (Lynch photo, in sun; Rockefeller and pier photos, overcast) */
+          float sideS = sin(aS * 3.7 + 0.6) > 0.0 ? 1.0 : -1.0;
+          pr = max(0.05, smoothstep(0.0, 0.03, u) * (1.0 - smoothstep(0.955, 1.0, u)) * (0.86 + 0.34 * smoothstep(0.7, 0.9, u) + 0.24 * (1.0 - smoothstep(0.03, 0.2, u))));
+          c.y += 0.14 + R * 0.62 - 0.4 * R * smoothstep(0.78, 0.96, u);
+          c += sd * sideS * R * (0.16 + 0.2 * sin(u * 5.0 + aS * 2.3));
+          pinch = pow(abs(cos(u * 3.14159 * ${GASK + 1}.0)), 10.0);
+          spill = smoothstep(0.55, 1.0, sin(u * 10.0 + aS * 5.3)) + 0.8 * smoothstep(0.7, 1.0, sin(u * 23.0 + aS * 1.9));
+        }
+        else {
+          /* a head sail: a long rough bundle lashed on its spar, fattest toward the middle */
+          pr = max(0.05, smoothstep(0.0, 0.05, u) * (1.0 - smoothstep(0.93, 1.0, u)) * (0.72 + 0.42 * sin(u * 3.14159) + 0.1 * sin(u * 11.0 + aS)));
+          c.y += R * 0.7 + 0.05;
+          pinch = pow(abs(cos(u * 3.14159 * 6.0)), 12.0);
+          spill = smoothstep(0.6, 1.0, sin(u * 13.0 + aS * 4.1));
+        }
         #ifdef SAIL_NEAR
-          /* long creases along the boom, a slow swell and the odd lump: cloth stuffed down by hand and tied. A head sail is twisted, like rope */
-          float f1 = sin(a * 3.0 + u * 5.0 + aS * 2.1), f2 = sin(a * 5.0 - u * 9.0 + aS), f3 = sin(u * 7.0 + aS * 3.0) * 0.8 + sin(u * 19.0 + a + aS) * 0.4;
-          if (p.w < 0.0) { f1 = sin(a * 2.0 + u * 58.0); f3 = 0.0; }
-          gFold = 0.5 * f1 + 0.3 * f2 - pinch;
-          pr *= (1.0 + 0.12 * (0.5 * f1 + 0.3 * f2 + 0.6 * f3)) * (1.0 - 0.07 * pinch);
+          /* folds: ridged rather than rippled (a fold is a crease, not a sine), running mostly along the boom and wandering, with the odd lump across them */
+          float wob = a * 3.0 + u * 3.0 + aS * 2.1 + 1.1 * sin(u * 4.0 + aS);
+          float f1 = 1.0 - 2.0 * abs(sin(wob)), f2 = 1.0 - 2.0 * abs(sin(a * 5.0 - u * 4.0 + aS + 0.6 * sin(u * 7.0 + aS * 3.0))), f3 = sin(u * 5.0 + aS * 3.0) * 0.8 + sin(u * 13.0 + a + aS) * 0.25;
+          gFold = 0.6 * f1 + 0.35 * f2 - 0.9 * pinch;
+          pr *= (1.0 + 0.13 * (0.55 * f1 + 0.3 * f2 + 0.6 * f3)) * (1.0 - 0.2 * pinch);
         #else
           gFold = 0.0;
         #endif
-        float wide = 0.84, tall = 1.0;
-        if (p.w < 0.0) { float b = 1.0 - smoothstep(0.03, 0.2, u); wide = mix(0.8, 0.42, b); tall = mix(0.8, 1.8, b); c.y += 0.5 * b * R * sin(u * 40.0 + a); }
-        return c + (sd * cos(a) * wide + up * sin(a) * tall) * R * pr * infl;
+        float wide = p.w > 0.0 ? 0.84 : 0.72, tall = p.w > 0.0 ? 1.0 : 0.82;
+        #ifdef SAIL_NEAR
+          /* a pouch: only the underside hangs, and only clear of the ties */
+          if (up1 < 0.0) tall *= 1.0 + 0.42 * spill * (1.0 - pinch);
+        #endif
+        return c + (sd * cos(a) * wide + up * up1 * tall) * R * pr * infl;
       }
       vec3 sailPos(vec2 q, vec3 tk, vec3 th, vec3 pk, vec3 cl, vec4 p, vec3 nrm) {
         float u = q.x, v = q.y;
@@ -11041,8 +11090,10 @@ const SAILS = (() => {
         vec3 nrm = normalize(cross(cCl - cTk, cTh - cTk));
         float e = 0.02; vec2 q = aU;
         sailPosV = sailPos(q, cTk, cTh, cPk, cCl, pS, nrm); vF = smoothstep(0.5, 1.0, pS.z); vFold = gFold;
-        vec3 pu = sailPos(q + vec2(q.x > 0.5 ? -e : e, 0.0), cTk, cTh, cPk, cCl, pS, nrm) - sailPosV, pv = sailPos(q + vec2(0.0, q.y > 0.5 ? -e : e), cTk, cTh, cPk, cCl, pS, nrm) - sailPosV;
-        objectNormal = normalize(cross(pu, pv)) * (q.x > 0.5 ? -1.0 : 1.0) * (q.y > 0.5 ? -1.0 : 1.0);
+        /* at a head sail's head the whole top row is one point and has no width to take a normal from (it came out black): take it from just below */
+        vec2 qn = vec2(q.x, min(q.y, 0.97)); vec3 p0 = q.y > 0.97 ? sailPos(qn, cTk, cTh, cPk, cCl, pS, nrm) : sailPosV;
+        vec3 pu = sailPos(qn + vec2(q.x > 0.5 ? -e : e, 0.0), cTk, cTh, cPk, cCl, pS, nrm) - p0, pv = sailPos(qn + vec2(0.0, qn.y > 0.5 ? -e : e), cTk, cTh, cPk, cCl, pS, nrm) - p0;
+        objectNormal = normalize(cross(pu, pv)) * (q.x > 0.5 ? -1.0 : 1.0) * (qn.y > 0.5 ? -1.0 : 1.0);
       } else if (aK.x < 2.5) {
         vec3 A = aK.x < 1.5 ? cTk + vec3(0.0, 0.14, 0.0) : cTh, B = aK.x < 1.5 ? cCl + vec3(0.0, 0.14, 0.0) : cPk;
         vec3 dr = normalize(B - A), sd = normalize(cross(dr, vec3(0.0, 1.0, 0.013))), up = cross(sd, dr);
@@ -11056,7 +11107,7 @@ const SAILS = (() => {
         sailPosV = (aN.x > 0.5 && aB.z > 0.0 ? mix(aA, B, aB.x) + normalize(B - aA) * aB.z * (aU.x * 2.0 - 1.0) : mix(aA, B, aU.x)) + sd * aK.y + up * aK.z;
         objectNormal = normalize(sd * aK.y + up * aK.z);
       } else if (aK.x < 4.5) {
-        vec3 foot = mix(cTk, cCl, aU.x) + vec3(0.0, 0.14, 0.0), o = buntPos(aU, cTk, cCl, pS, 1.07), n = buntPos(aU, cTk, cCl, pS, 0.9);
+        vec3 foot = mix(cTk, cCl, aU.x) + vec3(0.0, 0.14, 0.0), o = buntPos(aU, cTk, cCl, pS, 1.09), n = buntPos(aU, cTk, cCl, pS, 0.9);
         sailPosV = mix(foot, o, step(0.985, pS.z)); objectNormal = normalize(o - n);
       } else {
         float e = 0.02, s = smoothstep(0.0, 0.3, 1.0 - pS.z); vec2 q = aU;
@@ -11074,28 +11125,40 @@ const SAILS = (() => {
     const FRAG_HEAD = `
       varying float vKind; varying vec2 vQ; varying float vFlag; varying float vF; varying float vFold; uniform vec3 uBunt;
       vec3 flagColour(vec2 q, float id) {
-        vec3 navy = vec3(0.022, 0.03, 0.15), red = vec3(0.44, 0.03, 0.05), wht = vec3(0.8), yel = vec3(0.68, 0.5, 0.05), grn = vec3(0.03, 0.16, 0.05);
-        if (id < 0.5) { float e = length((q - vec2(0.42, 0.5)) * vec2(1.5, 1.0)); return mix(wht * vec3(0.9, 0.85, 0.7), navy, smoothstep(0.17, 0.2, e)); }
-        if (id < 1.5) return q.y > 0.62 ? navy : (q.y > 0.38 ? wht : red);
-        if (id < 2.5) return (q.x > 0.2 && q.x < 0.34) ? grn : yel;
+        vec3 navy = vec3(0.022, 0.03, 0.15), blue = vec3(0.025, 0.06, 0.2), red = vec3(0.44, 0.03, 0.05), wht = vec3(0.8), gold = vec3(0.62, 0.42, 0.08), grn = vec3(0.06, 0.2, 0.05);
+        /* fore: the Maine state flag, the arms in the middle */
+        if (id < 0.5) { vec2 d = (q - vec2(0.46, 0.5)) * vec2(1.6, 1.0); float e = length(d); vec3 c = navy; if (e < 0.2) c = abs(d.x) < 0.075 ? vec3(0.12, 0.26, 0.42) : gold; if (e < 0.24 && d.y < -0.14) c = vec3(0.3, 0.42, 0.55); return c; }
+        /* main: a blue ensign, its canton white with a red cross, a constellation of white stars toward the fly */
+        if (id < 1.5) {
+          if (q.x < 0.42 && q.y > 0.52) { vec2 g = vec2(q.x / 0.42, (q.y - 0.52) / 0.48); return (abs(g.x - 0.5) < 0.09 || abs(g.y - 0.5) < 0.12) ? red : wht; }
+          vec2 st; float d = 9.0; st = (q - vec2(0.62, 0.74)) * vec2(1.5, 1.0); d = min(d, dot(st, st)); st = (q - vec2(0.76, 0.46)) * vec2(1.5, 1.0); d = min(d, dot(st, st)); st = (q - vec2(0.6, 0.28)) * vec2(1.5, 1.0); d = min(d, dot(st, st)); st = (q - vec2(0.84, 0.2)) * vec2(1.5, 1.0); d = min(d, dot(st, st)); st = (q - vec2(0.88, 0.7)) * vec2(1.5, 1.0); d = min(d, dot(st, st));
+          return d < 0.0028 ? wht : blue;
+        }
+        /* mizzen: her own long green pennant, gold-edged, her name down it. Cut to a taper by the caller */
+        if (id < 2.5) { float e = abs(q.y - 0.5) / (0.5 - 0.3 * q.x); if (e > 0.82) return gold; float tx = q.x * 34.0; float lt = step(0.36, fract(tx)) * step(0.14, q.x) * step(q.x, 0.86) * step(e, 0.42) * step(0.3, fract(tx * 0.31 + 0.2 + q.y * 3.0)); return mix(grn, wht * 0.9, lt); }
         if (q.x < 0.4 && q.y > 0.46) { vec2 g = fract(q * vec2(16.0, 18.0)) - 0.5; return dot(g, g) < 0.05 ? wht : navy; }
         return mod(floor(q.y * 13.0), 2.0) < 0.5 ? red : wht;
       }`;
     const FRAG_MAP = `
       #ifdef USE_MAP
         vec4 texelColor = texture2D(map, vUv); texelColor = mapTexelToLinear(texelColor);
-        if (vKind > 4.5) diffuseColor.rgb = flagColour(vQ, vFlag);
+        if (vKind > 4.5) { if (vFlag > 1.5 && vFlag < 2.5 && abs(vQ.y - 0.5) > 0.5 - 0.3 * vQ.x) discard; diffuseColor.rgb = flagColour(vQ, vFlag); }
         else if (vKind > 0.5) diffuseColor *= texelColor;
         else {
           diffuseColor *= texelColor;
-          if (vF > 0.0) { float l = dot(texelColor.rgb, vec3(0.3, 0.6, 0.1)) / 0.092; diffuseColor.rgb = mix(diffuseColor.rgb, uBunt * min(l, 1.4) * (0.62 + 0.38 * smoothstep(-0.8, 0.5, vFold)) * (0.8 + 0.2 * smoothstep(-0.5, 0.5, sin(vQ.y * 62.8 + 1.6 * sin(vQ.x * 11.0) + 0.7 * sin(vQ.x * 37.0 + vQ.y * 25.0)))), vF); }
+          if (vF > 0.0) { float l = dot(texelColor.rgb, vec3(0.3, 0.6, 0.1)) / 0.118; diffuseColor.rgb = mix(diffuseColor.rgb, uBunt * min(l, 1.4) * (0.62 + 0.55 * smoothstep(-1.0, 0.6, vFold)) * (0.8 + 0.2 * smoothstep(-0.5, 0.5, sin(vQ.y * 62.8 + 1.6 * sin(vQ.x * 11.0) + 0.7 * sin(vQ.x * 37.0 + vQ.y * 25.0)))), vF); }
         }
       #endif`;
-        const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.82, metalness: 0, side: THREE.DoubleSide, vertexColors: true, map: o.tex || null });
+    /* cloth lets light through: a sail with the sun behind it glows, and doesn't go dark as painted plate would. The broadside shows this cloth at about a quarter of its sunlit brightness (96,35,56 against 181,52,54, both sRGB) with the sun behind it */
+    const LIT_THROUGH = `
+      #if NUM_DIR_LIGHTS > 0
+        if ((vKind < 0.5 && vF < 0.5) || vKind > 4.5) reflectedLight.directDiffuse += diffuseColor.rgb * directionalLights[0].color * max(-dot(normal, directionalLights[0].direction), 0.0) * 0.55;
+      #endif`;
+    const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.82, metalness: 0, side: THREE.DoubleSide, vertexColors: true, map: o.tex || null });
     if (near) mat.defines = Object.assign(mat.defines || {}, { SAIL_NEAR: 1 });
     mat.onBeforeCompile = sh => { Object.assign(sh.uniforms, uni);
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + VERT_HEAD).replace('#include <beginnormal_vertex>', VERT_NORMAL).replace('#include <begin_vertex>', 'vec3 transformed = sailPosV;');
-      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + FRAG_HEAD).replace('#include <map_fragment>', FRAG_MAP); };
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + FRAG_HEAD).replace('#include <map_fragment>', FRAG_MAP).replace('#include <lights_fragment_end>', LIT_THROUGH + '\n#include <lights_fragment_end>'); };
     mat.customProgramCacheKey = () => 'sails' + N + (near ? 'n' : 'f');
     if (typeof MODELS !== 'undefined' && MODELS.patch) MODELS.patch(mat);
     const depth = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, side: THREE.DoubleSide });
@@ -11107,6 +11170,7 @@ const SAILS = (() => {
     const r = { group, mesh, sails, oz: o.fit ? o.fit.off.z : 0, up: 0, sheet: null, force: { fx: 0, fz: 0, heel: 0, yaw: 0 }, area: sails.reduce((a, s) => a + s.area, 0), uni };
     /* a published sail area may differ from the area the corners enclose: forces read this */
     const k = rd.area_total_m2 ? rd.area_total_m2 / r.area : 1; sails.forEach(s => { s.area *= k; });
+    if (rd.bunt_k) sails.forEach(s => { s.bR *= rd.bunt_k; });   /* how fat a furl is, where the rule of thumb overdoes it: a lighter cloth than tanbark */
     let T = 0;
     function corners() {
       const C = uni.uC.value, Q = uni.uP.value;
@@ -11117,12 +11181,12 @@ const SAILS = (() => {
           const twist = sw * (1.22 - 0.2 * f), bare = Math.sign(sw || 1) * Math.min(Math.abs(twist), 75 * D2R);
           cl_ = turn(s.clew, s.pivot, s.axis, sw); const th0 = s.throat, pk0 = turn(s.peak, s.pivot, s.axis, bare);
           /* furled: the gaff lies down along the boom */
-          const h = 0.23 + s.bR * 1.78, lowT = add3(tk, [0, h, -0.02]), dS = unit(sub(pk0, th0)), dL = unit(sub(cl_, tk));
+          const h = 0.23 + s.bR * 2.1, lowT = add3(tk, [0, h, -0.02]), dS = unit(sub(pk0, th0)), dL = unit(sub(cl_, tk));
           th = mix(th0, lowT, f); pk = add3(th, mul(unit(mix(dS, dL, f)), s.gaffLen));
         } else {
           cl_ = turn(s.clew, s.pivot, s.axis, sw); const hd = s.sd.head;
           if (s.sd.boom) { const low = add3(mix(s.tack, cl_, 0.5), [0, 0.5, 0]); th = pk = mix(hd, low, f); }
-          else { const cz = add3(tk, [0, 0.42, -1.1]); th = pk = mix(hd, cz, f); cl_ = mix(cl_, add3(tk, [0, -0.22, -3.7]), f); }
+          else { const F = s.sd.furl, a0 = F ? F[0] : tk, b0 = F ? F[1] : add3(tk, [0, -0.22, -3.7]); tk = mix(s.tack, a0, f); th = pk = mix(hd, add3(tk, [0, 0.42, -1.1]), f); cl_ = mix(cl_, b0, f); }
         }
         const a = i * 12; for (const [n, v] of [[0, tk], [3, th], [6, pk], [9, cl_]]) { C[a + n] = v[0]; C[a + n + 1] = v[1]; C[a + n + 2] = v[2]; }
         /* which way the belly goes: the mesh normal is foot x luff; sign so that + is to port when she's on the wrong side */
@@ -11144,6 +11208,8 @@ const SAILS = (() => {
         const wantRet = s.furl > 0.5 ? -s.ang * 40 * s.I : s.I * 0.02 * Math.sin(T * 1.7 + i);   /* furled: lashed amidships. Set: no wind is ever exactly along her, so nothing balances for long */
         s.vel += (tau + wantRet - s.vel * s.I * 1.6) / s.I * dt; s.ang += s.vel * dt;
         if (s.ang > lim) { s.ang = lim; if (s.vel > 0) s.vel *= -0.08; } if (s.ang < -lim) { s.ang = -lim; if (s.vel < 0) s.vel *= -0.08; }
+        /* a topsail has no sheet of its own: its clew is held at the gaff's peak, and goes where the gaff goes */
+        if (s.sd.follows != null) { const g = sails[s.sd.follows]; s.ang = Math.sign(g.ang || 1) * Math.min(Math.abs(g.ang * 1.22), 75 * D2R); s.vel = 0; }
         /* shape: full in steady pressure, slack when the flow runs along the chord or in no wind */
         const V = Math.hypot(ax, az), press = Math.min(1, V / 3.0), a = s.alpha, want = (a > 7 * D2R && a < 175 * D2R ? 1 : 0) * press;
         s.luff += (1 - Math.min(1, a / (10 * D2R)) * 0.98 - s.luff) * Math.min(1, dt * 3); s.luff = Math.max(0, s.luff) * (V > 0.5 ? 1 : 0.15);
@@ -19422,6 +19488,7 @@ if (typeof module !== 'undefined') module.exports = { makePhysics, TUNE_DEFAULTS
      SOFTBODY.rake                       a boat with cut_N in her entry, pressed on rock and sliding, is opened along the way (S10). Off: blows only.
      SOFTBODY.rakeEnter                  a rock comes into her from her skin, and only by her sliding onto it or at 1.5 m/s; off: each key sets it down at full depth, cutting all in it at once (S10, nineteenth slice).
      SOFTBODY.rakeRocks                  how many places a rake can be on her at once, each its own rock (2: both keels of a catamaran. 1: the hardest only). Each is another solid in the worker's contact loop; nothing on the main thread.
+     SOFTBODY.tracks                     rubbed metal shows the tracks of what she slid on, and paint rubbed but not cut through goes matt (S10, twenty-third slice). Off: a stain with a chipped edge. A few noise reads on rubbed pixels only.
      SOFTBODY.jag                        a torn metal edge goes in sharp tongues instead of along the plate's triangles (S10, twentieth slice). Off: as cut. A draw per torn shard into the paint texture when it tears, and a few noise reads on pixels within 30 cm of a tear.
      SOFTBODY.lips                       a rake peels two long lips along its path (S10, fifteenth slice). Off: each plate it opens hangs alone. No frame cost of its own.
      SOFTBODY.shove                      a rake bends what it tears: a frame or stringer it cuts is swept the way the rock went and in, not left standing (S10, seventeenth slice). No frame cost of its own.
@@ -19694,7 +19761,7 @@ function sbCore() {
       for (let k = 0; k < solids.length; k++) { if (sharpOnly && !solids[k].sharp) continue; const d = probe(solids[k], px, py, pz); if (d > best) { best = d; n3[0] = Q[0] * nrm[0] + Q[3] * nrm[1] + Q[6] * nrm[2]; n3[1] = Q[1] * nrm[0] + Q[4] * nrm[1] + Q[7] * nrm[2]; n3[2] = Q[2] * nrm[0] + Q[5] * nrm[1] + Q[8] * nrm[2]; } } return best; }
 
     /* ---- energy bookkeeping ---- */
-    const E = { plastic: 0, hinge: 0, damping: 0, friction: 0, fracture: 0, impulse: 0, unload: 0, drag: 0, hydro: 0, settled: 0, selfWork: 0, clamped: 0, cut: 0 };
+    const E = { plastic: 0, hinge: 0, damping: 0, friction: 0, fracture: 0, impulse: 0, unload: 0, drag: 0, hydro: 0, settled: 0, selfWork: 0, clamped: 0, cut: 0, bed: 0 };
     let K0 = null;
     let lastRms = 0, steps = 0, simT = 0, wall = 0, quiet = 0, nActive = 0, asleep = true, peakActive = 0, sleeps = 0, ePrev = 0, worstStep = 0;
     const tmp = [0, 0, 0];
@@ -19781,9 +19848,20 @@ function sbCore() {
     }
 
     const depMax = 20 * dt;   /* 20 m/s, above any impact speed here */
-    const cSlide = new Float32Array(NN), cImp = new Float32Array(NN), cDir = new Float32Array(3 * NN);
-    function contacts() { const out = []; for (let i = 0; i < NN; i++) if (cImp[i] > 0) out.push({ node: i, slide: cSlide[i], impulse: cImp[i], dir: [cDir[3 * i], cDir[3 * i + 1], cDir[3 * i + 2]] }); return out; }
+    const cSlide = new Float32Array(NN), cImp = new Float32Array(NN), cDir = new Float32Array(3 * NN), cPaint = new Float32Array(NN);
+    function contacts() { const out = []; for (let i = 0; i < NN; i++) if (cImp[i] > 0) out.push({ node: i, slide: cSlide[i], impulse: cImp[i], dir: [cDir[3 * i], cDir[3 * i + 1], cDir[3 * i + 2]], paint: cPaint[i] || 1 }); return out; }
+    /* A bed that gives way (S10, twenty-second slice; so.q, Pa). Rock holds her wherever she touches it, whatever that asks of it. Mud, sand and gravel can't: they fail in bearing at a pressure of their own and she ploughs on, so what reaches her plate is that pressure and no more, and whether she dents is then her plate's to decide. Only her shell meets it (bedNode): it lies on her skin over the area that node stands for (Abed, the square of its shell members' mean length), through the solid's entry face (planes[0]: as she goes in, the nearest face of a block stops being the one she came through). Nothing is put back out of it. The work goes to E.bed. */
+    const bedNode = new Uint8Array(NN), Abed = new Float64Array(NN); { const sum = new Float64Array(NN), cnt = new Uint16Array(NN), SH = /^hull/, DK = /:dk$/; for (let i = 0; i < NN; i++) { const g = S.nodes[i].group || ''; bedNode[i] = SH.test(g) && !DK.test(g) ? 1 : 0; }
+      for (let j = 0; j < NB; j++) { const K = S.beams[j].kind, a = ba[j], b = bb[j]; if ((K !== 'frame' && K !== 'long' && K !== 'plate') || !bedNode[a] || !bedNode[b]) continue; sum[a] += L0[j]; cnt[a]++; sum[b] += L0[j]; cnt[b]++; }
+      for (let i = 0; i < NN; i++) { const l = cnt[i] ? sum[i] / cnt[i] : 0; Abed[i] = l * l; if (!cnt[i]) bedNode[i] = 0; } }
+    function contactBed(i, so) {
+      if (!bedNode[i]) return 0; const dep = probe(so, x[3 * i], x[3 * i + 1], x[3 * i + 2]); if (dep <= 0) return 0;
+      const n = so.planes[0].n, vn = v[3 * i] * n[0] + v[3 * i + 1] * n[1] + v[3 * i + 2] * n[2]; if (vn >= 0) return dep;
+      const mi = m[i], jn = Math.min(mi * -vn, so.q * Abed[i] * opt.dt), tx = v[3 * i] - vn * n[0], ty = v[3 * i + 1] - vn * n[1], tz = v[3 * i + 2] - vn * n[2], vt = Math.sqrt(tx * tx + ty * ty + tz * tz), keep = vt > 1e-9 ? Math.max(0, 1 - opt.mu * jn / (mi * vt)) : 0, vn2 = vn + jn / mi;
+      E.bed += 0.5 * mi * (vn * vn - vn2 * vn2); E.friction += 0.5 * mi * vt * vt * (1 - keep * keep); E.impulse += jn; cSlide[i] += vt * opt.dt; cImp[i] += jn; if (so.paint) cPaint[i] = so.paint; if (vt > 1e-6) { cDir[3 * i] += tx * opt.dt; cDir[3 * i + 1] += ty * opt.dt; cDir[3 * i + 2] += tz * opt.dt; }
+      v[3 * i] = tx * keep + vn2 * n[0]; v[3 * i + 1] = ty * keep + vn2 * n[1]; v[3 * i + 2] = tz * keep + vn2 * n[2]; return dep; }
     function contactNode(i, so) {
+      if (so.q) return contactBed(i, so);
       const dep = probe(so, x[3 * i], x[3 * i + 1], x[3 * i + 2]); if (dep <= 0) return 0;
       /* out of the solid at no more than depMax a step: a node that a sharp rock has got deep inside (it came in between nodes) would otherwise jump to the nearest face in one step, and the beams would be handed energy that came from nowhere (S6: the ledger went 3.5 MJ negative on the teeth) */
       const dp = dep < depMax ? dep : depMax; x[3 * i] += nrm[0] * dp; x[3 * i + 1] += nrm[1] * dp; x[3 * i + 2] += nrm[2] * dp;
@@ -20069,13 +20147,13 @@ function sbCore() {
       for (let s = 0; s < solids.length; s++) {
         const so = solids[s];
         if (so.sharp && opt.cut) for (let q = 0; q < nAct; q++) contactSharp(actN[q], so); else for (let q = 0; q < nAct; q++) contactNode(actN[q], so);
-        if (eA.length) {
+        if (eA.length && !so.q) {
           if (eHotN !== nActive) { eHotN = nActive; eHot.length = 0; for (let e = 0; e < eA.length; e++) if (act[eA[e]] && act[eB[e]]) eHot.push(e); }
           for (let q = 0; q < eHot.length; q++) if (eHot[q] < nBlunt || so.sharp) contactEdge(eHot[q], so, false);
           if (steps % opt.sweepSteps === 0) for (let e = 0, en = so.sharp ? eA.length : nBlunt; e < en; e++) if (!act[eA[e]] || !act[eB[e]]) contactEdge(e, so, true);
         }
         if (steps % opt.sweepSteps === 0) for (let i = 0; i < NN; i++) {
-          if (act[i] || gone[i]) continue;
+          if (act[i] || gone[i] || (so.q && !bedNode[i])) continue;
           const b0 = bp[3 * i], b1 = bp[3 * i + 1], b2 = bp[3 * i + 2], Q = R.Q, o = R.o;
           if (probe(so, o[0] + Q[0] * b0 + Q[1] * b1 + Q[2] * b2, o[1] + Q[3] * b0 + Q[4] * b1 + Q[5] * b2, o[2] + Q[6] * b0 + Q[7] * b1 + Q[8] * b2) > 0) {
             activate(i); activateAround(i, opt.activateR); if (R.dirty) rebuildRigid(); if (so.sharp && opt.cut) contactSharp(i, so); else contactNode(i, so);
@@ -20091,7 +20169,7 @@ function sbCore() {
       if (!asleep) {
         if (steps % opt.restSteps === 0) {
           const eNow = E.plastic + E.hinge, slow = relM === 0 || rel2 / relM < opt.restV * opt.restV;
-          if (slow && eNow - ePrev < opt.restJ && !opt.allActive) { if (++quiet >= 2) sleep(); } else quiet = 0;
+          if (slow && eNow - ePrev < opt.restJ && !opt.allActive) { if (++quiet >= 2) { /* she has stopped in a bed that gave way: what it holds of her is springing, and sleep keeps whatever shape it finds, so the bed lets go first and she springs back */ let bedded = false; for (let k = solids.length - 1; k >= 0; k--) if (solids[k].q) { solids.splice(k, 1); bedded = true; eHotN = -1; } if (bedded) quiet = 0; else sleep(); } } else quiet = 0;
           ePrev = eNow;
         }
       }
@@ -20353,8 +20431,8 @@ function sbCore() {
       /* paint: what she slid on, and what strained. Only what is new. */
       paint: (function () { const doneB = new Uint8Array(S.beams.length), doneC = new Map(); return function (r) { const out = []; const sh = r.shape;
         const centre = a => { const s = Math.sign(a[0]) || 1, d = [a[0] - s * INWARD[0], a[1] - INWARD[1], 0], l = Math.hypot(d[0], d[1]) || 1; return [d[0] / l, d[1] / l, 0]; };
-        for (const c of r.contacts || []) { const was = doneC.get(c.node) || 0; if (c.slide - was < 0.02) continue; const a = p0(c.node), press = Math.min(1, c.impulse / 1500); const seg = c.slide - was; doneC.set(c.node, c.slide);
-          out.push({ p: a, n: centre(a), dir: c.dir, r: (0.08 + 0.14 * press) * SCRAPE_R, len: Math.min(0.8, seg + 0.3) * SCRAPE_LEN, kind: press > 0.5 ? 'gouge' : 'scrape', strength: (0.5 + 0.5 * press) * SCRAPE_K }); }
+        for (const c of r.contacts || []) { const was = doneC.get(c.node) || 0; if (c.slide - was < 0.02) continue; const a = p0(c.node), press = Math.min(1, c.impulse / 1500), pk = c.paint == null ? 1 : c.paint; const seg = c.slide - was; doneC.set(c.node, c.slide);   /* pk: the bed she slid on (a stone digs in, sand polishes) */
+          out.push({ p: a, n: centre(a), dir: c.dir, r: (0.08 + 0.14 * press) * SCRAPE_R, len: Math.min(0.8, seg + 0.3) * SCRAPE_LEN, kind: press > 0.5 && pk >= 0.7 ? 'gouge' : 'scrape', strength: (0.5 + 0.5 * press) * SCRAPE_K * pk }); }
         if (r.lam) S.beams.forEach((b, j) => { const l = r.lam[j]; if (!l || doneB[j] >= l) return; doneB[j] = l; const a = p0(b.a), c = p0(b.b), m = [(a[0] + c[0]) / 2, (a[1] + c[1]) / 2, (a[2] + c[2]) / 2];   /* gelcoat: crazes past the knee, chips along a crack */
           out.push({ p: m, n: centre(m), dir: sub(c, a), r: Math.min(0.3, 0.08 + 0.2 * L0[j]), len: l === 2 ? L0[j] : 0.5 * L0[j], kind: 'craze', strength: l === 2 ? 1 : 0.7 }); if (l === 2) out.push({ p: m, n: centre(m), dir: sub(c, a), r: 0.025 + 0.025 * rnd(j, 5), len: L0[j], kind: 'flake', strength: 0.72 }); });
         else S.beams.forEach((b, j) => { if (FLAKE_KINDS.indexOf(b.kind) < 0 || doneB[j] >= 2) return; const e = Math.abs(strainOf(j, sh)), f = Math.max(foldAt(b.a, r.thP), foldAt(b.b, r.thP)), v = e + 0.25 * f, lvl = v > FLAKE_AT[1] ? 2 : v > FLAKE_AT[0] ? 1 : 0; if (lvl <= doneB[j]) return; doneB[j] = lvl;
@@ -20406,7 +20484,7 @@ function sbCore() {
     const t1 = nm(Math.abs(dt(n, up)) > 0.9 ? cr(n, [1, 0, 0]) : cr(up, n)), t2 = nm(cr(n, t1)), A = [p[0] - depth * n[0], p[1] - depth * n[1], p[2] - depth * n[2]], k = Math.SQRT1_2, face = (t, s) => { const N = [k * (s * t[0] - n[0]), k * (s * t[1] - n[1]), k * (s * t[2] - n[2])]; return { n: N, d: dt(N, A) }; }; return { sharp: true, planes: [face(t1, 1), face(t1, -1), face(t2, 1), face(t2, -1)] }; };
   root.workerMain = function (port) {
     const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
-    let rakeM = null, rakeLips = false, sb = null, opS = {}, d = null, fit = null, seen = null, running = false, flapTimer = 0, t0 = 0, tLast = 0, sliceMs = 12, rateHz = 60, chunk = 25, wind = [0, 0, 0], NB = 0, lastT = 0, sleeps0 = 0, cut = false, rakeS = null, rakeN = 0, rakeOff = 0, rakeSim = 0, rakeWall = 0, rakeD = 0, rakeW = 0, rakePl = 0, rakeTo = 0, S_ENTER = true; const rakeQ = [], RAKE_AHEAD = 0.12, RAKE_LEASE = 400, RAKE_MATCH = 2.5, RAKE_MISS = 4, RAKE_D0 = 0.05, RAKE_IN = 1.5, RAKE_DENT = 0.03;
+    let rakeM = null, rakeLips = false, sb = null, opS = {}, d = null, fit = null, seen = null, running = false, flapTimer = 0, t0 = 0, tLast = 0, sliceMs = 12, rateHz = 60, chunk = 25, wind = [0, 0, 0], NB = 0, lastT = 0, sleeps0 = 0, cut = false, rakeS = null, rakeN = 0, rakeOff = 0, rakeSim = 0, rakeWall = 0, rakeD = 0, rakeW = 0, rakePl = 0, rakeTo = 0, rakeHold = false, S_ENTER = true; const rakeQ = [], RAKE_AHEAD = 0.12, RAKE_LEASE = 500, RAKE_GAP = 0.4, RAKE_MATCH = 2.5, RAKE_MISS = 4, RAKE_D0 = 0.05, RAKE_IN = 1.5, RAKE_DENT = 0.03;
     const post = (m, tr) => port.postMessage(m, tr || []);
     function frame(realDt) {
       const a = now(), st = sb.stats(), shape = sb.shape(), live = sb.state(), r = { shape, broken: live.broken, thP: live.thP, lam: live.lam, contacts: sb.contacts(), solidAt: sb.solidAt, sharp: sb.hasSharp(), lips: rakeLips };
@@ -20425,14 +20503,20 @@ function sbCore() {
       if (!running) return;
       const start = now();
       while (now() - start < sliceMs) {
-        if (rakeS) { const t = sb.time(); while (rakeQ.length && rakeQ[0].tg + rakeOff <= t) rakeKey(rakeQ.shift());
-          if (!rakeQ.length && t > rakeSim + RAKE_AHEAD) { if (now() - rakeWall < RAKE_LEASE) break; rakeEnd(); }
-          else sleeps0 = sb.sleepCount(); }
-        if (!rakeS && sb.isAsleep() && sb.sleepCount() > sleeps0) break;
+        if (rakeS) { const t = sb.time();
+          /* a gap in the keys over RAKE_GAP of the game's clock ends a rake, whether the keys came on time (the lease below ran out, RAKE_GAP on the wall) or had queued up while she was behind: it used to end one and not the other, so a slow machine dragged the rock on through gaps a fast one lifted it from */
+          if (rakeQ.length && rakeQ[0].tg + rakeOff - rakeSim > RAKE_GAP && t > rakeSim + RAKE_AHEAD) rakeEnd();
+          else { while (rakeQ.length && rakeQ[0].tg + rakeOff <= t) rakeKey(rakeQ.shift());
+            if (!rakeQ.length && t > rakeSim + RAKE_AHEAD) { if (now() - rakeWall < RAKE_LEASE) break; rakeEnd(); }
+            else sleeps0 = sb.sleepCount(); } }
+        if (!rakeS && rakeQ.length) { const t = sb.time(); if (sb.isAsleep() || rakeQ[0].tg + rakeOff <= t) { const m = rakeQ.shift(); rakeOff = t - m.tg; rakeKey(m); sleeps0 = sb.sleepCount(); } }
+        if (!rakeS && !rakeQ.length && sb.isAsleep() && sb.sleepCount() > sleeps0) break;
+        /* her ring-down after a rake that a gap ended doesn't run ahead of the game: if the next key finds her further on than the game's clock says, how far she'd settled would depend on how fast this machine is */
+        if (rakeHold && !rakeS && !rakeQ.length && !sb.isAsleep() && sb.time() >= rakeSim + (now() - rakeWall) / 1000) break;
         rakeIn(chunk * sb.dt); sb.step(chunk); }
       const st = frame(Math.max(0.001, (start - tLast) / 1000)); tLast = start;
       /* asleep before she has reached it is only the moment before contact; a solid she never reaches (a contact point off her lattice) ends after 1.5 s */
-      if (!rakeS && ((st.asleep && st.sleeps > sleeps0) || (st.asleep && st.t - lastT > 1.5))) { running = false; lastT = st.t; post({ type: 'rest', t: st.t, stats: { plastic_J: st.E.plastic + st.E.hinge + st.E.cut, broken: st.broken, active: st.peakActive, cpu_ms: st.wall_ms, driver: d.stats() } }); flapOn(); return; }
+      if (!rakeS && !rakeQ.length && ((st.asleep && st.sleeps > sleeps0) || (st.asleep && st.t - lastT > 1.5))) { running = false; lastT = st.t; post({ type: 'rest', t: st.t, stats: { plastic_J: st.E.plastic + st.E.hinge + st.E.cut, broken: st.broken, active: st.peakActive, cpu_ms: st.wall_ms, driver: d.stats() } }); flapOn(); return; }
       setTimeout(tick, Math.max(0, 1000 / rateHz - (now() - start)));
     }
     /* she has come to rest and her loose plate still hangs in the wind: the flaps alone, at 30 Hz, until none's left */
@@ -20446,24 +20530,24 @@ function sbCore() {
       if (s.sphere) return Object.assign({}, s, { sphere: pt(s.sphere) });
       if (s.capsule) return Object.assign({}, s, { capsule: [pt(s.capsule[0]), pt(s.capsule[1])] }); return s; }
     const rotQ = v => { const Q = sb.pose().Q; return [Q[0] * v[0] + Q[1] * v[1] + Q[2] * v[2], Q[3] * v[0] + Q[4] * v[1] + Q[5] * v[2], Q[6] * v[0] + Q[7] * v[1] + Q[8] * v[2]]; };
-    /* how far in. Rapier stops her on her collider, so it can't say; the energy can. m.work is the part of her friction work that should go into metal (about 0.6: tooth12's own ledger, 66 of 110 MJ, the rest rubbing). So the rock goes deeper while the metal has taken less and draws back while it has taken more, on the solver's clock, not the game's. She can't tear more than she paid for, and a light press leaves a shallow cut. 3 % and 10 % a key, within m.dep (ASSUMED). solver.rakeMin: it never draws back shallower than the depth that still opens her plate, or the gash came in stretches with the rock clear of her between; and it doesn't go deeper while the worker is over a second behind the game, or a very hard press plays out long after she has stopped */
-    function rakeDepth(m) { const st = sb.stats(), pl = st.E.plastic + st.E.hinge + st.E.cut, sv = opS.solver || {}, lo = Math.max(m.dep[0], sv.rakeMin || 0); if (m.work < rakeW || !rakeD) { rakeD = Math.max(lo, Math.min(sv.rakeMax || m.dep[1], m.dep[1])); rakePl = pl; } rakeW = m.work; const lag = (now() - t0) / 1000 - (st.t - lastT); rakeD = Math.max(lo, Math.min(sv.rakeMax || m.dep[2], rakeD * (pl - rakePl < m.work && lag < 1 ? 1.03 : 0.9))); return rakeD; }
-    /* A real grounding is often on more than one place at once: Friendship V on a shore rides on both keels, 6.7 m apart. Each rock is its own solid with its own line along her; a key says where the rocks it heard from are, and one that matches nothing new is a new rock. A rock a key doesn't mention hasn't gone (contact flickers, and the records alternate): it stands still in the world, she slides over it, and only after RAKE_MISS keys in a row is it gone. All rocks share one depth: the budget is the boat's */
-    function rakeKey(m) { rakeM = m.V ? m : null; rakeLips = m.lips !== false && !m.tooth; S_ENTER = m.enter !== false; const sim = m.tg + rakeOff, list = m.rocks || (m.at && m.n ? [{ at: m.at, n: m.n }] : []), dep = m.tooth ? rakeD : rakeDepth(m), V = m.V || [0, 0, 0];
+    /* how far in. Rapier stops her on her collider, so it can't say; the energy can. m.work is the part of her friction work that should go into metal (about 0.6: tooth12's own ledger, 66 of 110 MJ, the rest rubbing). So the rock goes deeper while the metal has taken less and draws back while it has taken more, on the solver's clock, not the game's. She can't tear more than she paid for, and a light press leaves a shallow cut. 3 % and 10 % a key, within m.dep (ASSUMED). solver.rakeMin: it never draws back shallower than the depth that still opens her plate, or the gash came in stretches with the rock clear of her between; rakeW outlives a rake that a gap ended: the door's work runs on through a gap of under half a second, and starting the sum again at each one paid for the same metal twice. Nothing here reads the wall clock: it went no deeper while the worker was over a second behind, so a loaded machine broke 116 members where a quiet one broke 299 from the same keys. A slow machine now shows the same damage later */
+    function rakeDepth(m) { const st = sb.stats(), pl = st.E.plastic + st.E.hinge + st.E.cut, sv = opS.solver || {}, lo = Math.max(m.dep[0], sv.rakeMin || 0); const fresh = m.work < rakeW || !rakeW; if (fresh) rakePl = pl; if (fresh || !rakeD) rakeD = Math.max(lo, Math.min(sv.rakeMax || m.dep[1], m.dep[1])); rakeW = m.work; rakeD = Math.max(lo, Math.min(sv.rakeMax || m.dep[2], rakeD * (pl - rakePl < m.work ? 1.03 : 0.9))); return rakeD; }
+    /* A real grounding is often on more than one place at once: Friendship V on a shore rides on both keels, 6.7 m apart. Each rock is its own solid with its own line along her; a key says where the rocks it heard from are, and one that matches nothing new is a new rock. A rock a key doesn't mention hasn't gone (contact flickers, and the records alternate): it stands still in the world, she slides over it, and only after RAKE_MISS keys in a row is it gone. The budget is the boat's, but the depth is each rock's own: a 45 degree point bears on an area that grows as its depth squared, so at one bearing pressure depth goes as the root of the force (ASSUMED: same rock, same plate). The hardest-pressed rock in a key goes the full depth. Until 3 Nov all shared one, so the keel she barely touched was cut as deep as the one she rode on */
+    function rakeKey(m) { rakeHold = false; if (m.tooth && !rakeS) rakeW = 0; rakeM = m.V ? m : null; rakeLips = m.lips !== false && !m.tooth; S_ENTER = m.enter !== false; const sim = m.tg + rakeOff, list = m.rocks || (m.at && m.n ? [{ at: m.at, n: m.n }] : []), dep = m.tooth ? rakeD : rakeDepth(m), V = m.V || [0, 0, 0], Fmax = list.reduce((a, r) => Math.max(a, r.F || 0), 0), depLo = Math.max((m.dep || [0])[0], (opS.solver || {}).rakeMin || 0);
       if (!rakeS) rakeS = []; if (m.tooth) { const k = { id: ++rakeN, solid: place(m.tooth), sim, miss: 0 }; if (S_ENTER) { const f = (0.5 - RAKE_D0) * Math.SQRT1_2; for (const P of k.solid.planes) P.d -= f; k.d = RAKE_D0; rakeTo = 0.5; } rakeS.push(k); sb.addSolid(k.solid); }   /* the first blow's own point, 0.5 m as the door builds it (toothAt): in from her skin like any other */
       for (const k of rakeS) k.fresh = false;
-      for (const r of list) { let best = null, bd = RAKE_MATCH * RAKE_MATCH; for (const k of rakeS) { if (k.fresh || !k.at) continue; const g = sim - k.sim, dx = k.at[0] - V[0] * g - r.at[0], dy = k.at[1] - V[1] * g - r.at[1], dz = k.at[2] - V[2] * g - r.at[2], e = dx * dx + dy * dy + dz * dz; if (e < bd) { bd = e; best = k; } }
+      for (const r of list) { const dr = Fmax > 0 && r.F > 0 ? Math.max(Math.min(depLo, dep), dep * Math.sqrt(r.F / Fmax)) : dep; let best = null, bd = RAKE_MATCH * RAKE_MATCH; for (const k of rakeS) { if (k.fresh || !k.at) continue; const g = sim - k.sim, dx = k.at[0] - V[0] * g - r.at[0], dy = k.at[1] - V[1] * g - r.at[1], dz = k.at[2] - V[2] * g - r.at[2], e = dx * dx + dy * dy + dz * dz; if (e < bd) { bd = e; best = k; } }
         if (!best) { best = { id: ++rakeN }; rakeS.push(best); } else sb.removeSolid(best.solid);
         /* How far in this key can put it. A rock is in the metal it has already gone through: set down deep in fresh metal, everything inside it parted at once for no work, and a real contact path, which jumps, did that at every key (91 members for 4.7 kJ). So a new rock starts at her skin, and a rock moved off where it would have ridden to comes back out by as much as it moved: a 45 degree point moved aside e and drawn back e stands inside the one it was. From there the only ways into new metal are her sliding onto its leading face, and rakeIn: it goes deeper at RAKE_IN, 1.5 m/s (ASSUMED: a hull settling on a rock, about a 12 cm drop's speed) */
-        if (S_ENTER) { let off = RAKE_D0; if (best.at) { const g = sim - best.sim, dx = best.at[0] - V[0] * g - r.at[0], dy = best.at[1] - V[1] * g - r.at[1], dz = best.at[2] - V[2] * g - r.at[2], a = best.d || 0, tilt = Math.hypot(best.n[0] - r.n[0], best.n[1] - r.n[1], best.n[2] - r.n[2]); off = Math.max(RAKE_D0, Math.min(a, dep) - Math.hypot(dx, dy, dz) - a * tilt); } best.d = off; } else best.d = dep;
+        if (S_ENTER) { let off = RAKE_D0; if (best.at) { const g = sim - best.sim, dx = best.at[0] - V[0] * g - r.at[0], dy = best.at[1] - V[1] * g - r.at[1], dz = best.at[2] - V[2] * g - r.at[2], a = best.d || 0, tilt = Math.hypot(best.n[0] - r.n[0], best.n[1] - r.n[1], best.n[2] - r.n[2]); off = Math.max(RAKE_D0, Math.min(a, dr) - Math.hypot(dx, dy, dz) - a * tilt); } best.d = off; } else best.d = dr; best.to = dr;
         best.at = r.at; best.n = r.n; best.sim = sim; best.miss = 0; best.fresh = true; best.solid = place(root.toothAt(r.at, r.n, m.up, best.d)); sb.addSolid(best.solid); if (d) d.pathKey({ at: r.at, n: r.n, t: m.V }, best.id); }
       if (list.length) for (let i = rakeS.length - 1; i >= 0; i--) { const k = rakeS[i]; if (k.fresh || (k.at && ++k.miss < RAKE_MISS)) continue; sb.removeSolid(k.solid); if (d) d.pathKey(null, k.id); rakeS.splice(i, 1); }
       for (const max = m.max || 2; rakeS.length > max;) { let w = -1, wm = -1; rakeS.forEach((k, i) => { if (!k.fresh && (k.miss || 0) > wm) { wm = k.miss || 0; w = i; } }); if (w < 0) break; const k = rakeS[w]; sb.removeSolid(k.solid); if (d) d.pathKey(null, k.id); rakeS.splice(w, 1); }   /* never more solids than the switch says: each is another pass of her active nodes */
       if (!m.tooth) rakeTo = dep; sb.driveRigid(rotQ(V), rotQ(m.W || [0, 0, 0])); rakeSim = sim; }
     /* deeper, between keys: all four faces of a 45 degree point move out by a step's depth x cos 45, whatever frame they're in */
     /* and shallower, the moment the metal has taken what she has paid for: she can't tear more than the friction work so far, so past it the rock only dents (RAKE_DENT: under what parts a member) until the next keys pay for more. solver.rakeMin is what a paid rock won't draw back past */
-    function rakeIn(dt) { if (!rakeS) return; const to = S_ENTER && rakeM && rakeW > 0 && sb.absorbed() - rakePl > rakeW ? Math.min(rakeTo, RAKE_DENT) : rakeTo; for (const k of rakeS) { if (k.d == null || k.d === to) continue; const e = Math.max(-5 * RAKE_IN * dt, Math.min(to - k.d, RAKE_IN * dt)), f = e * Math.SQRT1_2; k.d += e; for (const P of k.solid.planes) P.d += f; } }
-    function rakeEnd() { rakeM = null; if (d) d.pathKey(null); if (rakeS) for (const k of rakeS) sb.removeSolid(k.solid); rakeS = null; rakeD = 0; rakeW = 0; sleeps0 = sb.isAsleep() ? sb.sleepCount() - 1 : sb.sleepCount(); }
+    function rakeIn(dt) { if (!rakeS) return; const to = S_ENTER && rakeM && rakeW > 0 && sb.absorbed() - rakePl > rakeW ? Math.min(rakeTo, RAKE_DENT) : rakeTo; for (const k of rakeS) { const tk = k.to != null ? Math.min(k.to, to) : to; if (k.d == null || k.d === tk) continue; const e = Math.max(-5 * RAKE_IN * dt, Math.min(tk - k.d, RAKE_IN * dt)), f = e * Math.SQRT1_2; k.d += e; for (const P of k.solid.planes) P.d += f; } }
+    function rakeEnd() { rakeM = null; if (d) d.pathKey(null); if (rakeS) for (const k of rakeS) sb.removeSolid(k.solid); rakeS = null; rakeD = 0; rakeHold = true; sleeps0 = sb.isAsleep() ? sb.sleepCount() - 1 : sb.sleepCount(); }
     function rake(m) { rakeWall = now(); if (flapTimer) { clearTimeout(flapTimer); flapTimer = 0; }
       if (!running) sb.clearSolids();
       if (!rakeS && !rakeQ.length) { rakeOff = sb.time() - m.tg; rakeKey(m); } else rakeQ.push(m);
@@ -20473,7 +20557,7 @@ function sbCore() {
         sb = root.SOFTBODY.create(S, Object.assign({ dt: c.dt, hingeScale: c.hingeScale || 1 }, c.strengthScale != null ? { strengthScale: c.strengthScale } : {}, m.opt || {}));   /* uncalibrated (the Osprey): an undefined scale here made every hull member's strength NaN, and NaN never yields: her door crushed her hull at no strength limit at all */ d = root.DRIVER.create(S); fit = root.ROTFIT(S); NB = S.beams.length; seen = new Uint8Array(NB); cut = !!(S.solver && S.solver.cut);
         sliceMs = m.sliceMs || sliceMs; rateHz = m.rateHz || rateHz; chunk = Math.max(1, Math.round(0.0025 / sb.dt)); post({ type: 'ready', nodes: sb.nodeCount, ms: now() - a }); }
       else if (m.type === 'rake') rake(m);
-      else if (m.type === 'impact') { const rk = cut && m.tg != null && (m.solids || []).find(s => s.tooth);
+      else if (m.type === 'impact') { rakeHold = false; const rk = cut && m.tg != null && (m.solids || []).find(s => s.tooth);
         /* a raking first blow to a lattice that can be cut is the first key of a rake: the tooth alone was all it ever met, and it was left in her frame, unplaced */
         if (rk) return rake({ tg: m.tg, V: m.V, W: m.W, tooth: rk.tooth, enter: m.enter });
         if (flapTimer) { clearTimeout(flapTimer); flapTimer = 0; }
@@ -20490,7 +20574,7 @@ function sbCore() {
 /* ---------- the door ---------- */
 const SOFTBODY = (() => {
   const core = sbCore(), recs = new Map();
-  const S = { on: true, paint: true, jag: true, rake: true, rakeEnter: true, lips: true, shove: true, scrape: true, scrapeV: 0.5, scrapeN: 5e3, scrapeJ: 100e3, scrapeStep: 0.3, scrapeRate: 20, rakeV: 1, rakeDt: 0.1, rakeDepth: [0.15, 1, 3], rakeRocks: 2, rakeJoin: 2, hardJ: 20e3, ms: 0, maxFree: 16, create: core.SOFTBODY.create, DRIVER: core.DRIVER, ROTFIT: core.ROTFIT, workerSrc: () => '(' + sbCore.toString() + ')().workerMain(self);', onDebris: null };
+  const S = { on: true, bed: true, bedCrush: 1.5e5, paint: true, jag: true, tracks: true, rake: true, rakeEnter: true, lips: true, shove: true, scrape: true, scrapeV: 0.5, scrapeN: 5e3, scrapeJ: 100e3, scrapeStep: 0.3, scrapeRate: 20, rakeV: 1, rakeDt: 0.1, rakeDepth: [0.15, 1, 3], rakeRocks: 2, rakeJoin: 2, hardJ: 20e3, ms: 0, maxFree: 16, create: core.SOFTBODY.create, DRIVER: core.DRIVER, ROTFIT: core.ROTFIT, workerSrc: () => '(' + sbCore.toString() + ')().workerMain(self);', onDebris: null };
   /* hardJ: below this a blow only marks her (damage.js does that) and nothing is fetched. 20 kJ is 75 t's bow at about 1 m/s on her effective mass: past a hard docking, about where 8 mm plate starts to dish between frames. ASSUMED */
   /* scrape: a slide marks her (below). scrapeV m/s and scrapeN newtons: less than this leaves paint alone. scrapeJ: friction work that wires a boat that has had no hard blow; below it damage.js's marks do. scrapeStep m and scrapeRate a second: the most marks one contact lays. All ASSUMED, by eye */
   let hit = 0, rate = 0, src = null;   /* hit: boats wired; the frame returns at once while it is 0 */
@@ -20503,13 +20587,32 @@ const SOFTBODY = (() => {
      Waterplane 0.35 L B, metacentric radii L²/12 and B²/5, damping per kg (ASSUMED: fitted to Friendship V's figures in crash.mjs, 115 m², 95 m, 18 m) */
   function hydroFor(e, M) { const L = e.length_m || 20, B = e.beam_m || 6, g = 9.81; return { kHeave: 1025 * g * 0.35 * L * B, cHeave: 2.4 * M, kPitch: M * g * L * L / 12, cPitch: 133 * M, kRoll: M * g * B * B / 5, cRoll: 29 * M }; }
 
+  /* what the shore is made of (S10, twenty-second slice). A record says `shore` or `bottom` whether it's granite or mud, and until now they were all rock. The level's habitat grid knows better (World's; class names from its manifest, read here, so a new class needs no code).
+     q: the pressure the bed fails at, ultimate bearing, Pa; 0 is rock, which doesn't. ASSUMED, as orders of size: soft marine clay, Su about 10 kPa x Nc 5.14 (Skempton) = 50 kPa; sand, gravelly sand and cobble about 3 x the presumed allowable values of BS 8004 (loose to dense sand 100-600 kPa, gravel over 600), from memory of the table, higher for the cobble's stones bearing point to point. Her plate's own limit is about 4 fy (t/b)^2: 344 kPa for Friendship V's 6 mm on 0.3 m frames, so sand can just dish her bottom and mud can't; crash.mjs's bed<kn>_<kPa>_<slope> tests show the same step without being told it.
+     rake: how many times cut_N it takes for this bed's stones to punch her (0: nothing in it has a point). scrape, gouge: how much paint a slide takes, and whether a stone digs in; a sand slide polishes more than it cuts, mud does nothing. All ASSUMED, by eye. */
+  const BEDS = { rock: { name: 'rock', q: 0, rake: 1, scrape: 1, gouge: true }, cobble: { name: 'cobble', q: 2.5e6, rake: 2, scrape: 0.8, gouge: true }, gravel: { name: 'gravelly sand', q: 1.2e6, rake: 0, scrape: 0.55, gouge: false }, sand: { name: 'sand', q: 6e5, rake: 0, scrape: 0.35, gouge: false }, seabed: { name: 'the seabed', q: 3e5, rake: 0, scrape: 0.25, gouge: false }, mud: { name: 'mud', q: 5e4, rake: 0, scrape: 0, gouge: false } };
+  const bedOfClass = nm => /mud|eelgrass|marsh|wetland/i.test(nm) ? BEDS.mud : /mixed sand/i.test(nm) ? BEDS.gravel : /sand/i.test(nm) ? BEDS.sand : /gravel|cobble|mussel/i.test(nm) ? BEDS.cobble : BEDS.rock;
+  /* the bed at a level point. Below the shoreline the grid is `water / unclassified`, so the nearest shore class within 64 m stands for it, and past that a slope over 1 in 5 is rock and the rest is `seabed`, a guess: the level has no bottom-type layer (requests.md, World). Charted rocks have their own colliders and don't come here */
+  function bedAt(x, z) { const L = typeof LEVEL !== 'undefined' ? LEVEL : null, C = L && L.data && L.data.habitat && L.data.habitat.classes; if (!L || !L.habAt || !C) return BEDS.rock;
+    const nameOf = id => { const c = C[id] && C[id].id === id ? C[id] : C.find(k => k.id === id); return c ? c.name : ''; }, cls = (a, b) => { const h = L.habAt(a, b); return h > 0 ? nameOf(h) : null; };
+    let nm = cls(x, z); if (nm) return bedOfClass(nm);
+    for (const r of [8, 16, 32, 64]) for (let k = 0; k < 8; k++) { nm = cls(x + r * Math.cos(k * Math.PI / 4), z + r * Math.sin(k * Math.PI / 4)); if (nm) return bedOfClass(nm); }
+    if (L.navd) { const d = 10, sx = (L.navd(x + d, z) - L.navd(x - d, z)) / (2 * d), sz = (L.navd(x, z + d) - L.navd(x, z - d)) / (2 * d); if (isFinite(sx + sz) && Math.hypot(sx, sz) > 0.2) return BEDS.rock; }
+    return BEDS.seabed; }
+  /* the bed under this record: rock, a pile, another boat are as they were. Kept while she stays within 8 m, so a grounding pays the grid once or twice a second, not per record */
+  function bedFor(rec, c) { const o = c.other, what = o && o.what; if (!S.bed || (what !== 'shore' && what !== 'bottom')) return BEDS.rock; if (o.bed) { rec.bedName = (BEDS[o.bed] || BEDS.rock).name; return BEDS[o.bed] || BEDS.rock; } const w = c.pw; if (!w) return BEDS.rock; const k = rec.bedK; if (k && Math.abs(k.x - w.x) < 8 && Math.abs(k.z - w.z) < 8) return k.b; const b = bedAt(w.x, w.z); rec.bedK = { x: w.x, z: w.z, b }; rec.bedName = b.name; return b; }
+  S.bedAt = (x, z) => bedAt(x, z);
+
   /* what she hit, as a solid in her frame, from the contact alone: p on her skin, n her outward normal there (the obstacle lies along +n). The contact says a place and a direction, not a shape, so each kind stands for its usual form: ASSUMED sizes */
   function solidFor(rec, c, p, n, up) {
     const o = c.other || {}, what = o.what || 'rock', box = (R, Up, D) => { const t1 = Math.abs(dot(n, up)) > 0.9 ? norm(cross(n, [1, 0, 0])) : norm(cross(up, n)), t2 = norm(cross(n, t1)), plane = (d, off) => ({ n: d, d: dot(d, p) + off });
       return { planes: [plane([-n[0], -n[1], -n[2]], 0), plane(n, D), plane(t1, R), plane([-t1[0], -t1[1], -t1[2]], R), plane(t2, Up), plane([-t2[0], -t2[1], -t2[2]], Up)] }; };
     if (what === 'pile') { const r = o.r || 0.3, cx = [p[0] + n[0] * r, p[1] + n[1] * r, p[2] + n[2] * r]; return { capsule: [[cx[0] - up[0] * 8, cx[1] - up[1] * 8, cx[2] - up[2] * 8], [cx[0] + up[0] * 8, cx[1] + up[1] * 8, cx[2] + up[2] * 8]], r }; }
     if (what === 'boat') return box(2.5, 2.5, 2);
-    if (what === 'shore' || what === 'bottom') return box(12, 12, 8);
+    if (what === 'shore' || what === 'bottom') { const B = bedFor(rec, c); if (!B.q) return box(12, 12, 8);
+      /* a bed can't stand steeper than its own angle of repose, whatever facet of the collider she touched: its face lies back to that (35 degrees, ASSUMED: wet sand to cobble, about 30 to 40), through the point she touched */
+      const cosR = 0.82, f = [-n[0], -n[1], -n[2]], cu = dot(f, up); if (cu < cosR) { const h = norm([f[0] - cu * up[0], f[1] - cu * up[1], f[2] - cu * up[2]]), sinR = Math.sqrt(1 - cosR * cosR); n = [-(cosR * up[0] + sinR * h[0]), -(cosR * up[1] + sinR * h[1]), -(cosR * up[2] + sinR * h[2])]; }
+      const s = box(12, 12, 8); s.q = B.q; s.paint = B.scrape; return s; }
     const rock = box(3, 3, 5);   /* rock */
     /* she is sliding along it (a raking blow, S10): a rock has points. A pyramid with its tip 0.5 m inside her skin and 45 degree faces (ASSUMED), the shape of crash.mjs's `tooth` tests */
     if (c.vt > 1.5 * Math.abs(c.vn || 0)) rock.tooth = core.toothAt(p, n, up, 0.5);
@@ -20519,11 +20622,12 @@ const SOFTBODY = (() => {
     const rec = recs.get(b); if (!rec || rec.state === 'failed') return;
     const what = c.other && c.other.what; if (what === 'float' || what === 'debris') return;   /* soft things don't crumple her; damage.js marks her */
     if (!c.hit || 0.5 * c.mEff * c.vn * c.vn * share < S.hardJ) return;
+    const bed = bedFor(rec, c); if (bed.q && bed.q < S.bedCrush) return;   /* it gives way long before her plate does: nothing to crush, nothing fetched */
     const q = b.rb.rotation(), qi = inv(q), org = rec.org, up = norm(qrot(qi, [0, 1, 0])), P = [p.x + org[0], p.y + org[1], p.z + org[2]], N = norm([n.x, n.y, n.z]);
     let vw = arr(b._v0 || b.rb.linvel()); const ww = arr(b._w0 || b.rb.angvel()); if (c.otherBoat) { const u = arr(c.otherBoat._v0 || c.otherBoat.rb.linvel()); vw = [vw[0] - u[0], vw[1] - u[1], vw[2] - u[2]]; }
     const V = qrot(qi, vw).map(v => v * Math.sqrt(share)), W = qrot(qi, ww), m = { type: 'impact', tg: c.t, V, W, solids: [solidFor(rec, c, P, N, up)], enter: S.rakeEnter };
     rec.blows++; rec.t0 = rec.t0 || performance.now();
-    mark(rec, { p: P, n: N, dir: slideDir(b, c, p, N), r: 0.22, len: 0.35, kind: 'scrape', strength: 1, snap: true });   /* whatever the lattice makes of it, what she hit took paint off where it touched: a blow she shrugged off left nothing to see */
+    if (bed.scrape) mark(rec, { p: P, n: N, dir: slideDir(b, c, p, N), r: 0.22, len: 0.35, kind: 'scrape', strength: bed.scrape, snap: true });   /* whatever the lattice makes of it, what she hit took paint off where it touched: a blow she shrugged off left nothing to see */
     if (rec.state === 'ready') rec.w.postMessage(m); else { rec.pending.push(m); if (rec.state === 'idle') wire(rec); } }
 
   /* a slide over anything hard takes her paint off along the way, from Rapier's records and on the main thread: no plastic work, no worker, no lattice. A bow running up a shore has the contact stay at a point of her collider as the ground goes by under it, or walk along her as a rock does; either way the mark is on her plate, where drawSplat snaps it to */
@@ -20531,7 +20635,7 @@ const SOFTBODY = (() => {
     const rr = [p.x, p.y, p.z], o = cross(w, rr), u = [v[0] + o[0], v[1] + o[1], v[2] + o[2]], d = dot(u, N); u[0] -= d * N[0]; u[1] -= d * N[1]; u[2] -= d * N[2]; const l = Math.hypot(u[0], u[1], u[2]); return l > 1e-3 ? [u[0] / l, u[1] / l, u[2] / l] : [0, 0, 1]; }
   function mark(rec, s) { if (!S.paint) return; const Q = rec.q.splats; Q.push(s); if (Q.length > 256) Q.shift(); }
   function scrape(b, c, p, n) {
-    const rec = recs.get(b); if (!rec || rec.state === 'failed' || !S.scrape || !S.paint || !(c.vt >= S.scrapeV)) return; const what = c.other && c.other.what; if (what === 'float' || what === 'debris') return;
+    const rec = recs.get(b); if (!rec || rec.state === 'failed' || !S.scrape || !S.paint || !(c.vt >= S.scrapeV)) return; const what = c.other && c.other.what; if (what === 'float' || what === 'debris') return; const bed = bedFor(rec, c); if (!bed.scrape) return;   /* mud leaves her paint alone, and fetches nothing */
     const sc = rec.sc || (rec.sc = { W: 0, t: -9, hit: -9, tr: [], n: 0 }); if (c.t - sc.t > 5) { sc.W = 0; sc.tr.length = 0; if (rec.state === 'idle') rec.q.splats.length = 0; } sc.t = c.t; if (c.hit) { sc.hit = c.t; return; } if (c.t - sc.hit < 0.1) return;
     const F = Math.min(Math.max(0, c.Fn || 0), 4 * 9.81 * b.rb.mass()); if (F < S.scrapeN) return; const d = c.vt * (c.dt || 0), org = rec.org, P = [p.x + org[0], p.y + org[1], p.z + org[2]];
     sc.W += 0.4 * F * d; if (rec.state === 'idle' && sc.W >= S.scrapeJ) wire(rec);   /* mu 0.4, as the rake */
@@ -20539,24 +20643,24 @@ const SOFTBODY = (() => {
     if (!t) { t = { q: P, t: c.t, slid: 0, al: 0, F: 0 }; sc.tr.push(t); if (sc.tr.length > 6) sc.tr.shift(); }
     t.t = c.t; t.slid += d; t.F = Math.max(t.F, F); const step = Math.max(S.scrapeStep, c.vt / S.scrapeRate), gap = Math.hypot(t.q[0] - P[0], t.q[1] - P[1], t.q[2] - P[2]), walked = gap >= step; if (!walked && t.slid < Math.max(step, 0.8)) return;
     /* how hard: a gouge from about 300 kN on a keel or a rock's point (ASSUMED); the patch, at a bearing of 2 MPa over 0.25 m of keel or chine (ASSUMED) */
-    const N = norm([n.x, n.y, n.z]), press = Math.min(1, t.F / 6e5), hard = what !== 'pile' || (c.other && c.other.material === 'steel'), wob = 0.75 + 0.25 * Math.sin(t.al * 1.3 + sc.n * 0.1) * Math.sin(t.al * 0.47 + 1), s = { n: N, kind: 'scrape', r: (0.07 + 0.2 * press) * wob, strength: (hard ? 0.6 : 0.45) + 0.4 * press, snap: true, al: t.al };   /* a rub comes and goes as the plate's waviness and the rock do: an even band reads as a line drawn on her */
+    const N = norm([n.x, n.y, n.z]), press = Math.min(1, t.F / 6e5), hard = what !== 'pile' || (c.other && c.other.material === 'steel'), wob = 0.75 + 0.25 * Math.sin(t.al * 1.3 + sc.n * 0.1) * Math.sin(t.al * 0.47 + 1), s = { n: N, kind: 'scrape', r: (0.07 + 0.2 * press) * wob * (bed.gouge ? 1 : 1.6), strength: ((hard ? 0.6 : 0.45) + 0.4 * press) * bed.scrape, snap: true, al: t.al };   /* a rub comes and goes as the plate's waviness and the rock do: an even band reads as a line drawn on her */
     if (walked) { s.p = [(t.q[0] + P[0]) / 2, (t.q[1] + P[1]) / 2, (t.q[2] + P[2]) / 2]; s.dir = [P[0] - t.q[0], P[1] - t.q[1], P[2] - t.q[2]]; s.len = gap + 0.15; t.al += gap; t.q = P; }
     else { s.p = P; s.dir = slideDir(b, c, p, N); s.len = Math.min(3, 0.3 + (t.F / 2e6) / 0.25); s.al = (sc.n * 0.37) % 7; }
-    const gouge = press > 0.5 && hard && sc.n % 3 === 0 ? { p: s.p, n: N, kind: 'gouge', r: 0.03 + 0.05 * press, strength: 0.6 + 0.4 * press, snap: true, dir: s.dir, len: s.len, al: s.al + 3 } : null;   /* now and then the rock's point digs in: narrow, with relief */
+    const gouge = press > 0.5 && hard && bed.gouge && sc.n % 3 === 0 ? { p: s.p, n: N, kind: 'gouge', r: 0.03 + 0.05 * press, strength: 0.6 + 0.4 * press, snap: true, dir: s.dir, len: s.len, al: s.al + 3 } : null;   /* now and then the rock's point digs in: narrow, with relief */
     t.slid = 0; t.F = 0; sc.n++; mark(rec, s); if (gouge) mark(rec, gouge); }
 
   /* a long rake (S10): she slides along rock pressed hard enough to go through her plate. A blow is over when it lands, a rake isn't, so this reads every record of the contact, not just its first. Only for a boat whose entry gives `cut_N`, the force to punch her shell (damage.js's: 0.58 of the flow stress over the rock's bearing, 0.3 m radius ASSUMED). Fn as Boats take it: past the first tenth of a second of a blow, no more than 4 of her weights. It starts, and fetches her, once the friction work (mu 0.4, ASSUMED) passes hardJ, as a blow must */
   function rake(b, c, p, n) {
-    const rec = recs.get(b); if (!rec || rec.state === 'failed' || !rec.entry.cut_N || !S.rake) return; const what = c.other && c.other.what; if (what !== 'rock' && what !== 'shore' && what !== 'bottom') return;
+    const rec = recs.get(b); if (!rec || rec.state === 'failed' || !rec.entry.cut_N || !S.rake) return; const what = c.other && c.other.what; if (what !== 'rock' && what !== 'shore' && what !== 'bottom') return; const bed = bedFor(rec, c); if (!bed.rake) return;   /* nothing in sand or mud has a point to open her with */
     const r = rec.rk || (rec.rk = { W: 0, t: -9, hit: -9, sent: -9, k: [] }); if (c.t - r.t > 0.5) { r.W = 0; r.k = []; } r.t = c.t; if (c.hit) { r.hit = c.t; return; } if (c.t - r.hit < 0.1 || c.vt < S.rakeV) return;
-    const F = Math.min(Math.max(0, c.Fn || 0), 4 * 9.81 * b.rb.mass()); if (F < rec.entry.cut_N) return;
+    const F = Math.min(Math.max(0, c.Fn || 0), 4 * 9.81 * b.rb.mass()); if (F < rec.entry.cut_N * bed.rake) return;
     r.W += 0.4 * F * c.vt * (c.dt || 0); if (r.W < S.hardJ) return;
     /* up to S.rakeRocks rocks in each key, the hardest record near each place: a rock is a place on her, S.rakeJoin across. On two keels at once the records alternate, and taking the hardest of all of them made one rock jump 6.7 m from keel to keel at every key */
     const org = rec.org, P = [p.x + org[0], p.y + org[1], p.z + org[2]]; let slot = null, bj = S.rakeJoin * S.rakeJoin, weak = null; for (const k of r.k) { const e = (k.at[0] - P[0]) ** 2 + (k.at[1] - P[1]) ** 2 + (k.at[2] - P[2]) ** 2; if (e < bj) { bj = e; slot = k; } if (!weak || k.F < weak.F) weak = k; }
     if (!slot) { if (r.k.length < S.rakeRocks) r.k.push(slot = { F: -1 }); else if (F > weak.F) { slot = weak; slot.F = -1; } } if (slot && F >= slot.F) { slot.F = F; slot.at = P; slot.n = norm([n.x, n.y, n.z]); }
     if (c.t - r.sent < S.rakeDt) return; r.sent = c.t;
     const q = b.rb.rotation(), qi = inv(q), up = norm(qrot(qi, [0, 1, 0]));
-    const m = { type: 'rake', tg: c.t, V: qrot(qi, arr(b._v0 || b.rb.linvel())), W: qrot(qi, arr(b._w0 || b.rb.angvel())), rocks: r.k.map(k => ({ at: k.at, n: k.n })), max: S.rakeRocks, up, work: 0.6 * r.W, dep: S.rakeDepth, lips: S.lips, enter: S.rakeEnter }; r.k = []; rec.blows = Math.max(rec.blows, 1); rec.t0 = rec.t0 || performance.now();
+    const m = { type: 'rake', tg: c.t, V: qrot(qi, arr(b._v0 || b.rb.linvel())), W: qrot(qi, arr(b._w0 || b.rb.angvel())), rocks: r.k.map(k => ({ at: k.at, n: k.n, F: k.F })), max: S.rakeRocks, up, work: 0.6 * r.W, dep: S.rakeDepth, lips: S.lips, enter: S.rakeEnter }; r.k = []; rec.blows = Math.max(rec.blows, 1); rec.t0 = rec.t0 || performance.now();
     if (rec.state === 'ready') rec.w.postMessage(m); else { rec.pending.push(m); if (rec.state === 'idle') wire(rec); } }
 
   /* her first hard blow: fetch the lattice and sidecar, wire her meshes, start her worker. A blow while it loads waits, and plays when it's here */
@@ -20597,6 +20701,7 @@ const SOFTBODY = (() => {
     for (const rec of recs.values()) { const sb = rec.sb; if (!sb) continue;
       if (rec.shown !== S.on) { rec.shown = S.on; sb.enabled(S.on); } if (!S.on) continue;
       if (rec.jag !== S.jag) { rec.jag = S.jag; if (sb.setJag) sb.setJag(S.jag); }
+      if (rec.tracks !== S.tracks) { rec.tracks = S.tracks; if (sb.setTracks) sb.setTracks(S.tracks); }
       if (rec.draw) { sb.setNodes(rec.draw, rec.rot); rec.draw = rec.rot = null; }
       const Q = rec.q;
       if (Q.states.length) { sb.plates(Q.states); if (!rec.inside && rec.entry.inside && Q.states.some(s => s.state !== 'attached')) { rec.inside = true; sb.inside().catch(e => console.warn('softbody inside', e)); } Q.states.length = 0; }
@@ -20607,7 +20712,7 @@ const SOFTBODY = (() => {
       if (rec.wind && rec.w && rec.drv && rec.drv.loose > 0 && a - rec.windT > 1000) { rec.windT = a; const u = rec.wind(), qi = inv(rec.b.rb.rotation()), v = rec.b.rb.linvel(); rec.w.postMessage({ type: 'wind', v: qrot(qi, [u.x - v.x, (u.y || 0) - v.y, u.z - v.z]) }); }
       sb.tick(renderer, 8, camera); }
     S.ms = performance.now() - a; };
-  S.report = function (b) { const r = recs.get(b); if (!r) return null; const d = r.drv || {}; return { state: r.state === 'failed' ? 'idle' : r.state, failed: r.state === 'failed', blows: r.blows, t: r.t, behind: r.behind, active: r.active, atRest: r.asleep, plastic_J: r.plastic, broken: r.nBroken, loose: d.loose || 0, gone: d.gone || 0, off: d.fitGone || 0, cpu_ms: r.rest ? r.rest.cpu_ms : 0 }; };
+  S.report = function (b) { const r = recs.get(b); if (!r) return null; const d = r.drv || {}; return { state: r.state === 'failed' ? 'idle' : r.state, failed: r.state === 'failed', bed: r.bedName || null, blows: r.blows, t: r.t, behind: r.behind, active: r.active, atRest: r.asleep, plastic_J: r.plastic, broken: r.nBroken, loose: d.loose || 0, gone: d.gone || 0, off: d.fitGone || 0, cpu_ms: r.rest ? r.rest.cpu_ms : 0 }; };
   S.fitout = function (b, root) { const r = recs.get(b); if (!r || r.fitout === root) return; r.fitout = root; if (r.sb) r.sb.bind(root, 'fitout'); };
   S.repair = function (b) { const r = recs.get(b); if (!r) return; if (r.w) r.w.terminate(); if (r.sb) { r.sb.dispose(); hit = Math.max(0, hit - 1); } for (const f of r.free) if (r.P && r.P.removeDebris && !f.e.removed) r.P.removeDebris(f.e); Object.assign(r, { state: 'idle', sb: null, w: null, draw: null, rot: null, pending: [], blows: 0, free: [], freeN: 0, t: 0, behind: 0, active: 0, plastic: 0, nBroken: 0, asleep: true, drv: null, rest: null, inside: false, rk: null, sc: null, q: { states: [], broken: [], shoves: [], debris: [], splats: [] } }); };
   S.detach = function (b) { S.repair(b); recs.delete(b); };
@@ -23420,8 +23525,10 @@ const DOCKS = (() => {
        chain      { path: [[x, y, z], ...], link_m }  stud-less chain lying where it was dropped, link by link (hardware tier)
        ladder     { from: [x, y, z], to: [x, y, z], w_m, missing: [rung, ...] }  a steel rung ladder, some rungs gone
        anchor     { at, y, yaw_deg, pitch_deg, roll_deg, l_m }  an old fisherman anchor half in the mud, shank, arms, palms, ring; its wood stock rotted to a stub
-       block      { at, y, yaw_deg, pitch_deg, roll_deg, size: [l, h, d], tint, rough }  a stone come out of the wall, lying on the beach; rough (m) puts its corners off true, split not sawn
+       block      { at, y, yaw_deg, pitch_deg, roll_deg, size: [l, h, d], tint, rough, mat }  a stone come out of the wall, lying on the beach; rough (m) puts its corners off true, split not sawn
        erratic    { at, y, size: [x, h, z], yaw_deg, seed, tint, stain_navd, pinch, cuts, detail, uv_m, far }  one sculpted boulder, y is its foot
+       outcrop    { plan: [[x, z], ...], dem: { x0, z0, dx, nx, nz, cm: [...] }, joints: [{ strike_deg, spacing_m, jitter, persist }, { ... }, { strike_deg, chance }], bed: { dip_deg, dip_dir_deg, thickness_m },
+                    step_from, step, lift_m, jit_m, tilt, chamfer_m, top: [r, g, b], face: [r, g, b], vary, seed, far_k, uv_m }  jointed bedded ledge you can walk on (K11): real joint blocks, not a height field; see OUTCROP below
        ring_bolt  { at, y, yaw_deg }  a mooring ring on an eye bolt let into the cap, for a boat nobody ties there now
        paving     { poly: [[x, z], ...], y, mat, uv_m, tint, t_m, far }  a paved floor on a convex outline, the scan laid across it; kept in the far tier unless far is false
        cafe_table { at, y, yaw_deg, umbrella, r_m, tint }  a terrace table, four chairs (frames in the hardware tier), an umbrella if asked
@@ -23431,9 +23538,82 @@ const DOCKS = (() => {
         v = (r, ya, a) => [x + r * Math.cos(a), y + ya, z + r * Math.sin(a)]; g.quad(v(r0, y0, a1), v(r0, y0, a0), v(r1, y1, a0), v(r1, y1, a1), t || 1); } } };
   const torus = (g, M, R, r, nu, segs) => { g.push(M); let pv = null; for (let i = 0; i <= nu; i++) { const a = i / nu * 6.2832, q = [R * Math.cos(a), R * Math.sin(a), 0]; if (pv) g.tube(pv, q, r, segs, 1, 'none'); pv = q; } g.pop(); };
   const posed = (x, y, z, it) => mat34mul(mat34mul(frame(x, y, z, (it.yaw_deg || 0) * Math.PI / 180), tiltX((it.pitch_deg || 0) * Math.PI / 180)), tiltZ((it.roll_deg || 0) * Math.PI / 180));
+  /* ---------- K11 jointed ledge (site 1, item 30; Matt's COA photos of 3 Nov) ----------
+     Rock of the Bar Harbor Formation is what is left when joints and bedding cut a bank into blocks, so it is built the same way. A plan is cut into
+     strips along one joint set and each strip across by the next; a joint carries on into the next strip only sometimes (`persist`), so joints stop against
+     each other as in `_rock_joints_flat`. Each cell is one convex block: its sides the two joints a crack apart, its top the ground's own tilt there from the
+     lidar (a whaleback) or, where the ground is steep (`step_from`, slope), the bedding's (square steps, as at the foot of `_ledge_barnacles_eyebolts`). A
+     block standing proud of its neighbours is split into courses along the bedding. Top edges are chamfered, since these rocks are worn. Faces are flat and
+     the scan lies flat on each, so nothing smears, as a height field's riser does inside about 5 m. Near about 40 triangles a block. */
+  const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const norm3 = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+  /* cut a convex solid, a list of { v: [points], n }, by the half-space n.p <= d, and close the cut with a new face */
+  function cutConvex(F, n, d) { const out = [], cap = [], eps = 1e-5;
+    for (const f of F) { const r = [], V = f.v; let any = false;
+      for (let i = 0; i < V.length; i++) { const a = V[i], b = V[(i + 1) % V.length], da = dot3(n, a) - d, db = dot3(n, b) - d; if (da <= eps) r.push(a); else any = true;
+        if ((da < -eps && db > eps) || (da > eps && db < -eps)) { const t = da / (da - db), p = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; r.push(p); cap.push(p); } else if (Math.abs(da) <= eps) cap.push(a); }
+      if (r.length >= 3) out.push({ v: r, n: f.n, cap: f.cap }); }
+    if (cap.length < 3) return out; const c = [0, 0, 0]; for (const p of cap) { c[0] += p[0] / cap.length; c[1] += p[1] / cap.length; c[2] += p[2] / cap.length; }
+    const u = norm3(cross(Math.abs(n[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0], n)), w = cross(n, u), ang = p => { const q = [p[0] - c[0], p[1] - c[1], p[2] - c[2]]; return Math.atan2(dot3(q, w), dot3(q, u)); };
+    const S = cap.map(p => [ang(p), p]).sort((a, b) => a[0] - b[0]), V = []; for (const [, p] of S) { const l = V[V.length - 1]; if (!l || Math.hypot(p[0] - l[0], p[1] - l[1], p[2] - l[2]) > 1e-4) V.push(p); }
+    if (V.length >= 3) out.push({ v: V, n }); return out; }
+  const inPoly = (P, x, z) => { let c = false; for (let i = 0, j = P.length - 1; i < P.length; j = i++) if ((P[i][1] > z) !== (P[j][1] > z) && x < (P[j][0] - P[i][0]) * (z - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0]) c = !c; return c; };
+  const polyDist = (P, x, z) => { let m = 1e9; for (let i = 0, j = P.length - 1; i < P.length; j = i++) { const ax = P[j][0], az = P[j][1], bx = P[i][0] - ax, bz = P[i][1] - az, t = Math.max(0, Math.min(1, ((x - ax) * bx + (z - az) * bz) / (bx * bx + bz * bz || 1))); m = Math.min(m, Math.hypot(x - ax - bx * t, z - az - bz * t)); } return m; };
+  D.outcropInto = function (G, it, opt) { const sd = it.seed || 11, D0 = it.dem, near = !opt.far, k0 = opt.far ? (it.far_k || 2.6) : 1, hs = sd + (opt.far ? 500 : 0);
+    const h = (x, z) => { const u = Math.max(0, Math.min(D0.nx - 1.001, (x - D0.x0) / D0.dx)), v = Math.max(0, Math.min(D0.nz - 1.001, (z - D0.z0) / D0.dx)), i = u | 0, j = v | 0, a = u - i, b = v - j, n = D0.nx, C = D0.cm;
+      return ((C[j * n + i] * (1 - a) + C[j * n + i + 1] * a) * (1 - b) + (C[(j + 1) * n + i] * (1 - a) + C[(j + 1) * n + i + 1] * a) * b) / 100; };
+    const dirOf = deg => { const t = deg * Math.PI / 180; return [Math.cos(t), Math.sin(t)]; };   /* a joint's normal in plan, x east, z south, from its strike's bearing */
+    const J = it.joints, Na = dirOf(J[0].strike_deg), Nb = dirOf(J[1].strike_deg), J3 = near && J[2] ? J[2] : null;
+    const pa = p => p[0] * Na[0] + p[1] * Na[1], pb = p => p[0] * Nb[0] + p[1] * Nb[1], As = it.plan.map(pa), Bs = it.plan.map(pb), A0 = Math.min(...As), A1 = Math.max(...As), B0 = Math.min(...Bs), B1 = Math.max(...Bs);
+    const bed = it.bed || { dip_deg: 28, dip_dir_deg: 130, thickness_m: 0.5 }, dd = bed.dip_dir_deg * Math.PI / 180, td = Math.tan(bed.dip_deg * Math.PI / 180), gBed = [-td * Math.sin(dd), td * Math.cos(dd)];
+    const uvm = it.uv_m || 1.5, jit = it.jit_m != null ? it.jit_m : 0.12, step0 = it.step_from != null ? it.step_from : 0.6, stepA = it.step != null ? it.step : 1, lift = it.lift_m != null ? it.lift_m : 0.1, chamfer = it.chamfer_m != null ? it.chamfer_m : 0.09, gap = 0.012, vary = it.vary != null ? it.vary : 0.14;
+    const TOP = it.top || [1, 1, 1], FACE = it.face || [1, 1, 1]; let blocks = 0, n = 0;
+    /* one convex piece: the four joints, its top, its bed, its chamfers */
+    const piece = (a0, a1, b0, b1, top, dTop, yBase, extra, tn, chA, ix) => { const xs = [], zs = []; for (const a of [a0, a1]) for (const b of [b0, b1]) { const det = Na[0] * Nb[1] - Na[1] * Nb[0], x = (a * Nb[1] - b * Na[1]) / det, z = (b * Na[0] - a * Nb[0]) / det; xs.push(x); zs.push(z); }
+      const x0 = Math.min(...xs) - 0.5, x1 = Math.max(...xs) + 0.5, z0 = Math.min(...zs) - 0.5, z1 = Math.max(...zs) + 0.5, ym = (dTop - top[0] * (x0 + x1) / 2 - top[2] * (z0 + z1) / 2) / top[1], y1 = ym + 3, y0 = yBase;
+      let F = [{ v: [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]], n: [0, -1, 0] }, { v: [[x0, y1, z0], [x0, y1, z1], [x1, y1, z1], [x1, y1, z0]], n: [0, 1, 0] }, { v: [[x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0]], n: [-1, 0, 0] }, { v: [[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]], n: [1, 0, 0] }, { v: [[x0, y0, z0], [x0, y1, z0], [x1, y1, z0], [x1, y0, z0]], n: [0, 0, -1] }, { v: [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], n: [0, 0, 1] }];
+      const ca = (a0 + a1) / 2, cb = (b0 + b1) / 2, det = Na[0] * Nb[1] - Na[1] * Nb[0], cx = (ca * Nb[1] - cb * Na[1]) / det, cz = (cb * Na[0] - ca * Nb[0]) / det, cy = (dTop - top[0] * cx - top[2] * cz) / top[1];
+      /* each joint: plan normal o, o.p = dist on the joint, leaning a little off plumb about the block's own height */
+      const SD = [[Na, -1, -a0, 1], [Na, 1, a1, 2], [Nb, -1, -b0, 3], [Nb, 1, b1, 4]].map(([N, sg, dist, q]) => { const v = norm3([N[0] * sg, 0.09 * (hash(hs, ix + q, 61) - 0.5), N[1] * sg]), hv = Math.hypot(v[0], v[2]); return { v, o: [N[0] * sg, N[1] * sg], dist, D: dist * hv + v[1] * cy }; });
+      for (const S of SD) F = cutConvex(F, S.v, S.D);
+      for (const [v, d] of extra || []) F = cutConvex(F, v, d);
+      F = cutConvex(F, top, dTop);
+      if (chA > 0) for (const S of SD) { const cn = norm3([top[0] + S.v[0], top[1] + S.v[1], top[2] + S.v[2]]), e = S.dist - (S.o[0] * cx + S.o[1] * cz) - chA, ex = cx + S.o[0] * e, ez = cz + S.o[1] * e, ey = (dTop - top[0] * ex - top[2] * ez) / top[1]; F = cutConvex(F, cn, cn[0] * ex + cn[1] * ey + cn[2] * ez); }
+      for (const f of F) { const nf = f.n; if (nf[1] < -0.3) continue; let V = f.v; const c0 = sub(V[1], V[0]), c1 = sub(V[2], V[0]); if (dot3(cross(c0, c1), nf) < 0) V = V.slice().reverse();
+        const up = nf[1] > 0.55, t0 = norm3(cross(Math.abs(nf[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0], nf)), b0_ = cross(nf, t0), ru = hash(hs, ix, 66) * 6.2832, cr = Math.cos(ru), sr = Math.sin(ru), t = [t0[0] * cr + b0_[0] * sr, t0[1] * cr + b0_[1] * sr, t0[2] * cr + b0_[2] * sr], bt = cross(nf, t), o = hash(hs, ix, 67), o2 = hash(hs, ix, 68), base = G.pos.length / 3; G.material(up ? 'bhf_top' : 'bhf_face');
+        const shade = 0.82 + 2 * vary * hash(hs, ix, 69); for (const p of V) { const dk = up ? 1 : 0.62 + 0.38 * Math.min(1, Math.max(0, (p[1] - y0) / 1.2)); G.tint(tn[up ? 0 : 1][0] * shade * dk, tn[up ? 0 : 1][1] * shade * dk, tn[up ? 0 : 1][2] * shade * dk); G._emit(p, nf); G.uv.push(dot3(p, t) / uvm + o, dot3(p, bt) / uvm + o2); }
+        for (let i = 1; i < V.length - 1; i++) G.idx.push(base, base + i, base + i + 1); }
+      G.tint(1, 1, 1); };
+    /* the strips */
+    let a = A0 - hash(hs, 1, 71) * J[0].spacing_m, strip = 0, prev = null;
+    while (a < A1) { const wa = J[0].spacing_m * k0 * (1 + (J[0].jitter || 0.5) * (2 * hash(hs, strip, 72) - 1)), a1 = a + wa; const breaks = []; const pers = J[1].persist != null ? J[1].persist : 0.5;
+      if (prev && hash(hs, strip, 73) < pers) for (const b of prev) breaks.push(b + 0.1 * (hash(hs, strip, breaks.length) - 0.5));
+      else { let b = B0 - hash(hs, strip, 74) * J[1].spacing_m * k0, q = 0; while (b < B1 + J[1].spacing_m * k0) { breaks.push(b); b += J[1].spacing_m * k0 * (1 + (J[1].jitter || 0.5) * (2 * hash(hs, strip, 75 + q) - 1)); q++; } }
+      prev = breaks;
+      for (let c = 0; c < breaks.length - 1; c++) { const b0 = breaks[c], b1 = breaks[c + 1], ix = strip * 1009 + c, ca = (a + a1) / 2, cb = (b0 + b1) / 2, det = Na[0] * Nb[1] - Na[1] * Nb[0], cx = (ca * Nb[1] - cb * Na[1]) / det, cz = (cb * Na[0] - ca * Nb[0]) / det;
+        if (!inPoly(it.plan, cx, cz)) continue;
+        const la = a1 - a, lb = b1 - b0, e = Math.max(0.5, Math.min(la, lb) / 2), hc = h(cx, cz), gx = (h(cx + e, cz) - h(cx - e, cz)) / (2 * e), gz = (h(cx, cz + e) - h(cx, cz - e)) / (2 * e), s = Math.hypot(gx, gz), t0 = Math.max(0, Math.min(1, (s - step0) / 0.5)), k = t0 * t0 * (3 - 2 * t0) * stepA;
+        const edge = Math.min(1, polyDist(it.plan, cx, cz) / 1.5), tilt = it.tilt != null ? it.tilt : 0.07, tl = () => (hash(hs, ix, 76 + tl.n++) - 0.5) * tilt; tl.n = 0;
+        let y0 = (hc * 2 + h(cx + la * 0.3 * Na[0], cz + la * 0.3 * Na[1]) + h(cx - la * 0.3 * Na[0], cz - la * 0.3 * Na[1]) + h(cx + lb * 0.3 * Nb[0], cz + lb * 0.3 * Nb[1]) + h(cx - lb * 0.3 * Nb[0], cz - lb * 0.3 * Nb[1])) / 6;
+        y0 += (lift + jit * (hash(hs, ix, 80) - 0.5) + (k > 0.3 ? 0.12 * k : 0)) * edge - 0.3 * (1 - edge);
+        const gX = gx + (gBed[0] - gx) * k + tl(), gZ = gz + (gBed[1] - gz) * k + tl(), top = norm3([-gX, 1, -gZ]), dTop = top[0] * cx + top[1] * y0 + top[2] * cz;
+        const ring = Math.min(h(cx + 1.3, cz), h(cx - 1.3, cz), h(cx, cz + 1.3), h(cx, cz - 1.3), hc), vis = y0 - ring, tb = (bed.thickness_m || 0.5) * (0.7 + 0.6 * hash(hs, ix, 81)), yB = ring - 0.6;
+        const tn = [TOP, FACE], cA = near ? chamfer * (0.6 + 0.9 * hash(hs, ix, 82)) * (1 - 0.5 * k) : 0, extra = []; blocks++;
+        /* a third joint cuts some blocks across, and the cut-off part sits a little lower */
+        if (J3 && hash(hs, ix, 83) < (J3.chance != null ? J3.chance : 0.25) && la * lb > 0.5) { const an = (J3.strike_deg + (J3.spread_deg != null ? J3.spread_deg : 30) * (2 * hash(hs, ix, 86) - 1)) * Math.PI / 180, Nc = [Math.cos(an), Math.sin(an)], dn = Nc[0] * cx + Nc[1] * cz + (hash(hs, ix, 84) - 0.5) * 0.7 * Math.min(la, lb), n3 = [Nc[0], 0, Nc[1]];
+          piece(a + gap, a1 - gap, b0 + gap, b1 - gap, top, dTop, yB, [[n3, dn - gap]], tn, cA, ix);
+          piece(a + gap, a1 - gap, b0 + gap, b1 - gap, top, dTop - 0.03 - 0.1 * hash(hs, ix, 85), yB, [[[-n3[0], 0, -n3[2]], -dn - gap]], tn, cA, ix + 7); n += 2; }
+        else { const nc = near ? Math.min(5, Math.floor(vis / tb)) : 0;
+          if (nc >= 1) { const flat = norm3([-gBed[0], 1, -gBed[1]]), at = y => flat[0] * cx + flat[1] * y + flat[2] * cz; let ox = 0, yq = y0;   /* courses along the bedding, each standing a little proud or back of the one above */
+            for (let q = 0; q <= nc; q++) { const yn = yq - tb * (0.85 + 0.3 * hash(hs, ix, 90 + q)), lower = q < nc ? [[[-flat[0], -flat[1], -flat[2]], -at(yn)]] : null;
+              piece(a + gap - ox, a1 - gap + ox, b0 + gap - ox, b1 - gap + ox, q === 0 ? top : flat, q === 0 ? dTop : at(yq - 0.008), yB, lower, tn, q === 0 ? cA : cA * 0.5, ix + q * 3); yq = yn; ox = 0.2 * (hash(hs, ix, 95 + q) - 0.35); n++; } }
+          else { piece(a + gap, a1 - gap, b0 + gap, b1 - gap, top, dTop, yB, null, tn, cA, ix); n++; } }
+        if (opt.solids) opt.solids.push([+cx.toFixed(2), +cz.toFixed(2), +(Math.min(la, lb) / 2).toFixed(2), +y0.toFixed(2)]); }
+      a = a1; strip++; }
+    return { blocks, pieces: n }; };
   D.lampGlow = k => { D.lampLevel = k; for (const m of D.lampMats || []) m.emissiveIntensity = k; };
   D.MODULES.dressing = function (opt, style, wear) {
-    const g = new Geo(), hw = new Geo(), far = new Geo(), seed = opt.seed || 1, cells = (style._mats && style._mats.sign_atlas && style._mats.sign_atlas.cells) || {}, count = {};
+    const g = new Geo(), hw = new Geo(), far = new Geo(), seed = opt.seed || 1, cells = (style._mats && style._mats.sign_atlas && style._mats.sign_atlas.cells) || {}, count = {}, solids = [];
     const DRESS = {
       lamp_twin(it) { const [x, z] = it.at, y = it.y, yaw = (it.yaw_deg || 0) * Math.PI / 180, cy = Math.cos(yaw), sy = Math.sin(yaw), arm = 0.85, top = 4.6, P = (a, h) => [x + cy * a, y + h, z - sy * a];
         g.material('concrete_wall'); g.tint(0.9, 0.9, 0.88); g.tube([x, y - 0.6, z], [x, y + 0.08, z], 0.26, 8, 1, 'end');
@@ -23468,7 +23648,7 @@ const DOCKS = (() => {
         g.tube([0, 0, 0], [0, 0, S], 0.028, 6, 1, 'both'); for (const s of [-1, 1]) { const q = [[0, 0, 0.02], [s * 0.2, 0, 0.04], [s * 0.38, 0, 0.17], [s * 0.46, 0, 0.36]]; for (let i = 0; i < 3; i++) g.tube(q[i], q[i + 1], 0.024, 6, 1, 'none'); g.quad([s * 0.53, -0.012, 0.46], [s * 0.53, 0.012, 0.46], [s * 0.39, 0.012, 0.21], [s * 0.39, -0.012, 0.21], 1); g.quad([s * 0.39, 0.012, 0.21], [s * 0.53, 0.012, 0.46], [s * 0.53, -0.012, 0.46], [s * 0.39, -0.012, 0.21], 1); g.box([s * 0.46, 0, 0.33], [0.13, 0.016, 0.26], 1); }
         g.tube([0, 0, S], [0, 0, S + 0.03], 0.045, 6, 1, 'both'); torus(g, [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, S + 0.09], 0.07, 0.012, 10, 4);
         g.material('pile_wood'); g.tint(0.5, 0.48, 0.44); g.box([0.1, 0.04, S - 0.16], [0.42, 0.09, 0.09], 1); g.tint(1, 1, 1); g.pop(); },
-      block(it) { const [x, z] = it.at, sz = it.size || [1.3, 0.55, 0.9], tn = it.tint || [0.9, 0.9, 0.88]; g.material('granite_block'); g.tint(tn[0], tn[1], tn[2]); g.push(posed(x, it.y, z, it)); g.uvMap = (u, v) => [(u + x) / 2, (v + z) / 2];
+      block(it) { const [x, z] = it.at, sz = it.size || [1.3, 0.55, 0.9], tn = it.tint || [0.9, 0.9, 0.88]; g.material(it.mat || 'granite_block'); g.tint(tn[0], tn[1], tn[2]); g.push(posed(x, it.y, z, it)); g.uvMap = (u, v) => [(u + x) / 2, (v + z) / 2];
         if (it.rough) { /* split, not sawn: each of the 8 corners off true by up to `rough` (m); the same 12 triangles as a box */
           const k = Math.round(x * 100) + Math.round(z * 100) * 7, C = (a, b, c) => { const i = (a > 0 ? 1 : 0) + (b > 0 ? 2 : 0) + (c > 0 ? 4 : 0); return [a * sz[2] / 2 + (hash(seed, k, 10 + i) - 0.5) * 2 * it.rough, b * sz[1] / 2 + (hash(seed, k, 20 + i) - 0.5) * 2 * it.rough, c * sz[0] / 2 + (hash(seed, k, 30 + i) - 0.5) * 2 * it.rough]; };
           g.quad(C(-1, 1, 1), C(1, 1, 1), C(1, 1, -1), C(-1, 1, -1), 1); g.quad(C(-1, -1, -1), C(1, -1, -1), C(1, -1, 1), C(-1, -1, 1), 1); g.quad(C(-1, -1, 1), C(1, -1, 1), C(1, 1, 1), C(-1, 1, 1), 1);
@@ -23493,6 +23673,8 @@ const DOCKS = (() => {
             for (const i of [a, b, c]) { const y = P[i][1], k = stain != null ? Math.max(0, Math.min(1, (stain - y) / 0.5)) : 0, sh = 0.82 + 0.3 * hash(sd, i, 51); G.tint(tn[0] * sh * (1 - 0.68 * k), tn[1] * sh * (1 - 0.7 * k), tn[2] * sh * (1 - 0.74 * k)); G._emit(P[i], N[i]); const q = ax === 1 ? [P[i][0], P[i][2]] : ax === 0 ? [P[i][2], P[i][1]] : [P[i][0], P[i][1]]; G.uv.push(q[0] / uvS, q[1] / uvS); }
             G.idx.push(base, base + 1, base + 2); } G.tint(1, 1, 1); };
         cast(g, it.detail != null ? it.detail : 3, it.uv_m || 1.2); if (it.far !== false) cast(far, 1, it.uv_m || 1.2); },
+      /* K11, see above: near tier and a far tier at far_k times the spacing; meta.solids lists each near block as [x, z, r, top] for a boat to strike */
+      outcrop(it) { const r = D.outcropInto(g, it, { solids }); count.outcrop_blocks = (count.outcrop_blocks || 0) + r.pieces; if (it.far !== false) D.outcropInto(far, it, { far: true }); },
       pipe(it) { const m = it.mat || 'white_trim'; g.material(m); g.tint(1, 1, 1); g.tube(it.from, it.to, it.r_m || 0.05, 8, 1, 'both'); },   /* a drain line, plastic, out of the wall: `from`, `to` as [x, navd, z] */
       /* a paved floor (site 1 item 26a): a convex outline in level metres, its top at y, the scan laid flat across it in level coordinates so neighbouring pieces meet; a 12 cm edge round it. Kept in the far tier: a terrace reads from the water. */
       paving(it) { const y = it.y, t = it.t_m || 0.12, uvm = it.uv_m || 3, tn = it.tint || [1, 1, 1]; let area = 0; const P = it.poly; for (let i = 0; i < P.length; i++) { const q = P[(i + 1) % P.length]; area += P[i][0] * q[1] - q[0] * P[i][1]; } const Q = area < 0 ? P : P.slice().reverse();   /* wound to face up: y up, x east, z south */
@@ -23508,7 +23690,7 @@ const DOCKS = (() => {
     };
     for (const it of opt.items || []) { const f = DRESS[it.type]; if (!f) throw new Error('dressing: no type ' + it.type); f(it); count[it.type] = (count[it.type] || 0) + 1; }
     g.tint(1, 1, 1); g.finish(); hw.finish(); far.finish();
-    return { geometry: g, hardware: hw, far: far.idx.length ? far : null, far_m: opt.far_m || 120, cutoff_m: opt.cutoff_m || 900, sockets: [], size: [0, 0, 0], meta: { kind: 'dressing', count } };
+    return { geometry: g, hardware: hw, far: far.idx.length ? far : null, far_m: opt.far_m || 120, cutoff_m: opt.cutoff_m || 900, sockets: [], size: [0, 0, 0], meta: { kind: 'dressing', count, solids: solids.length ? solids : undefined } };
   };
   /* K7, the general seawall (docs/sites/bar-harbor-waterfront.md item 11, 1 Nov). Built the way a mason or a contractor builds one:
        granite         dry-laid courses of split blocks, bottom up, each course's joints broken over the one below, the face

@@ -44,6 +44,7 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | lamp_cobra |  | procedural stand-in (tools/assets/lampgen.py) | CC0 |  |
 | lamp_colonial |  | procedural stand-in (tools/assets/lampgen.py) | CC0 |  |
 | le_lyrial |  | tools/assets/vessels/build.py (procedural, from published particulars, deck plan and photographs) | CC0 |  |
+| lewis_french_sailcloth |  | tools/assets/vessels/lewis_french.py | CC0 |  |
 | lifebuoy |  | Poly Haven | CC0-1.0 | https://polyhaven.com/a/lifebuoy |
 | lobster_buoy |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
 | lobster_buoy_lv |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
@@ -57,10 +58,13 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | lobster_wesmac |  | tools/assets/vessels/build.py (lobster.py, lob_hull.py, lob_top.py; procedural) | CC0 |  |
 | margaret_todd |  | tools/assets/vessels/build.py (mt.py; procedural) | CC0 |  |
 | margaret_todd_sailcloth |  | tools/assets/vessels/mt.py | CC0 |  |
+| mary_day |  | tools/assets/vessels/build.py (mary_day.py; procedural) | CC0 |  |
+| mary_day_sailcloth |  | tools/assets/vessels/mary_day.py | CC0 |  |
 | ocean_buoy |  | Poly Haven | CC0-1.0 | https://polyhaven.com/a/ocean_buoy |
 | osprey |  | tools/assets/vessels/osprey.py, osprey_top.py, osprey_lines.py, osprey_rails.py, osprey_fore.py, osprey_aft.py, osprey_roof.py, osprey_tender.py via build.py (from Wesmac's and Matt's photos of her, docs/osprey.md) | CC0 |  |
 | osprey_wheelhouse |  | tools/assets/vessels/osprey_wh.py via build.py (procedural, from Matt's wheelhouse photos, 30 Oct 2026) | CC0 |  |
 | razorbill | Guillemot 3d model free | iRahulRajput (https://sketchfab.com/rt699448) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/guillemot-3d-model-free-b3e4fddb5d034b389aa9eacea85ac7ba |
 | schooner | Schooner | Tobias.De.Maine (https://sketchfab.com/Tobias.De.Maine) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/schooner-56148c53e9664ee683b598fadb457992 |
+| schooner_coaster_small |  | tools/assets/vessels/build.py (lewis_french.py; procedural) | CC0 |  |
 | sloop | Sailboat | Sergei (https://sketchfab.com/sergeif) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/sailboat-76d0b1e24be14d2f9a524bfce3001aeb |
 | towboatus | Tow Boat | BoatUS Foundation (https://sketchfab.com/boatusfoundation) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/tow-boat-86939cf48b914951aa3c6ed2bc8bb446 |

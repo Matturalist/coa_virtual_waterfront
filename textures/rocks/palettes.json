@@ -1,10 +1,10 @@
 {
- "_doc": "tools/assets/rock_palettes.py \u2014 the default rock palettes (textures/rocks/palettes.json), one per rock_rules formation. Built by tools/assets/rock_palettes.py; edit palettes in the editor, not here.",
+ "_doc": "tools/assets/rock_palettes.py — the default rock palettes (textures/rocks/palettes.json), one per rock_rules formation. Built by tools/assets/rock_palettes.py; edit palettes in the editor, not here.",
  "amount_doc": "amount: 0 = the scans as photographed, 1 = the scans' pattern in the palette's colours.",
  "formations": {
   "bar_harbor_formation": {
    "name": "Bar Harbor Formation (siltstone, sandstone)",
-   "amount": 1.0,
+   "amount": 0.0,
    "wet": 0.55,
    "top": [
     [
