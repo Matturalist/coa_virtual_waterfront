@@ -2886,6 +2886,8 @@ const MODELS = (() => {
         const part = src.clone(true); src.matrixWorld.decompose(part.position, part.quaternion, part.scale);   /* its place in the pack, with every parent's transform */
         scene = new THREE.Group(); scene.add(part); }
       else if ([...M.byId.values()].filter(x => x.file === file || (x.files && Object.values(x.files).some(f => f.file === file))).length > 1) scene = scene.clone(true);   /* a file two entries share whole: each gets its own copy */
+      /* hide: nodes of a shared file this entry leaves out (sloop.py: one hull, with her sails set, or covered, or neither) */
+      if (e.hide) for (const h of e.hide) { const o = scene.getObjectByName(h); if (o && o.parent) o.parent.remove(o); }
       /* orientation: wrap the file's scene so the rotation is a transform of the template, not an edit of the file's nodes */
       const root = new THREE.Group(); root.name = 'model:' + e.id;
       const r = e.rot || [0, 0, 0]; scene.rotation.set(r[0] * deg, r[1] * deg, r[2] * deg, e.order || 'XYZ'); root.add(scene);
@@ -2908,7 +2910,7 @@ const MODELS = (() => {
           roughness: m.roughness != null ? m.roughness : 0.7, metalness: pbr ? (m.metalness || 0) : 0, emissive: m.emissive ? m.emissive.clone() : 0x000000, emissiveMap: fresh(m.emissiveMap),
           transparent: !!m.transparent && !(m.alphaTest > 0), opacity: m.opacity, alphaTest: m.alphaTest || 0,
           side: e.single_sided && e.single_sided.includes(m.name) ? THREE.FrontSide : THREE.DoubleSide });   /* single_sided: the entry's materials drawn from their front only (a windscreen dark from outside, clear from the helm) */
-        if (m.normalScale && n.normalScale) n.normalScale.copy(m.normalScale); n.name = m.name; remade.set(m, n); if (m.aoMap && m.userData && m.userData.wear) wearOn(n, fresh(m.aoMap)); return M.patch(n); };
+        if (m.normalScale && n.normalScale) n.normalScale.copy(m.normalScale); n.name = m.name; if (e.paint && e.paint[m.name]) { const c = e.paint[m.name]; n.color.setRGB(Math.pow(c[0] / 255, 2.2), Math.pow(c[1] / 255, 2.2), Math.pow(c[2] / 255, 2.2)); }   /* paint: this entry's colour for a material whose picture is neutral (sRGB) */ remade.set(m, n); if (m.aoMap && m.userData && m.userData.wear) wearOn(n, fresh(m.aoMap)); return M.patch(n); };
       scene.traverse(o => { if (o.isMesh) { o.castShadow = !(e.no_cast && !Array.isArray(o.material) && e.no_cast.includes(o.material.name)); /* no_cast: the entry's decals and printed faces, millimetres off what they sit on */ o.receiveShadow = true; o.material = Array.isArray(o.material) ? o.material.map(remake) : remake(o.material);
         /* baked ambient occlusion (tools/assets/vessels/ao.py, COLOR_0): drawn only where the manifest says the file carries it */
         if (e.vertex_ao && o.geometry.attributes.color) for (const m of (Array.isArray(o.material) ? o.material : [o.material])) if (m && !m.vertexColors) { m.vertexColors = true; m.needsUpdate = true; } } });
@@ -3258,7 +3260,7 @@ const MODELS = (() => {
     #ifdef SB_INSIDE
     attribute vec3 _off;
     #endif
-    vec3 sbD; vec3 sbR; vec4 sbS0; vec4 sbS1; vec4 sbS2; vec4 sbS3; bool sbDone = false;
+    vec3 sbD; vec3 sbR; vec4 sbS0; vec4 sbS1; vec4 sbS2; vec4 sbS3; bool sbDone = false; vec3 sbBk = vec3(0.0); vec3 sbBkG = vec3(0.0);
     vec3 sbRv(float p) { float a = floor(p / 65536.0), b = floor((p - a * 65536.0) / 256.0), c = p - a * 65536.0 - b * 256.0; return (vec3(a, b, c) - 128.0) / 127.0 * 3.14159265; }
     vec3 sbRot(vec3 r, vec3 v) { float a = length(r); if (a < 1e-3) return v; vec3 k = r / a; float cs = cos(a); return v * cs + cross(k, v) * sin(a) + k * dot(k, v) * (1.0 - cs); }
     vec3 sbQrot(vec4 q, vec3 v) { return v + 2.0 * cross(q.xyz, cross(q.xyz, v) + q.w * v); }
@@ -3268,19 +3270,43 @@ const MODELS = (() => {
     /* a lip is creased into the plate it never parted from (S10, twentieth slice). Near its outer edge it follows the lattice as that plate does, sharing the very nodes, and only further in does it take the bend: so nothing steps at the crease, and the ragged edge its shard was cut with stays flush with the plate above. Its arm is across the hinge in her skin: hinge x outward normal. How far the bend takes to come on: over at least two rows of her triangles (S10, twenty-third slice; solver.lipW, 0.9 m for her 0.35 m shell), or a row spans it and every triangle stands up as a tooth or a diamond: */
     float sbLipK(vec3 m, vec3 nr) { return sbS1.w == 0.0 ? 1.0 : smoothstep(0.0, uSbLipW, dot(m, cross(sbS3.xyz, nr))); }
     vec3 sbCurl(vec3 p) { float g = dot(p, sbS3.xyz), h = 0.5 * sbRoll(p); if (abs(h) < 1e-4) return p; vec3 q = p - sbS3.xyz * g; return sbS3.xyz * g + sbRot(sbS3.xyz * h, q) * sin(h) / h; }
+    #ifdef SB_BUCKLE
+    /* plate doesn't shrink (S10, twenty-seventh slice). When the frames and stringers round a panel are pushed closer, the metal between them has to go somewhere: it bows in or out, as a real hull's plating does between its frames ("hungry horse"). A panel's own four corners are the vertex's four nodes (plates.py Panels; u along the stringers, v along the frames), and a bilinear vertex's weights give u and v back; anything else fails w0 w2 = w1 w3 and is left alone. Height from a strip of length L0 pushed to chord L: 0.5 sqrt(L0^2 - L^2), a V fold; kept under the panel's present size so a nearly closed panel doesn't stand up as a spike. uSbBk: x on, y the strain below which plate stays flat, z how much of that height (most of a crush's shortening is taken by the lattice's own folds), w the most, m. */
+    uniform highp sampler2D uSbRest; uniform vec4 uSbBk; uniform vec2 uSbBkY;
+    vec3 sbX0(int k) { int n = int(_nodes[k]); return texelFetch(uSbRest, ivec2(n & SB_MASK, n >> SB_BITS), 0).xyz; }
+    void sbBuckle(vec3 D0, vec3 D1, vec3 D2, vec3 D3) { float u = _weights[1] + _weights[2], v = _weights[2] + _weights[3];
+      if (uSbBk.x < 0.5 || u < 0.004 || u > 0.996 || v < 0.004 || v > 0.996 || abs(_weights[0] * _weights[2] - _weights[1] * _weights[3]) > 0.003) return;
+      vec3 d1 = D1 - D0, d2 = D2 - D0, d3 = D3 - D0; if (dot(d1, d1) + dot(d2, d2) + dot(d3, d3) < 4e-6) return;   /* moved together: no strain, and none of the four fetches below */
+      vec3 A0 = sbX0(0), B0 = sbX0(1), C0 = sbX0(2), D_0 = sbX0(3), ab = B0 + D1 - A0 - D0, dc = C0 + D2 - D_0 - D3, ad = D_0 + D3 - A0 - D0, bc = C0 + D2 - B0 - D1;
+      float L0u = mix(length(B0 - A0), length(C0 - D_0), v), Lu = mix(length(ab), length(dc), v), L0v = mix(length(D_0 - A0), length(C0 - B0), u), Lv = mix(length(ad), length(bc), u);
+      float ru = clamp(Lu / L0u + uSbBk.y, 0.0, 1.0), rv = clamp(Lv / L0v + uSbBk.y, 0.0, 1.0), au = L0u * sqrt(1.0 - ru * ru), av = L0v * sqrt(1.0 - rv * rv), h = 0.5 * sqrt(au * au + av * av); if (h < 1e-4) return;
+      h = min(uSbBk.z * h, min(uSbBk.w, 0.5 * min(Lu, Lv) + 0.02));
+      #if SB_BUCKLE == 2
+      if ((uSbL2M * vec4(position, 1.0)).y > uSbBkY.x) h = min(h, uSbBkY.y);   /* her shell above this has a lining close behind it, on nodes of its own: a deep dent goes through and shows its back as a dark hole */
+      #endif
+      float hs = fract(dot(_nodes, vec4(0.1379, 0.2713, 0.5317, 0.7193))), u0 = 0.36 + 0.28 * fract(hs * 37.0), v0 = 0.36 + 0.28 * fract(hs * 91.0); h *= hs < 0.7 ? -1.0 : 1.0;   /* mostly in, as a hull's plate goes: her frames hold it out at the edges. One panel, one sign and one peak, from its node numbers */
+      /* not a pillow: plate that has gone plastic collapses as flat facets meeting along yield lines (the roof mechanism of plated-structure collapse; Murray 1973), here an X from the corners to a peak off the panel's middle */
+      float g0 = u / u0, g1 = (1.0 - u) / (1.0 - u0), g2 = v / v0, g3 = (1.0 - v) / (1.0 - v0), g = min(min(g0, g1), min(g2, g3));
+      sbBk = h * g * normalize(sbRot(sbR, mat3(uSbL2M) * normal));
+      vec3 eu = normalize(mix(ab, dc, v) + vec3(1e-5)) / max(Lu, 0.05), ev = normalize(mix(ad, bc, u) + vec3(1e-5)) / max(Lv, 0.05);
+      sbBkG = h * (g == g0 ? eu / u0 : g == g1 ? -eu / (1.0 - u0) : g == g2 ? ev / v0 : -ev / (1.0 - v0)); }
+    #endif
     void sbFetch() { if (sbDone) return; sbDone = true; sbD = vec3(0.0); sbR = vec3(0.0);
-      for (int k = 0; k < 4; k++) { float w = _weights[k]; if (w > 0.0) { int n = int(_nodes[k]); vec4 t = texelFetch(uSbNodes, ivec2(n & SB_MASK, n >> SB_BITS), 0); sbD += w * t.xyz; sbR += w * sbRv(t.w); } }
+      vec3 sbDk[4]; for (int k = 0; k < 4; k++) { float w = _weights[k]; sbDk[k] = vec3(0.0); if (w > 0.0) { int n = int(_nodes[k]); vec4 t = texelFetch(uSbNodes, ivec2(n & SB_MASK, n >> SB_BITS), 0); sbDk[k] = t.xyz; sbD += w * t.xyz; sbR += w * sbRv(t.w); } }
+      #ifdef SB_BUCKLE
+      sbBuckle(sbDk[0], sbDk[1], sbDk[2], sbDk[3]);
+      #endif
       sbS0 = vec4(0.0);
       #ifndef SB_INSIDE
       if (_plate < 65534.5) { int p = int(_plate); sbS0 = texelFetch(uSbStates, ivec2(0, p), 0); if (sbS0.w > 0.5) { sbS1 = texelFetch(uSbStates, ivec2(1, p), 0); sbS2 = texelFetch(uSbStates, ivec2(2, p), 0); sbS3 = texelFetch(uSbStates, ivec2(3, p), 0); } }
       #endif
       }`;
   const SB_NORMAL = `#include <beginnormal_vertex>
-    sbFetch(); { vec3 nm = mat3(uSbL2M) * objectNormal; vec3 sbP0 = (uSbL2M * vec4(position, 1.0)).xyz - sbS0.xyz; if (sbS0.w > 0.5 && sbS0.w < 1.5) { vec3 nm0 = nm; float lk = sbLipK(sbP0, normalize(mat3(uSbL2M) * normal)); if (sbS3.w != 0.0) nm = sbRot(sbS3.xyz * sbRoll(sbP0), nm); nm = sbQrot(sbS2, nm); if (lk < 1.0) nm = mix(sbRot(sbR, nm0), nm, lk); } else nm = sbRot(sbR, nm); objectNormal = mat3(uSbM2L) * nm; }`;
+    sbFetch(); { vec3 nm = mat3(uSbL2M) * objectNormal; vec3 sbP0 = (uSbL2M * vec4(position, 1.0)).xyz - sbS0.xyz; if (sbS0.w > 0.5 && sbS0.w < 1.5) { vec3 nm0 = nm; float lk = sbLipK(sbP0, normalize(mat3(uSbL2M) * normal)); if (sbS3.w != 0.0) nm = sbRot(sbS3.xyz * sbRoll(sbP0), nm); nm = sbQrot(sbS2, nm); if (lk < 1.0) nm = mix(sbRot(sbR, nm0) - sbBkG, nm, lk); } else nm = sbRot(sbR, nm) - sbBkG; objectNormal = mat3(uSbM2L) * nm; }`;
   const SB_MOVE = `#include <begin_vertex>
     sbFetch();
     #ifdef SB_PAINT
-    vSbRest = transformed; vSbUv = uv2; vSbCrush = smoothstep(0.015, 0.09, length(sbD)); if (sbS0.w > 0.5 && sbS0.w < 1.5 && sbS1.w != 0.0) vSbCrush *= smoothstep(0.9, 1.0, sbLipK((uSbL2M * vec4(transformed, 1.0)).xyz - sbS0.xyz, normalize(mat3(uSbL2M) * normal)));   /* a lip's crease is a rolled band, a metre wide, with smooth shading: facets there are only how the mesh happened to fall */ vSbIn = sbS0.w > 0.5 ? 1.0 : mix(0.32, 1.0, smoothstep(0.03, 0.3, length(sbD)));   /* the inside of a hull that has not moved is in the dark; a torn or folded-out plate is in the light */
+    vSbK = length(modelViewMatrix[0].xyz); vSbRest = transformed; vSbUv = uv2; vSbCrush = smoothstep(0.015, 0.09, length(sbD)); if (sbS0.w > 0.5 && sbS0.w < 1.5 && sbS1.w != 0.0) vSbCrush *= smoothstep(0.9, 1.0, sbLipK((uSbL2M * vec4(transformed, 1.0)).xyz - sbS0.xyz, normalize(mat3(uSbL2M) * normal)));   /* a lip's crease is a rolled band, a metre wide, with smooth shading: facets there are only how the mesh happened to fall */ vSbIn = sbS0.w > 0.5 ? 1.0 : mix(0.32, 1.0, smoothstep(0.03, 0.3, length(sbD)));   /* the inside of a hull that has not moved is in the dark; a torn or folded-out plate is in the light */
     #endif
     #ifdef SB_INSIDE
     #ifdef SB_TRIP
@@ -3293,11 +3319,11 @@ const MODELS = (() => {
     if (sbS0.w < 1.5) transformed = vec3(0.0); else transformed += mat3(uSbM2L) * sbD;   /* the room behind a pane: drawn only once that pane has gone, so a whole ship has no more to draw */
     #else
     if (sbS0.w > 1.5) transformed = vec3(0.0);                                   /* gone: every vertex to one point, nothing drawn */
-    else if (sbS0.w > 0.5) { vec3 m = (uSbL2M * vec4(transformed, 1.0)).xyz; vec3 mA = m + sbD; m -= sbS0.xyz; float lk = sbLipK(m, normalize(mat3(uSbL2M) * normal)); if (sbS3.w != 0.0) m = sbCurl(m); m = sbS1.xyz + sbQrot(sbS2, m); if (lk < 1.0) m = mix(mA, m, lk); transformed = (uSbM2L * vec4(m, 1.0)).xyz; }   /* torn free or hanging: one rigid piece */
-    else transformed += mat3(uSbM2L) * sbD;
+    else if (sbS0.w > 0.5) { vec3 m = (uSbL2M * vec4(transformed, 1.0)).xyz; vec3 mA = m + sbD + sbBk; m -= sbS0.xyz; float lk = sbLipK(m, normalize(mat3(uSbL2M) * normal)); if (sbS3.w != 0.0) m = sbCurl(m); m = sbS1.xyz + sbQrot(sbS2, m); if (lk < 1.0) m = mix(mA, m, lk); transformed = (uSbM2L * vec4(m, 1.0)).xyz; }   /* torn free or hanging: one rigid piece */
+    else transformed += mat3(uSbM2L) * (sbD + sbBk);
     #endif
     #endif`;
-  const SB_F = `uniform sampler2D uSbPaint; uniform vec3 uSbBare; uniform float uSbBareM; uniform float uSbShell; uniform float uSbCreaseK; uniform float uSbFacet; uniform float uSbSmear; uniform float uSbFibre; uniform float uSbTrack; varying vec3 vSbRest; varying vec2 vSbUv; varying float vSbCrush; varying float vSbIn; float sbBareA = 0.0; float sbDull = 0.0; float sbGrain = 0.0; float sbCrease = 0.0; vec4 sbPaint;
+  const SB_F = `uniform sampler2D uSbPaint; uniform vec3 uSbBare; uniform float uSbBareM; uniform float uSbShell; uniform float uSbCreaseK; uniform float uSbFacet; uniform float uSbSmear; uniform float uSbFibre; uniform float uSbTrack; uniform float uSbSnap; varying float vSbK; varying vec3 vSbRest; varying vec2 vSbUv; varying float vSbCrush; varying float vSbIn; float sbBareA = 0.0; float sbDull = 0.0; float sbGrain = 0.0; float sbCrease = 0.0; vec4 sbPaint;
     float sbH(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
     float sbNs(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
       return mix(mix(mix(sbH(i), sbH(i + vec3(1, 0, 0)), f.x), mix(sbH(i + vec3(0, 1, 0)), sbH(i + vec3(1, 1, 0)), f.x), f.y), mix(mix(sbH(i + vec3(0, 0, 1)), sbH(i + vec3(1, 0, 1)), f.x), mix(sbH(i + vec3(0, 1, 1)), sbH(i + vec3(1, 1, 1)), f.x), f.y), f.z); }
@@ -3309,6 +3335,8 @@ const MODELS = (() => {
       float th = 1.2 * (sbNs(p * 1.1) - 0.5), u = dot(p, cos(th) * t1 + sin(th) * t2) + 0.009 * sbNs(p * 11.0) + 0.004 * sbNs(p * 43.0), l = abs(fract(u * 34.0) - 0.5) / 34.0, run = smoothstep(0.6, 0.68, sbNs(p * 29.0)) * smoothstep(0.42, 0.62, sbNs(p * 5.0 + 4.0));
       return k * max(o, run * smoothstep(hw * 1.6, hw * 0.5, l)); }`;
   const SB_COLOR = `#include <color_fragment>
+    /* a tube or fitting pulled past what metal can stretch has parted (S10, twenty-eighth slice): a rail bound to sound structure at one end and to a crushed bow at the other drew as a straight rod half as long again. The largest stretch of this triangle from its rest shape, from screen derivatives, so only on a fitting (never a plate: those have their own tears) that the crush has moved */
+    if (uSbSnap > 0.0 && uSbShell < 0.5 && vSbCrush > 0.0) { vec3 sbA0 = dFdx(vSbRest), sbB0 = dFdy(vSbRest), sbA1 = dFdx(vViewPosition) / vSbK, sbB1 = dFdy(vViewPosition) / vSbK; float sbG00 = dot(sbA0, sbA0), sbG01 = dot(sbA0, sbB0), sbG02 = dot(sbB0, sbB0), sbG10 = dot(sbA1, sbA1), sbG11 = dot(sbA1, sbB1), sbG12 = dot(sbB1, sbB1), sbDt = sbG00 * sbG02 - sbG01 * sbG01; if (sbDt > 1e-3 * sbG00 * sbG02) { float sbTr = (sbG02 * sbG10 - 2.0 * sbG01 * sbG11 + sbG00 * sbG12) / sbDt, sbDe = (sbG10 * sbG12 - sbG11 * sbG11) / sbDt; if (0.5 * sbTr + sqrt(max(0.0, 0.25 * sbTr * sbTr - sbDe)) > uSbSnap * uSbSnap) discard; } }
     sbPaint = texture2D(uSbPaint, vSbUv);
     float sbTear = 0.0; if (uSbFibre > 0.1 && uSbFibre < 0.5 && sbPaint.a > 0.8) { sbTear = (sbPaint.a - 0.8) * 5.0 + 1.1 * (abs(2.0 * sbNs(vSbRest * 3.7) - 1.0) - 0.5) + 0.5 * (abs(2.0 * sbNs(vSbRest * 11.0 + 3.0) - 1.0) - 0.5) + 0.05 * (sbNs(vSbRest * 60.0) - 0.5); if (sbTear > 0.8) discard; }   /* metal (S10, twentieth slice): a torn edge is not where the plate's triangles ran: it goes in long tongues a hand to a forearm long, and sharp, with no fibres */
     else if (uSbFibre > 0.5 && sbPaint.a > 0.8) { sbTear = (sbPaint.a - 0.8) * 5.0 + 0.85 * (sbNs(vSbRest * 8.0) - 0.5) + 0.35 * (sbNs(vSbRest * 31.0) - 0.5) + 0.3 * (sbNs(vSbRest * 140.0) - 0.5) + 0.26 * (sbNs(vSbRest * vec3(520.0, 310.0, 470.0)) - 0.5); if (sbTear > 0.8) discard; }   /* glass (S11): a torn edge runs where it likes, in teeth a hand long, whatever triangles it tore along, and ends in fibres: how near the tear (alpha), broken up at three scales */
@@ -3367,23 +3395,24 @@ const MODELS = (() => {
     const X0 = new Float32Array(3 * N), pos = new Float32Array(3 * N), data = new Float32Array(4 * size * size), REST = 128 * 65536 + 128 * 256 + 128;
     S.nodes.forEach((n, i) => { X0.set(n.p, 3 * i); pos.set(n.p, 3 * i); }); for (let i = 0; i < size * size; i++) data[4 * i + 3] = REST;
     const nodeTex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.FloatType); nodeTex.minFilter = nodeTex.magFilter = THREE.NearestFilter; nodeTex.generateMipmaps = false; nodeTex.needsUpdate = true;
+    const restData = new Float32Array(4 * size * size); S.nodes.forEach((n, i) => restData.set(n.p, 4 * i)); const restTex = new THREE.DataTexture(restData, size, size, THREE.RGBAFormat, THREE.FloatType); restTex.minFilter = restTex.magFilter = THREE.NearestFilter; restTex.generateMipmaps = false; restTex.needsUpdate = true;   /* (65 kB, once; one sampler, on a damaged boat's plating only, and read only where a panel has strained) */
     const ids = X.plates + X.shards + (X.fittings || 0), stData = new Float32Array(4 * 4 * ids), stTex = new THREE.DataTexture(stData, 4, ids, THREE.RGBAFormat, THREE.FloatType); stTex.minFilter = stTex.magFilter = THREE.NearestFilter; stTex.generateMipmaps = false; stTex.needsUpdate = true;
     const blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat); blank.needsUpdate = true;
-    const sbSV = S.solver || {}, uTrk = { value: 1 }, uFib = { value: sbSV.fibre ? 1 : sbSV.jag === 0 ? 0 : 0.25 };   /* uSbFibre: 1 glass; metal 0.25 with jagged torn edges (S10, twentieth slice), 0 without (solver.jag 0: Le Lyrial, whose shell triangles are too coarse for it; SOFTBODY.jag) */
+    const sbSV = S.solver || {}, uSnap = { value: sbSV.snap || 0 }, uTrk = { value: 1 }, uBk = { value: new THREE.Vector4(sbSV.buckle ? 1 : 0, sbSV.buckle ? sbSV.buckle[0] : 0, sbSV.buckle ? sbSV.buckle[1] : 0, sbSV.buckle ? sbSV.buckle[2] : 0) }, uBkY = { value: new THREE.Vector2(sbSV.buckle && sbSV.buckle[3] != null ? sbSV.buckle[3] : 1e6, sbSV.buckle && sbSV.buckle[4] != null ? sbSV.buckle[4] : 0) }, uFib = { value: sbSV.fibre ? 1 : sbSV.jag === 0 ? 0 : 0.25 };   /* uSbFibre: 1 glass; metal 0.25 with jagged torn edges (S10, twentieth slice), 0 without (solver.jag 0: Le Lyrial, whose shell triangles are too coarse for it; SOFTBODY.jag) */
     const creaseK = (S.solver && S.solver.creaseBare != null) ? S.solver.creaseBare : 1, uPaint = { value: blank }, bareC = opt.bare || X.bare || [214, 217, 219], uBare = { value: new THREE.Vector3(...bareC.map(v => Math.pow(v / 255, 2.2))) };   /* the sidecar's own (Le Lyrial: steel, lyrial_plates.py), or her own bare 5083, mill finish: fv.py 'fv_deck', sampled from the side-deck and bow photos */
     const defs = { SB_MASK: size - 1, SB_BITS: bits };
     /* a material for one mesh of this boat: the same shader for all, its own frame matrices (a part's node may be turned from the model frame) */
     const skinned = (base, l2m, m2l, paint, shell, ins) => { const c = base.clone(), prev = base.onBeforeCompile, key = base.customProgramCacheKey ? base.customProgramCacheKey() : ''; c.defines = Object.assign({}, base.defines, defs); if (paint) c.defines.SB_PAINT = 1; if (ins) c.defines.SB_INSIDE = 1;
-      c.onBeforeCompile = function (sh, r) { if (prev) prev.call(this, sh, r); Object.assign(sh.uniforms, { uSbNodes: { value: nodeTex }, uSbStates: { value: stTex }, uSbL2M: { value: l2m }, uSbM2L: { value: m2l }, uSbPaint: uPaint, uSbBare: uBare, uSbBareM: { value: X.bare_metal != null ? X.bare_metal : 0.7 }, uSbShell: { value: +shell || 0 }, uSbCreaseK: { value: creaseK }, uSbFacet: { value: (S.solver && S.solver.facet) || 1 }, uSbFibre: uFib, uSbTrack: uTrk, uSbLipW: { value: sbSV.lipW || 0.9 }, uSbSmear: { value: S.solver && S.solver.smear != null ? S.solver.smear : 0.72 } });
-        sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + SB_V + '\n#ifdef SB_PAINT\nattribute vec2 uv2; varying vec3 vSbRest; varying vec2 vSbUv; varying float vSbCrush; varying float vSbIn;\n#endif')
+      c.onBeforeCompile = function (sh, r) { if (prev) prev.call(this, sh, r); Object.assign(sh.uniforms, { uSbNodes: { value: nodeTex }, uSbStates: { value: stTex }, uSbL2M: { value: l2m }, uSbM2L: { value: m2l }, uSbPaint: uPaint, uSbSnap: uSnap, uSbBare: uBare, uSbBareM: { value: X.bare_metal != null ? X.bare_metal : 0.7 }, uSbShell: { value: +shell || 0 }, uSbCreaseK: { value: creaseK }, uSbFacet: { value: (S.solver && S.solver.facet) || 1 }, uSbFibre: uFib, uSbTrack: uTrk, uSbLipW: { value: sbSV.lipW || 0.9 }, uSbRest: { value: restTex }, uSbBk: uBk, uSbBkY: uBkY, uSbSmear: { value: S.solver && S.solver.smear != null ? S.solver.smear : 0.72 } });
+        sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + SB_V + '\n#ifdef SB_PAINT\nattribute vec2 uv2; varying float vSbK; varying vec3 vSbRest; varying vec2 vSbUv; varying float vSbCrush; varying float vSbIn;\n#endif')
           .replace('#include <beginnormal_vertex>', SB_NORMAL).replace('#include <begin_vertex>', SB_MOVE);
         if (paint) sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + SB_F).replace('#include <color_fragment>', SB_COLOR).replace('#include <roughnessmap_fragment>', SB_ROUGH)
           .replace('#include <metalnessmap_fragment>', SB_METAL).replace('#include <normal_fragment_maps>', SB_NORMF).replace('#include <aomap_fragment>', SB_AO);
         if (ins) { sh.fragmentShader = sh.fragmentShader.replace('#include <aomap_fragment>', '#include <aomap_fragment>\n reflectedLight.indirectSpecular *= vColor.r * vColor.r;'); sh.vertexShader = sh.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n#ifdef SB_BACK\n{ vec4 sbQ = projectionMatrix * vec4(mvPosition.xyz * (1.0 + SB_BACK / length(mvPosition.xyz)), 1.0); gl_Position.z = sbQ.z / sbQ.w * gl_Position.w; }\n#endif'); } };   /* SB_BACK: the inside is tested for depth this many metres further from the eye than it is drawn. Her shell is coarser than her lattice: a triangle running from a moved lip to still plate cuts in front of the frames between, and each stood through it as a hairline */
       c.customProgramCacheKey = () => key + '|sb' + bits + (paint ? 'p' : '') + (ins ? 'i' : ''); return c; };
-    const depthOf = (l2m, m2l) => { const d = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }); d.defines = Object.assign({}, defs);
-      d.onBeforeCompile = sh => { Object.assign(sh.uniforms, { uSbNodes: { value: nodeTex }, uSbStates: { value: stTex }, uSbL2M: { value: l2m }, uSbM2L: { value: m2l } }); sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + SB_V).replace('#include <begin_vertex>', SB_MOVE); };
-      d.customProgramCacheKey = () => 'sbd' + bits; return d; };
+    const depthOf = (l2m, m2l, bk) => { const d = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }); d.defines = Object.assign({}, defs); if (bk) d.defines.SB_BUCKLE = bk;
+      d.onBeforeCompile = sh => { Object.assign(sh.uniforms, { uSbNodes: { value: nodeTex }, uSbStates: { value: stTex }, uSbL2M: { value: l2m }, uSbM2L: { value: m2l }, uSbRest: { value: restTex }, uSbBk: uBk, uSbBkY: uBkY }); sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + SB_V).replace('#include <begin_vertex>', SB_MOVE); };
+      d.customProgramCacheKey = () => 'sbd' + bits + (bk ? 'b' + bk : ''); return d; };
     const undo = [], added = [], rims = [], rimsLip = [], lipOf = new Map(), baseMats = {}; let on = true, IN = null;
     const stripN = n => n.replace(/_\d+$/, '');
     const bindTier = async (rootT, tier) => { rootT = frameOf(rootT); rootT.updateMatrixWorld(true); const inv = new THREE.Matrix4().copy(rootT.matrixWorld).invert(), list = [], mats = {}; rootT.traverse(o => { if (o.isMesh) list.push(o); });
@@ -3405,7 +3434,7 @@ const MODELS = (() => {
         undo.push({ o, geometry: o.geometry, material: o.material, depth: o.customDepthMaterial, cull: o.frustumCulled, g, mt, dp }); }
       if (trims.length || tier === 'hd') { const id = new THREE.Matrix4(); sidecar.scene.traverse(pm => { if (!pm.isMesh) return; const pn = pm.material.name, b = mats[(X.material_of && X.material_of[pn]) || pn]; if (!b) { warn('softbody: no material ' + pn); return; }
           const G = pm.geometry; if (G.attributes._plate.array.constructor !== Float32Array) G.setAttribute('_plate', new THREE.BufferAttribute(Float32Array.from(G.attributes._plate.array), 1));
-          const glass = /^fv_glass/.test(b.name) || /_glass$|_balust$|_room$/.test(pn), m = skinned(b, id, id, !glass, /hull$/.test(pn) ? 1 : /_deck$/.test(pn) ? 2 : 0); if (!glass) m.side = THREE.DoubleSide; if (/_room$/.test(pn)) { m.defines.SB_ROOM = 1; const k_ = m.customProgramCacheKey; m.customProgramCacheKey = () => k_() + 'r'; } const nm = new THREE.Mesh(G, m); nm.userData.sbGlass = glass;   /* (S8: the windscreen as eight panes; glass takes no paint, and keeps its one-sidedness) */ nm.name = 'sb_plates_' + b.name; nm.castShadow = nm.receiveShadow = true; if (/_balust$|_room$/.test(pn)) nm.castShadow = false; if (/_room$/.test(pn)) m.envMapIntensity = 0.1;   /* (a room sees no sky) */ nm.customDepthMaterial = depthOf(id, id); nm.frustumCulled = false; nm.visible = on; rootT.add(nm); added.push(nm); }); }
+          const glass = /^fv_glass/.test(b.name) || /_glass$|_balust$|_room$/.test(pn), m = skinned(b, id, id, !glass, /hull$/.test(pn) ? 1 : /_deck$/.test(pn) ? 2 : 0); if (!glass) m.side = THREE.DoubleSide; if (/_room$/.test(pn)) { m.defines.SB_ROOM = 1; const k_ = m.customProgramCacheKey; m.customProgramCacheKey = () => k_() + 'r'; } const bk_ = !glass && sbSV.buckle ? (/hull$/.test(pn) ? 2 : 1) : 0; if (bk_) { m.defines.SB_BUCKLE = bk_; const k_ = m.customProgramCacheKey; m.customProgramCacheKey = () => k_() + 'b' + bk_; } const nm = new THREE.Mesh(G, m); nm.userData.sbGlass = glass;   /* (S8: the windscreen as eight panes; glass takes no paint, and keeps its one-sidedness) */ nm.name = 'sb_plates_' + b.name; nm.castShadow = nm.receiveShadow = true; if (/_balust$|_room$/.test(pn)) nm.castShadow = false; if (/_room$/.test(pn)) m.envMapIntensity = 0.1;   /* (a room sees no sky) */ nm.customDepthMaterial = depthOf(id, id, bk_); nm.frustumCulled = false; nm.visible = on; rootT.add(nm); added.push(nm); }); }
       apply(); };
     const apply = () => { for (const u of undo) { u.o.geometry = on ? u.g : u.geometry; u.o.material = on ? u.mt : u.material; u.o.customDepthMaterial = on ? u.dp || undefined : u.depth; u.o.frustumCulled = on ? false : u.cull; } for (const a of added) a.visible = on; if (IN) IN.show(); };
     await bindTier(root, opt.tier || 'hd');
@@ -3470,6 +3499,8 @@ const MODELS = (() => {
       for (const [e, c] of own) if (c.n === 1 && !whole(e, c)) out.push(c.a, c.b); if (ownOnly) return; const s = shard.get(id); if (s) for (const [nb] of s.nb || []) walk(nb, (e, a, b) => { const c = own.get(e); if (c && c.n === 1 && !whole(e, c)) out.push(a, b); }); };
     sb.splat = function (s) { queue.push(s); };
     sb.setTracks = function (v) { uTrk.value = v ? 1 : 0; };
+    sb.setSnap = function (v) { uSnap.value = v && sbSV.snap ? sbSV.snap : 0; };
+    sb.setBuckle = function (v) { uBk.value.x = v && sbSV.buckle ? 1 : 0; };
     sb.setJag = function (v) { if (sbSV.fibre || sbSV.jag === 0) return; uFib.value = v ? 0.25 : 0; };
     /* a mark from a contact: the collider isn't her plate, so find the plate. The nearest triangle within SNAP_R that faces the way the contact does, taking its face as the mark's; none, and there's nothing there to mark */
     const SNAP_R = 1.2, snapTo = (s) => { const { ps, ix, cell, key } = P, p = s.p, N = s.n; let best = 1e9, q = null, tn = null; const eval1 = t => { const a = 3 * ix[3 * t], b = 3 * ix[3 * t + 1], c = 3 * ix[3 * t + 2], ax = ps[a], ay = ps[a + 1], az = ps[a + 2]; { const ox = ax - p[0], oy = ay - p[1], oz = az - p[2], lx = ps[b] - p[0], ly = ps[b + 1] - p[1], lz = ps[b + 2] - p[2], mx = ps[c] - p[0], my = ps[c + 1] - p[1], mz = ps[c + 2] - p[2], R = SNAP_R; if ((ox > R && lx > R && mx > R) || (ox < -R && lx < -R && mx < -R) || (oy > R && ly > R && my > R) || (oy < -R && ly < -R && my < -R) || (oz > R && lz > R && mz > R) || (oz < -R && lz < -R && mz < -R)) return; } const ux = ps[b] - ax, uy = ps[b + 1] - ay, uz = ps[b + 2] - az, vx = ps[c] - ax, vy = ps[c + 1] - ay, vz = ps[c + 2] - az; let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; const nl = Math.sqrt(nx * nx + ny * ny + nz * nz); if (nl < 1e-9) return; nx /= nl; ny /= nl; nz /= nl; let f = nx * N[0] + ny * N[1] + nz * N[2]; if (Math.abs(f) < 0.2) return; if (f < 0) { nx = -nx; ny = -ny; nz = -nz; f = -f; }
@@ -3579,7 +3610,9 @@ const MODELS = (() => {
      FILL.on                               the frame-cost switch (rule 9)
 
    brush (one entry in authored.json `brushes`, kind 'fill' — same raster convention as the Editor's terrain grid brush):
-     { kind: 'fill', stroke, x0, z0, dx, nx, nz, depth: [nx*nz metres], d50, sorting, roundedness, imbrication|null, settle, seed }
+     { kind: 'fill', stroke, x0, z0, dx, nx, nz, depth: [nx*nz metres], d50, sorting, roundedness, imbrication|null, settle, seed, stamps? }
+   stamps: a beach library's id (textures/fill/beach/<id>.json, tools/assets/beach_stones.py): stones cut from a photo of that beach, drawn in
+   their photographed colours, at any size from 2 to 50 cm, instead of the scan's stamps coloured by rock palette (docs/fill.md).
    lib: textures/fill/clasts/clasts.json (+ in the page, the atlases as ImageData for heights). Without height atlases (node,
    tests) a stamp's relief is an ellipsoid from its measured size, height and elongation. Assets owns this file. */
 const FILL = (() => {
@@ -3620,8 +3653,10 @@ const FILL = (() => {
     /* the paint is the thickness you SEE (the pile's envelope); coarse deposits are ~40 % voids, so the solid to place is 60 % of it */
     const POR = opt.porosity != null ? opt.porosity : 0.4, target = depth.map(d => d * dx * dx * (1 - POR)), have = new Float32Array(nx * nz); let total = 0; for (const t of target) total += t;
     const stones = []; let vol = 0, tries = 0;
+    /* a beach's own stones (brush.stamps, a library in textures/fill/beach/): every size draws from it, by the stone's share of that beach */
+    const stamps = brush.stamps && lib[brush.stamps] ? brush.stamps : null;
     /* stamps per class, with roundedness weights when the slider is set */
-    const pickStamp = cls => { const L = lib[cls].clasts; let sum = 0; const w = L.map(s => { const v = s.skip || s.height_m > 0.9 * s.d_m ? 0 : round == null ? 1 : Math.exp(-(((s.roundedness - round) / 0.08) ** 2)) + 1e-3; sum += v; return v; });   // skip: flagged stamps (glare), and stamps measured taller than 0.9 x their diameter (bad scans, 28 of 1,106), are never drawn
+    const pickStamp = cls => { const L = lib[cls].clasts; let sum = 0; const w = L.map(s => { if (s.share != null) { sum += s.share; return s.share; } const v = s.skip || s.height_m > 0.9 * s.d_m ? 0 : round == null ? 1 : Math.exp(-(((s.roundedness - round) / 0.08) ** 2)) + 1e-3; sum += v; return v; });   // skip: flagged stamps (glare), and stamps measured taller than 0.9 x their diameter (bad scans, 28 of 1,106), are never drawn
       let t = r() * sum; for (let k = 0; k < L.length; k++) { t -= w[k]; if (t <= 0) return [k, L]; } return [L.length - 1, L]; };
     const maxTries = opt.maxTries || 60000, REPOSE = Math.tan((opt.repose_deg || 34) * D2R);
     /* the ground under a stone of footprint `foot` at (x, z): 16 samples over its disc, their 10th/90th percentile, and the
@@ -3633,7 +3668,8 @@ const FILL = (() => {
     const maxStones = opt.maxStones || Infinity;
     while (vol < total && tries < maxTries && stones.length < maxStones) { tries++; if ((tries & 7) === 0) yield; const phase = vol / total;
       /* the size draw: log-normal about D50, sorting the width; drifts coarse -> fine over the fill so fines settle between */
-      const d = d50 * Math.pow(2, normal(r) * sorting) * (1.25 - 0.5 * phase); let cls = null; for (const c in F.CLASSES) { const [a, b] = F.CLASSES[c]; if (d >= a && d < b && lib[c]) { cls = c; break; } } if (!cls) continue;
+      const d = d50 * Math.pow(2, normal(r) * sorting) * (1.25 - 0.5 * phase); let cls = null;
+      if (stamps) { if (d >= 0.02 && d < 0.5) cls = stamps; } else for (const c in F.CLASSES) { const [a, b] = F.CLASSES[c]; if (d >= a && d < b && lib[c]) { cls = c; break; } } if (!cls) continue;
       const [si, L] = pickStamp(cls), s = L[si], k = d / s.d_m, foot = s.footprint_m * k, hm = s.height_m * k;
       /* where: six candidates drawn by deficit; keep the one that rests least on taller neighbours (least overlap) */
       let best = null;
@@ -3687,7 +3723,7 @@ const FILL = (() => {
   F.prepare = function (lib) { if (lib._poly) return lib._poly; const g = F.prepareGen(lib); let r = g.next(); while (!r.done) r = g.next(); return r.value; };
   F.prepareGen = function* (lib) {
     if (lib._poly) return lib._poly; const P = {};
-    for (const cls of Object.keys(F.CLASSES)) { const e = lib[cls], H = lib._heights && lib._heights[cls]; if (!e || !H || !H.alpha) continue;
+    for (const cls of Object.keys(F.CLASSES).concat(lib._beaches || [])) { const e = lib[cls], H = lib._heights && lib._heights[cls]; if (!e || !H || !H.alpha) continue;
       const S = e.cell_px, Wd = H.width, A = H.alpha, n = e.clasts.length, NA = 32, lut = new Uint8Array(NA * n * 4), rows = [], Ls = [];
       for (let k = 0; k < n; k++) { const [c, r] = e.clasts[k].cell, ox = c * S, oy = r * S; let sx = 0, sy = 0, m = 0;
         const al = (x, y) => (x < 0 || y < 0 || x >= S || y >= S) ? 0 : A[((oy + y) * Wd + ox + x) * 4 + 3];
@@ -3742,11 +3778,11 @@ const FILL = (() => {
   /* the meshes: one InstancedMesh per size class at opt.shape, sharing the instance arrays (opt.attrs caches the GPU attributes
      so the tiers of one block share them too) */
   F.meshes = function (inst, lib, opt) {
-    opt = opt || {}; const U = opt.units || 1, group = new THREE.Group(); group.name = 'fill'; const P = F.prepare(lib), sh = opt.shape || F.SHAPE_HD, AT = opt.attrs || {};
+    opt = opt || {}; const U = opt.units || 1, group = new THREE.Group(); group.name = 'fill'; const P = F.prepare(lib), AT = opt.attrs || {};
     lib._lutTex = lib._lutTex || {};
     for (const cls in inst) { const e = lib[cls], pc = P[cls], I = inst[cls]; if (!pc || !I.n) continue; const S = e.cell_px, H = lib._heights[cls], Wd = H.width, Ht = H.alpha.length / 4 / Wd, n = I.n;
       let lt = lib._lutTex[cls]; if (!lt) { lt = new THREE.DataTexture(pc.lut, pc.na, pc.n, THREE.RGBAFormat); lt.wrapS = THREE.RepeatWrapping; lt.magFilter = lt.minFilter = THREE.LinearFilter; lt.needsUpdate = true; lib._lutTex[cls] = lt; }
-      const g = F.stoneGrid(sh); g.instanceCount = n;
+      const g = F.stoneGrid(e.shapes ? e.shapes[opt.tier || 0] : (opt.shape || F.SHAPE_HD)); g.instanceCount = n;   /* a beach library's stones are small and many: its own lighter grids */
       const at = AT[cls] || (AT[cls] = { aCell: new THREE.InstancedBufferAttribute(I.aCell, 2), aS: new THREE.InstancedBufferAttribute(I.aS, 4), aF: new THREE.InstancedBufferAttribute(I.aF, 2), aM: I.aM.map(a => new THREE.InstancedBufferAttribute(a, 4)) });
       g.setAttribute('aCell', at.aCell); g.setAttribute('aS', at.aS); g.setAttribute('aF', at.aF); for (let c = 0; c < 4; c++) g.setAttribute('aM' + c, at.aM[c]);
       const tA = opt.atlas && opt.atlas[cls], tH = opt.heights && opt.heights[cls];
@@ -3792,16 +3828,16 @@ const FILL = (() => {
           varying float vLodFade; varying vec2 vLodMS; varying float vRho; ${opt.lod ? LOD.DITHER_GLSL : ''}`)
           .replace('#include <map_fragment>', `${opt.lod ? '{ float th = lodNoise(gl_FragCoord.xy, vLodMS.y); if (vLodMS.x > 0.5) th = 1.0 - th; if (vLodFade < th) discard; }' : ''}
             { vec3 sc = pow(texture2D(tA, vAt).rgb, vec3(2.2)); float t = clamp((dot(sc, vec3(0.2126, 0.7152, 0.0722)) - uLum.x) / (uLum.y - uLum.x), 0.0, 1.0);
-            int f = int(vForm + 0.5); vec3 pc = t < 0.5 ? mix(uPal[f * 3], uPal[f * 3 + 1], t * 2.0) : mix(uPal[f * 3 + 1], uPal[f * 3 + 2], t * 2.0 - 1.0);
+            int fr = int(vForm + 0.5), f = fr > 7 ? 0 : fr; vec3 pc = t < 0.5 ? mix(uPal[f * 3], uPal[f * 3 + 1], t * 2.0) : mix(uPal[f * 3 + 1], uPal[f * 3 + 2], t * 2.0 - 1.0);
             float wet = smoothstep(0.05, -0.05, vWp.y / ${U.toFixed(1)} - uY0 - uTide);   /* below the water: darker */
-            diffuseColor.rgb = mix(sc, pc, uAmt[f]) * mix(1.0, 0.6, wet); }`)
+            diffuseColor.rgb = (fr > 7 ? sc : mix(sc, pc, uAmt[f])) * mix(1.0, 0.6, wet); }`)
           /* the scan's own relief as surface detail (pits, grain, chips): the height atlas' slope, in metres per metre */
           .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
             { float hx = texture2D(tH, vAt + vec2(uTexel.x, 0.0)).r - texture2D(tH, vAt - vec2(uTexel.x, 0.0)).r, hz = texture2D(tH, vAt - vec2(0.0, uTexel.y)).r - texture2D(tH, vAt + vec2(0.0, uTexel.y)).r;
               float m = vBump.x / (2.0 * vBump.y * uTexel.x / uCellSize.x) * 0.6 * (vBump.z > 0.0 ? mix(1.0, 0.5, pow(vRho, 4.0)) : 0.5);   /* the same at the girth on both faces */
               vec3 pw = -(hx * vTx + hz * vTz) * m; normal = normalize(normal + mat3(viewMatrix) * pw); }`);
       };
-      mat.customProgramCacheKey = () => 'fill4-' + cls + '-' + U + (opt.lod ? 'L' : '');
+      mat.customProgramCacheKey = () => 'fill5-' + cls + '-' + U + (opt.lod ? 'L' : '');
       const mesh = new THREE.Mesh(g, mat); mesh.frustumCulled = false; mesh.name = 'fill:' + cls; mesh.userData.count = n; mesh.userData.cls = cls; mesh.userData.tris = n * g.userData.tris; group.add(mesh); }
     group.visible = F.on; return group;
   };
@@ -3846,7 +3882,7 @@ const FILL = (() => {
        - drawn in 64 m BLOCKS (4 x 4 chunks): one instanced mesh per size class per tier per block, rebuilt (one a frame)
          when a chunk in it finishes, so a big painted beach is a few dozen draw calls, not hundreds
      Stones within a chunk see each other; across a chunk edge they do not (they may touch or overlap slightly there). */
-  const CH = 16, BLK = 2, CELL_CAP = 200000, STONE_CAP = 6000;
+  const CH = 16, BLK = 2, CELL_CAP = 200000, STONE_CAP = 6000, BEACH_FORM = 8;   /* BEACH_FORM: a stone in its own photographed colour, no palette */
   F.budget_ms = 3; F.build_m = 320;
   /* how far out a chunk is worth building: as far as its biggest stones are drawn (cobble beaches to ~60 m, boulder fields further) */
   const reach = ch => { if (ch.reach == null) { let d = 0; for (const ds of ch.strokes) d = Math.max(d, ds[0].d50 || 0.35); ch.reach = Math.min(F.build_m, d < 0.3 ? 60 : d < 0.6 ? 110 : d < 1.2 ? 180 : 330); } return ch.reach; };
@@ -3863,6 +3899,10 @@ const FILL = (() => {
       for (const c of Object.keys(F.CLASSES)) { const e = lib[c]; if (!e) continue; const [a, h] = await Promise.all([img(e.atlas), img(e.height)]);
         lib._heights[c] = { data: pix(h), alpha: pix(a), width: h.width };
         const ta = new THREE.Texture(a); ta.encoding = THREE.sRGBEncoding; ta.anisotropy = 4; ta.needsUpdate = true; fl.atlas[c] = ta; const th = new THREE.Texture(h); th.needsUpdate = true; fl.heights[c] = th; }
+      /* the beach libraries the authored strokes name (each about 0.3 MB; none loads unless a stroke asks) */
+      lib._beaches = [];
+      for (const id of new Set(fillBrushes().map(b => b.stamps).filter(Boolean))) { try { const e = await (await fetch(F.assetUrl('textures/fill/beach/' + id + '.json'))).json(), [a, h] = await Promise.all([img(e.atlas), img(e.height)]); lib[id] = e; lib._beaches.push(id); if (e.fars) F.CLASS_FARS[id] = e.fars;
+          lib._heights[id] = { data: pix(h), alpha: pix(a), width: h.width }; const ta = new THREE.Texture(a); ta.encoding = THREE.sRGBEncoding; ta.anisotropy = 4; ta.needsUpdate = true; fl.atlas[id] = ta; const th = new THREE.Texture(h); th.needsUpdate = true; fl.heights[id] = th; } catch (e) { console.warn('FILL: beach library ' + id, e); } }
       /* the stamps' outlines (F.prepare: ~0.3-0.9 s of pixel walking) a few ms at a time between frames, not in one */
       { const g = F.prepareGen(lib); let r = { done: false }; while (!r.done) { const t0 = performance.now(); while (!r.done && performance.now() - t0 < 6) r = g.next(); if (!r.done) await new Promise(res => setTimeout(res, 0)); } }
       fl.lib = lib; return lib; })().catch(e => { console.warn('FILL: clast library', e); fl.libP = null; throw e; }));
@@ -3873,11 +3913,11 @@ const FILL = (() => {
     let x0 = 1e9, z0 = 1e9, x1 = -1e9, z1 = -1e9; for (const b of dabs) { x0 = Math.min(x0, b.c[0] - b.r); z0 = Math.min(z0, b.c[1] - b.r); x1 = Math.max(x1, b.c[0] + b.r); z1 = Math.max(z1, b.c[1] + b.r); }
     x0 = Math.floor(x0 / DX) * DX; z0 = Math.floor(z0 / DX) * DX; const nx = Math.max(1, Math.ceil((x1 - x0) / DX)), nz = Math.max(1, Math.ceil((z1 - z0) / DX)), depth = new Array(nx * nz).fill(0);
     for (const b of dabs) { const dm = b.depth_m == null ? 0.5 : b.depth_m; for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) { const v = dm * fallF(Math.hypot(x0 + (i + 0.5) * DX - b.c[0], z0 + (j + 0.5) * DX - b.c[1]), b.r, b.falloff), k = j * nx + i; if (v > depth[k]) depth[k] = v; } }
-    return { kind: 'fill', stroke: d0.stroke || d0.id, x0, z0, dx: DX, nx, nz, depth: depth.map(v => +v.toFixed(3)), d50: d0.d50 || 0.35, sorting: d0.sorting != null ? d0.sorting : 0.6, roundedness: d0.roundedness != null ? d0.roundedness : null, imbrication: null, settle: d0.settle != null ? d0.settle : 0.35, seed: d0.seed || 1, mix: d0.mix || null, rock: d0.rock || null, tumble: d0.tumble != null ? d0.tumble : 0.5 };
+    return { kind: 'fill', stroke: d0.stroke || d0.id, x0, z0, dx: DX, nx, nz, depth: depth.map(v => +v.toFixed(3)), d50: d0.d50 || 0.35, sorting: d0.sorting != null ? d0.sorting : 0.6, roundedness: d0.roundedness != null ? d0.roundedness : null, imbrication: null, settle: d0.settle != null ? d0.settle : 0.35, seed: d0.seed || 1, mix: d0.mix || null, rock: d0.rock || null, stamps: d0.stamps || null, tumble: d0.tumble != null ? d0.tumble : 0.5 };
   };
   const fillBrushes = () => { const A = typeof LEVEL !== 'undefined' && LEVEL.authored; return A && A.brushes ? A.brushes.filter(b => b && b.kind === 'fill' && (b.c || b.depth)) : []; };
   const strokesOfF = list => { const S = new Map(); for (const b of list) { const k = b.stroke || b.id; if (!S.has(k)) S.set(k, []); S.get(k).push(b); } return S; };
-  const sigOf = ds => ds.map(b => b.id + ':' + (b.c || '') + ':' + b.r + ':' + b.falloff + ':' + b.depth_m + ':' + b.d50 + ':' + b.sorting + ':' + b.roundedness + ':' + JSON.stringify(b.mix || b.rock || '') + ':' + b.tumble + (b.depth ? ':' + b.depth.length + ':' + b.x0 + ':' + b.z0 : '')).join('|');
+  const sigOf = ds => ds.map(b => b.id + ':' + (b.c || '') + ':' + b.r + ':' + b.falloff + ':' + b.depth_m + ':' + b.d50 + ':' + b.sorting + ':' + b.roundedness + ':' + JSON.stringify(b.mix || b.rock || '') + ':' + (b.stamps || '') + ':' + b.tumble + (b.depth ? ':' + b.depth.length + ':' + b.x0 + ':' + b.z0 : '')).join('|');
   /* the rock palettes (ledge.js; the ones Matt sets in the Ledge panel), tops, in formation order, linear */
   let palCache = null, palT = 0;
   function palettes() {
@@ -3897,7 +3937,7 @@ const FILL = (() => {
       for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const v = dm * fallF(Math.hypot(x0 + (i + 0.5) * DX - b.c[0], z0 + (j + 0.5) * DX - b.c[1]), b.r, b.falloff), k = j * n + i; if (v > depth[k]) { depth[k] = v; any = true; } } }
     if (!any) return null;
     return { kind: 'fill', stroke: d0.stroke || d0.id, x0, z0, dx: DX, nx: n, nz: n, depth: Array.from(depth), d50: d0.d50 || 0.35, sorting: d0.sorting != null ? d0.sorting : 0.6, roundedness: d0.roundedness != null ? d0.roundedness : null, imbrication: null,
-      settle: d0.settle != null ? d0.settle : 0.35, seed: hashI(d0.seed || 1, ci, cj), mix: d0.mix || null, rock: d0.rock || null, tumble: d0.tumble != null ? d0.tumble : 0.5 };
+      settle: d0.settle != null ? d0.settle : 0.35, seed: hashI(d0.seed || 1, ci, cj), mix: d0.mix || null, rock: d0.rock || null, stamps: d0.stamps || null, tumble: d0.tumble != null ? d0.tumble : 0.5 };
   }
   /* one chunk, as a generator: the ground (a 0.25 m grid of terrain + painted ledges, bilinear), then each stroke's deposit on it
      and on the strokes before it, then the dark "voids" sheet under the stones */
@@ -3916,7 +3956,7 @@ const FILL = (() => {
       const mix = b.rock ? { [b.rock]: 1 } : (b.mix && Object.keys(b.mix).length ? b.mix : null), cum = [];
       if (mix) { let a = 0; for (const k in mix) { const i = ids.indexOf(k); if (i < 0) continue; a += mix[k]; cum.push([a, i]); } }
       const rr = (k, c) => { let h = Math.imul((b.seed || 1) * 2654435761 ^ (k * 40503 + c * 9973), 2246822519); h ^= h >>> 15; h = Math.imul(h, 3266489917); h ^= h >>> 13; return (h >>> 0) / 4294967296; };
-      res.stones.forEach((st, k) => { const t = rr(k, 1) * (cum.length ? cum[cum.length - 1][0] : 1); st.form = cum.length ? (cum.find(c => t <= c[0]) || cum[cum.length - 1])[1] : 0; st.round = b.roundedness != null ? b.roundedness : 0.35; stones.push(st); });
+      res.stones.forEach((st, k) => { const t = rr(k, 1) * (cum.length ? cum[cum.length - 1][0] : 1); st.form = cum.length ? (cum.find(c => t <= c[0]) || cum[cum.length - 1])[1] : 0; st.round = b.roundedness != null ? b.roundedness : 0.35; if (b.stamps && fl.lib && fl.lib[b.stamps]) st.form = BEACH_FORM; stones.push(st); });
       /* the dark between the stones: the pile's envelope just over the ground on a 25 cm grid, only under stones, not across a
          ledge step */
       const P = res.pile, stp = Math.max(1, Math.round(0.25 / P.cell)), sx = Math.ceil(P.nx / stp) + 1, sz = Math.ceil(P.nz / stp) + 1, v0 = env.pos.length / 3, at = (i, j) => Math.min(P.nz - 1, j * stp) * P.nx + Math.min(P.nx - 1, i * stp);
@@ -3947,7 +3987,7 @@ const FILL = (() => {
       for (const ch of chs) { const v0 = po / 3; for (let k = 0; k < ch.env.pos.length; k++) env.pos[po + k] = (k % 3 === 1 ? ch.env.pos[k] + Y0 : ch.env.pos[k]) * U; for (let k = 0; k < ch.env.idx.length; k++) env.idx[io + k] = ch.env.idx[k] + v0; po += ch.env.pos.length; io += ch.env.idx.length; } }
     const inst = F.joinInstances(chs.filter(ch => ch.inst).map(ch => ch.inst)), attrs = {};
     const pal = palettes(), op = { units: U, atlas: fl.atlas, heights: fl.heights, pal: pal.pal, amt: pal.amt, attrs }, lod = typeof LOD !== 'undefined' && LOD.BAND_GLSL;
-    B.tiers = [F.SHAPE_HD, F.SHAPE_MID, F.SHAPE_LO].map((shape, i) => { const g = F.meshes(inst, fl.lib, Object.assign({ shape, lod: lod ? { bandOf: cls => bandsOf(tiersOf(cls), i) } : null }, op)); let tris = 0;
+    B.tiers = [F.SHAPE_HD, F.SHAPE_MID, F.SHAPE_LO].map((shape, i) => { const g = F.meshes(inst, fl.lib, Object.assign({ shape, tier: i, lod: lod ? { bandOf: cls => bandsOf(tiersOf(cls), i) } : null }, op)); let tris = 0;
       g.traverse(m => { if (m.isMesh) { tris += m.userData.tris; m.userData.far = tiersOf(m.userData.cls)[i].far; m.userData.band = bandsOf(tiersOf(m.userData.cls), i); } }); fl.group.add(g); return { g, tris, i }; });
     if (env.idx.length) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(env.pos, 3)); g.setIndex(new THREE.BufferAttribute(env.idx, 1)); g.computeVertexNormals();
       B.env = new THREE.Mesh(g, fl.envMat || (fl.envMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(0x1c1d1f).convertSRGBToLinear(), roughness: 0.5 }))); fl.group.add(B.env); }
@@ -19489,6 +19529,8 @@ if (typeof module !== 'undefined') module.exports = { makePhysics, TUNE_DEFAULTS
      SOFTBODY.rakeEnter                  a rock comes into her from her skin, and only by her sliding onto it or at 1.5 m/s; off: each key sets it down at full depth, cutting all in it at once (S10, nineteenth slice).
      SOFTBODY.rakeRocks                  how many places a rake can be on her at once, each its own rock (2: both keels of a catamaran. 1: the hardest only). Each is another solid in the worker's contact loop; nothing on the main thread.
      SOFTBODY.tracks                     rubbed metal shows the tracks of what she slid on, and paint rubbed but not cut through goes matt (S10, twenty-third slice). Off: a stain with a chipped edge. A few noise reads on rubbed pixels only.
+     SOFTBODY.buckle                     plate squeezed between its frames bows in or out, since metal doesn't shrink (S10, twenty-seventh slice; a boat whose structure has solver.buckle). Off: panels stay flat between their frames. A damaged boat's plating only.
+     SOFTBODY.snap                       a fitting (rail, bracket, tube) pulled past solver.snap times its length has parted, and isn't drawn (S10, twenty-eighth slice; a boat whose structure has solver.snap). Off: it stretches as a straight rod.
      SOFTBODY.jag                        a torn metal edge goes in sharp tongues instead of along the plate's triangles (S10, twentieth slice). Off: as cut. A draw per torn shard into the paint texture when it tears, and a few noise reads on pixels within 30 cm of a tear.
      SOFTBODY.lips                       a rake peels two long lips along its path (S10, fifteenth slice). Off: each plate it opens hangs alone. No frame cost of its own.
      SOFTBODY.shove                      a rake bends what it tears: a frame or stringer it cuts is swept the way the rock went and in, not left standing (S10, seventeenth slice). No frame cost of its own.
@@ -20574,7 +20616,7 @@ function sbCore() {
 /* ---------- the door ---------- */
 const SOFTBODY = (() => {
   const core = sbCore(), recs = new Map();
-  const S = { on: true, bed: true, bedCrush: 1.5e5, paint: true, jag: true, tracks: true, rake: true, rakeEnter: true, lips: true, shove: true, scrape: true, scrapeV: 0.5, scrapeN: 5e3, scrapeJ: 100e3, scrapeStep: 0.3, scrapeRate: 20, rakeV: 1, rakeDt: 0.1, rakeDepth: [0.15, 1, 3], rakeRocks: 2, rakeJoin: 2, hardJ: 20e3, ms: 0, maxFree: 16, create: core.SOFTBODY.create, DRIVER: core.DRIVER, ROTFIT: core.ROTFIT, workerSrc: () => '(' + sbCore.toString() + ')().workerMain(self);', onDebris: null };
+  const S = { on: true, bed: true, bedCrush: 1.5e5, paint: true, jag: true, tracks: true, buckle: true, snap: true, rake: true, rakeEnter: true, lips: true, shove: true, scrape: true, scrapeV: 0.5, scrapeN: 5e3, scrapeJ: 100e3, scrapeStep: 0.3, scrapeRate: 20, rakeV: 1, rakeDt: 0.1, rakeDepth: [0.15, 1, 3], rakeRocks: 2, rakeJoin: 2, hardJ: 20e3, ms: 0, maxFree: 16, create: core.SOFTBODY.create, DRIVER: core.DRIVER, ROTFIT: core.ROTFIT, workerSrc: () => '(' + sbCore.toString() + ')().workerMain(self);', onDebris: null };
   /* hardJ: below this a blow only marks her (damage.js does that) and nothing is fetched. 20 kJ is 75 t's bow at about 1 m/s on her effective mass: past a hard docking, about where 8 mm plate starts to dish between frames. ASSUMED */
   /* scrape: a slide marks her (below). scrapeV m/s and scrapeN newtons: less than this leaves paint alone. scrapeJ: friction work that wires a boat that has had no hard blow; below it damage.js's marks do. scrapeStep m and scrapeRate a second: the most marks one contact lays. All ASSUMED, by eye */
   let hit = 0, rate = 0, src = null;   /* hit: boats wired; the frame returns at once while it is 0 */
@@ -20702,6 +20744,8 @@ const SOFTBODY = (() => {
       if (rec.shown !== S.on) { rec.shown = S.on; sb.enabled(S.on); } if (!S.on) continue;
       if (rec.jag !== S.jag) { rec.jag = S.jag; if (sb.setJag) sb.setJag(S.jag); }
       if (rec.tracks !== S.tracks) { rec.tracks = S.tracks; if (sb.setTracks) sb.setTracks(S.tracks); }
+      if (rec.buckle !== S.buckle) { rec.buckle = S.buckle; if (sb.setBuckle) sb.setBuckle(S.buckle); }
+      if (rec.snap !== S.snap) { rec.snap = S.snap; if (sb.setSnap) sb.setSnap(S.snap); }
       if (rec.draw) { sb.setNodes(rec.draw, rec.rot); rec.draw = rec.rot = null; }
       const Q = rec.q;
       if (Q.states.length) { sb.plates(Q.states); if (!rec.inside && rec.entry.inside && Q.states.some(s => s.state !== 'attached')) { rec.inside = true; sb.inside().catch(e => console.warn('softbody inside', e)); } Q.states.length = 0; }
@@ -24668,6 +24712,7 @@ const DOCKS = (() => {
   D.toThree = function (built, opt) {
     if (typeof THREE === 'undefined') throw new Error('no THREE');
     opt = opt || {}; const U = opt.units || 1, group = new THREE.Group(); group.name = 'dock:' + built.id; const matCache = opt.materials || {};
+    if (opt.materials && opt.loader && !D._three) D._three = { materials: opt.materials, loader: opt.loader };   /* the level's cache, for D.preview: no second copy of a texture */
     const stainOf = mode => Object.assign({ strength: 0.4 + 0.6 * Math.min(1, built.wear.algae || 0) }, built.stain || {});
     const matFor = (name, mode) => { const key = name + '|' + (mode || '') + '|' + JSON.stringify(stainOf(mode)) + '|' + (built.wear.droppings || 0); if (matCache[key]) return matCache[key]; const spec = (built.mats && built.mats[name]) || (D.styles && D.styles._materials && D.styles._materials[name]) || { color: 0x888888 };
       const m = new THREE.MeshStandardMaterial({ color: spec.color_lin ? new THREE.Color(spec.color_lin[0], spec.color_lin[1], spec.color_lin[2]) : spec.color != null ? new THREE.Color(spec.color).convertSRGBToLinear() : 0xffffff,   /* color_lin: a look tint, tint / texture mean in linear light */   /* style colours are sRGB hex (as picked from photos): linearise, or dark browns render red-orange */ roughness: spec.roughness != null ? spec.roughness : 0.85, metalness: spec.metalness || 0, vertexColors: true });   // COLOR_0 is the per-plank / per-pile tint
@@ -24709,6 +24754,7 @@ const DOCKS = (() => {
      'hard'), so World's lookups, perchesOf and the droppings decals parented to them keep working. D.update merges each group
      the first time it sees it; D.mergeOn = false keeps the old one-mesh-per-part drawing (switch, rule 9). */
   D.mergeOn = true;
+  D.TIER_CELL_M = 300;
   D.merge = function (grp) {
     if (!grp || grp.userData.dockMerged) return 0; grp.userData.dockMerged = true;
     const src = grp.children.filter(m => m.isMesh && !m.isInstancedMesh && (m.userData.part || m.userData.hardware) && !m.userData.merged && !m.userData.noMerge && !m.userData.tierFar && m.geometry && m.geometry.index
@@ -24743,7 +24789,8 @@ const DOCKS = (() => {
        draw per material near and one per material far, not one per part */
     const tiered = grp.children.filter(m => m.isMesh && m.userData.tier && !m.userData.ride && !m.userData.swing && !m.userData.merged && !m.userData.mergedInto && m.geometry && m.geometry.index && m.userData.tier.far.geometry.index
       && ['position', 'normal', 'uv', 'color'].every(a => m.geometry.attributes[a] && m.userData.tier.far.geometry.attributes[a]));
-    const tb = new Map(); for (const m of tiered) { const key = (m.userData.hard ? 1 : 0) + '|' + (m.receiveShadow ? 1 : 0) + '|' + (m.castShadow ? 1 : 0); (tb.get(key) || tb.set(key, []).get(key)).push(m); }
+    /* by place too: a merged mesh swaps tier by its whole bounding sphere, so a file a kilometre long would stay near everywhere inside it (West Street north: 57k tris from the COA spawn, 600 m from the nearest stone). D.TIER_CELL_M squares, one mesh each */
+    const tb = new Map(), cellM = D.TIER_CELL_M * (D.units || 1); for (const m of tiered) { if (!m.geometry.boundingSphere) m.geometry.computeBoundingSphere(); const c = m.geometry.boundingSphere.center, key = (m.userData.hard ? 1 : 0) + '|' + (m.receiveShadow ? 1 : 0) + '|' + (m.castShadow ? 1 : 0) + '|' + Math.floor(c.x / cellM) + '|' + Math.floor(c.z / cellM); (tb.get(key) || tb.set(key, []).get(key)).push(m); }
     for (const list of tb.values()) { if (list.length < 2) continue; const fars = list.map(m => m.userData.tier.far);
       const [mm, sn] = mergeList(list), [fm, sf] = mergeList(fars); saved += sn + sf; mm.userData.hardware = mm.userData.hw0 = false; fm.userData.hardware = fm.userData.hw0 = false;
       mm.name = grp.name + ':merged:tiered'; fm.name = mm.name + ':far'; fm.userData.tierFar = true; fm.userData.merged = false; fm.visible = false; fm.userData.parts = [];
@@ -24755,13 +24802,39 @@ const DOCKS = (() => {
     for (const m of grp.children) { const mm = m.userData.mergedInto; if (m.userData.merged) { m.visible = on; m.userData.hardware = on && m.userData.hw0; }
       else if (mm) { if (on) m.layers.disableAll(); else m.layers.set(0); m.userData.hard = on ? false : mm.userData.hard; m.userData.hardware = on ? false : mm.userData.hw0; if (!on) m.visible = true; } } }
 
+  /* ---------- built, not yet placed (CLAUDE.md rule 11) ----------
+     D.preview.on (read every frame, Display "Site 1: built, not yet placed (preview)") draws the dock files listed in
+     models/dock/docks/preview.json that the level doesn't place yet, so Matt can see them while they wait on World. The list loads the first
+     time the switch goes on, one file is built every PREVIEW_GAP frames, and the groups then run through D.update like any other.
+     It cuts no ground, adds no colliders and retires no chart line: a look, not the placement. Off (the default) costs one comparison a frame. */
+  D.preview = { on: false, list: 'models/dock/docks/preview.json', groups: [], hidden: [], _shown: false, _queue: null, _wait: 0, built: [] };
+  const PREVIEW_GAP = 20;
+  D.previewPrep = function (dk, item) {   /* one list entry onto its dock file: pure, for dock_test.js */
+    const dock = JSON.parse(JSON.stringify(dk)); for (const k of item.omit || []) delete dock[k]; if (item.id) dock.id = item.id; return dock; };
+  function previewBuild(dock, item, groups) { const P = D.preview, st = D.styles, U = D.units || 1, T = D._three || (D._three = { materials: {}, loader: new THREE.TextureLoader() });
+    if (dock.materials && st._materials) for (const k in dock.materials) if (!st._materials[k]) st._materials[k] = dock.materials[k];
+    if (dock.style_patch && st[dock.style]) { const key = dock.id + ':style', sp = JSON.parse(JSON.stringify(st[dock.style])); for (const q in dock.style_patch) sp[q] = Object.assign(sp[q] || {}, dock.style_patch[q]); st[key] = sp; dock.style = key; }
+    const Y0 = typeof LEVEL !== 'undefined' && LEVEL.Y0 != null ? LEVEL.Y0 : 0, tide = typeof LEVEL !== 'undefined' && LEVEL.tide != null ? LEVEL.tide : 0;
+    const grp = D.toThree(D.build(dock), { units: U, loader: T.loader, materials: T.materials, waterY: tide * U }); grp.position.y = Y0 * U; grp.userData.preview = true;
+    P.groups.push(grp); P.built.push(dock.id); if (P.scene) P.scene.add(grp); if (P.on) groups.push(grp);
+    if (item.hides) P.hidden.push(item.hides); P._shown = null; }
+  function previewTick(groups) { const P = D.preview; if (groups.length && groups[0].parent) P.scene = groups[0].parent;
+    if (P.on && !P._queue && !P._loaded && typeof fetch !== 'undefined') { P._loaded = true; P._queue = [];
+      fetch(P.list, { cache: 'no-cache' }).then(r => r.json()).then(L => Promise.all(L.files.map(it => fetch(P.list.replace(/[^/]+$/, it.file)).then(r => r.json()).then(dk => P._queue.push([D.previewPrep(dk, it), it])))))
+        .catch(e => console.warn('dock preview', e)).then(() => { P._all = true; }); }
+    if (P.on && P._queue) { if (P._queue.length) { if (--P._wait <= 0) { P._wait = PREVIEW_GAP; const [dock, it] = P._queue.shift(); try { previewBuild(dock, it, groups); } catch (e) { console.warn('dock preview ' + dock.id, e); } } }
+      else if (P._all) P._queue = null; }
+    if (P.on === P._shown) return; P._shown = P.on;
+    for (const g of P.groups) { const i = groups.indexOf(g); if (P.on && i < 0) groups.push(g); else if (!P.on && i >= 0) groups.splice(i, 1); if (!P.on) g.visible = false; }
+    for (const g of groups) { const b = g.userData.built; if (b && !g.userData.preview && P.hidden.includes(b.id)) g.userData.previewHidden = P.on; } }
+
   /* a ramp turning about its hinge with the tide (K5): the mesh's matrix, set only when the angle changes */
   function swingTo(m, sw, tide) { const a = D.swingPitch(sw, tide); if (m.userData.swingA === a) return; m.userData.swingA = a; const U = D.units || 1, H = sw.hinge, M = m.matrix; m.matrixAutoUpdate = false;
     M.makeRotationAxis(new THREE.Vector3(sw.axis[0], sw.axis[1], sw.axis[2]), a); const e = M.elements, x = H[0] * U, y = H[1] * U, z = H[2] * U; e[12] = x - (e[0] * x + e[4] * y + e[8] * z); e[13] = y - (e[1] * x + e[5] * y + e[9] * z); e[14] = z - (e[2] * x + e[6] * y + e[10] * z); m.matrixWorldNeedsUpdate = true; }
   /* once a frame from the page: the switch, and hardware only within HARDWARE.range_m of the camera (a few hundred bolts are
      nothing near, and nothing at all when they would be sub-pixel) */
-  D.update = function (groups, camPos) { stainTick(); const R = (typeof HARDWARE !== 'undefined' ? HARDWARE.range_m : 60) * (D.units || 1), R2 = R * R;
-    for (const grp of groups) { grp.visible = D.on; if (!D.on) continue; if (D.mergeOn && !grp.userData.dockMerged) D.merge(grp);
+  D.update = function (groups, camPos) { stainTick(); if (D.preview.on !== D.preview._shown || D.preview._queue) previewTick(groups); const R = (typeof HARDWARE !== 'undefined' ? HARDWARE.range_m : 60) * (D.units || 1), R2 = R * R;
+    for (const grp of groups) { grp.visible = D.on && !grp.userData.previewHidden; if (!D.on) continue; if (D.mergeOn && !grp.userData.dockMerged) D.merge(grp);
       /* what floats free of a float run's body (a berth's pneumatic fenders, K2): up and down with the tide, one assignment each */
       if (typeof LEVEL !== 'undefined' && LEVEL.tide != null) for (const m of grp.children) { if (m.userData.ride) m.position.y = LEVEL.tide * (D.units || 1); else if (m.userData.swing) swingTo(m, m.userData.swing, LEVEL.tide); }
       if (grp.userData.dockMerged && grp.userData.mergeShown !== D.mergeOn) mergeShow(grp, D.mergeOn); if (typeof DECALS !== 'undefined') for (const m of grp.children) for (const c of m.children) if (c.userData.decal) DECALS.cull(c, camPos);
@@ -31479,7 +31552,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
   const tuneTips = () => attachTips($('tuneGroups'), row => { const i = row.querySelector('input[id^="tu-"]'); return i ? i.id.slice(3) : null; }, (k, row) => (row.querySelector('output') || {}).textContent || '');
   /* settings are split three ways: the boat you are driving, the world (wind, sea, sky), and how it is drawn */
   const VESSEL_GROUPS = new Set(['Boat', 'Hydrostatics', 'Hydrodynamics', 'Lower unit & steering', 'Propeller', 'Contacts']);
-  const DISP_DEF = { instDock: 1, damage: 1, damageMarks: 1, softbody: 1, sbPaint: 1, sbScrape: 1, sbLips: 1, boatWear: 1, ospHaul: 1, trSail: 1, trCG: 1, trSmall: 1, trCruise: 1, ospModel: 1, jetWash: 1, reflections: 1, farLod: 1, lodPerceptual: 0, distCull: 1, farLight: 1, groundStones: 1, horizonShade: 1, shake: 1, buffet: 1, shadows: 2, clouds: 1, foamMap: 1, birds: 1, mammals: 1, traffic: 1, fps: 0, forest: 1, buildings: 1, roads: 1, shoreFx: 1, granite: 1, treeModels: 1, lamps: 1, currents: 1, build: typeof EDITOR_PAGE !== 'undefined' ? 1 : 0, docks: 1, fixtures: 1, weed: 1, windMotion: 1, stones: 0, ledges: 1, volSun: 0, shafts: 0, catspaws: 1, windShadow: 1, swash: 1, plants: 1, edges: 1, stain: 1, nightSky: 1, cloudShadows: 1, aurora: 0, buoys: 1, droppings: 1, cars: 1, curve: 1, loom: 0 };
+  const DISP_DEF = { instDock: 1, damage: 1, damageMarks: 1, softbody: 1, sbPaint: 1, sbScrape: 1, sbLips: 1, sbBuckle: 1, sbSnap: 1, site1Preview: 0, boatWear: 1, ospHaul: 1, trSail: 1, trCG: 1, trSmall: 1, trCruise: 1, ospModel: 1, jetWash: 1, reflections: 1, farLod: 1, lodPerceptual: 0, distCull: 1, farLight: 1, groundStones: 1, horizonShade: 1, shake: 1, buffet: 1, shadows: 2, clouds: 1, foamMap: 1, birds: 1, mammals: 1, traffic: 1, fps: 0, forest: 1, buildings: 1, roads: 1, shoreFx: 1, granite: 1, treeModels: 1, lamps: 1, currents: 1, build: typeof EDITOR_PAGE !== 'undefined' ? 1 : 0, docks: 1, fixtures: 1, weed: 1, windMotion: 1, stones: 0, ledges: 1, volSun: 0, shafts: 0, catspaws: 1, windShadow: 1, swash: 1, plants: 1, edges: 1, stain: 1, nightSky: 1, cloudShadows: 1, aurora: 0, buoys: 1, droppings: 1, cars: 1, curve: 1, loom: 0 };
   const DISP = Object.assign({}, DISP_DEF); try { Object.assign(DISP, JSON.parse(localStorage.getItem('zodiac-display') || '{}')); } catch (e) {}
   /* 19 Oct: the editor froze building painted cobbles; Stones starts off once on every machine (editor_page.js has the why) */
   try { if (!localStorage.getItem('zp-stones-off-1019')) { DISP.stones = 0; localStorage.setItem('zp-stones-off-1019', '1'); localStorage.setItem('zodiac-display', JSON.stringify(DISP)); } } catch (e) {}
@@ -31489,7 +31562,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     ['Lighting', [['shadows', 'Shadows', ['Off', 'Medium (1024)', 'High (2048)', 'Ultra (4096)']]]],
     ['Effects', [['clouds', 'Cloud detail', ['Low (half rate)', 'Full']], ['foamMap', 'Wind foam and windrows (foam that drifts and lasts)', 'sw'], ['birds', 'Seabirds and shorebirds', 'sw'], ['mammals', 'Seals, porpoises, dolphins and whales', 'sw']]],
     ['Scenery', [['forest', 'Forest detail (how far each tier of tree detail reaches; 1 = as designed)', { lo: 0.25, hi: 3, step: 0.05 }],
-      ['treeModels', 'Modelled trees near the camera (off: simple trees everywhere)', 'sw'], ['buildings', 'Towns: buildings and façades', 'sw'], ['roads', 'Roads, poles and lamps', 'sw'], ['farLod', 'Far boats and buoys simplified (off: full physics everywhere, much slower)', 'sw'], ['instDock', 'Instruments docked along the bottom (off: free windows)', 'sw'], ['damage', 'Crash damage: hulls dent, crack and leak (off: they bounce)', 'sw'], ['damageMarks', 'Damage marks on the hull', 'sw'], ['softbody', 'Structural damage: plates fold and tear, fittings break off (a hit boat only)', 'sw'], ['ospModel', 'Osprey: Assets\' model (off: the old code-built boat)', 'sw'], ['sbPaint', 'Scraped paint on a crushed hull', 'sw'], ['sbScrape', 'Damage: slides scrape paint (a grounding or a hard rub)', 'sw'], ['sbLips', 'Damage: rock peels long lips (preview)', 'sw'], ['boatWear', 'Faint wear on boats (preview)', 'sw'], ['ospHaul', 'Haul small boats aboard the Osprey (preview)', 'sw'], ['trSail', 'Harbour sailboats (preview)', 'sw'], ['trCG', 'Coast Guard boats (preview)', 'sw'], ['trSmall', 'Small boats: tenders and RIBs (preview)', 'sw'], ['trCruise', 'Cruise ships (preview)', 'sw'], ['jetWash', 'Jet wash behind the jets', 'sw'], ['reflections', 'Reflections of boats, docks and shore in the sea', ['Off', 'Low', 'Medium', 'High', 'Ultra']], ['lodPerceptual', 'Detail by screen size, changed while the camera swings (Assets, trial)', 'sw'], ['distCull', 'Small things near the camera only (poles, lamps, shore rubble, piles)', 'sw'], ['farLight', 'Ground lit by its own roughness from afar', 'sw'], ['groundStones', 'Stones and blocks drawn into beaches and granite', 'sw'], ['horizonShade', 'Hills shade the land behind them', 'sw'], ['cars', 'Cars driving the roads', 'sw'], ['docks', 'Piers and floating docks', 'sw'], ['fixtures', 'Dock hardware: bolts, hinges, hoops, rub rails (within 60 m)', 'sw'], ['weed', 'Seaweed on the shore (within 120 m)', 'sw'], ['stones', 'Stones: painted cobble and boulder fill (within 120 m; off until it is cheaper. In the editor, turning it on freezes the page for a while as it builds)', 'sw'], ['ledges', 'Ledges: painted rock ledge (the editor\'s Ledge brush)', 'sw'], ['windMotion', 'Wind motion: trees, grass, flags and loose gear sway in the wind', 'sw'], ['lamps', 'Lamps at night: street lamps, windows, nav lights lighting the water and fog', 'sw'], ['catspaws', 'Catspaws: ripples follow the gusts, glassy between them in light air', 'sw'], ['windShadow', 'Wind shadow: a slick in the lee of floats and boats', 'sw'], ['swash', 'Swash sheet: the thin sheet of water running up the shore', 'sw'], ['plants', 'Shrubs and marsh grass painted with the editor', 'sw'], ['buoys', 'Lobster buoys', 'sw'], ['droppings', 'Gull droppings and pavement wear', 'sw'], ['curve', "Earth's curve: boats go hull-down past the horizon", 'sw'], ['loom', 'Looming / mirage (0 normal air)', { lo: 0, hi: 1, step: 0.05 }], ['stain', 'Intertidal staining on docks, piles and seawalls', 'sw'], ['nightSky', 'Night sky: real stars, the Milky Way, meteors', 'sw'], ['cloudShadows', 'Cloud shadows on land and sea', 'sw'], ['aurora', 'Aurora', ['Now and then', 'Never', 'Tonight, strong']], ['edges', 'Path edges: walls, railings, fences, edging stones along the Shore Path', 'sw'], ['volSun', 'Volumetric sunlight near you (off until measured on the F readout)', 'sw'], ['shafts', 'Light shafts from clouds', 'sw'], ['granite', 'Granite veneer (rock textures, dikes, sills, lichen)', 'sw'], ['shoreFx', 'Seas on the shore: graded splashes, wet rock, foam deposits', 'sw'], ['currents', 'Tidal stream (boats drift with the tide)', 'sw']]],
+      ['treeModels', 'Modelled trees near the camera (off: simple trees everywhere)', 'sw'], ['buildings', 'Towns: buildings and façades', 'sw'], ['roads', 'Roads, poles and lamps', 'sw'], ['farLod', 'Far boats and buoys simplified (off: full physics everywhere, much slower)', 'sw'], ['instDock', 'Instruments docked along the bottom (off: free windows)', 'sw'], ['damage', 'Crash damage: hulls dent, crack and leak (off: they bounce)', 'sw'], ['damageMarks', 'Damage marks on the hull', 'sw'], ['softbody', 'Structural damage: plates fold and tear, fittings break off (a hit boat only)', 'sw'], ['ospModel', 'Osprey: Assets\' model (off: the old code-built boat)', 'sw'], ['sbPaint', 'Scraped paint on a crushed hull', 'sw'], ['sbScrape', 'Damage: slides scrape paint (a grounding or a hard rub)', 'sw'], ['sbLips', 'Damage: rock peels long lips (preview)', 'sw'], ['sbBuckle', 'Damage: plate dents between frames (preview)', 'sw'], ['sbSnap', 'Damage: rails and fittings part when overstretched (preview)', 'sw'], ['site1Preview', 'Site 1: built, not yet placed (preview; boats pass through, can cost over 1 ms near the ferry terminal)', 'sw'], ['boatWear', 'Faint wear on boats (preview)', 'sw'], ['ospHaul', 'Haul small boats aboard the Osprey (preview)', 'sw'], ['trSail', 'Harbour sailboats (preview)', 'sw'], ['trCG', 'Coast Guard boats (preview)', 'sw'], ['trSmall', 'Small boats: tenders and RIBs (preview)', 'sw'], ['trCruise', 'Cruise ships (preview)', 'sw'], ['jetWash', 'Jet wash behind the jets', 'sw'], ['reflections', 'Reflections of boats, docks and shore in the sea', ['Off', 'Low', 'Medium', 'High', 'Ultra']], ['lodPerceptual', 'Detail by screen size, changed while the camera swings (Assets, trial)', 'sw'], ['distCull', 'Small things near the camera only (poles, lamps, shore rubble, piles)', 'sw'], ['farLight', 'Ground lit by its own roughness from afar', 'sw'], ['groundStones', 'Stones and blocks drawn into beaches and granite', 'sw'], ['horizonShade', 'Hills shade the land behind them', 'sw'], ['cars', 'Cars driving the roads', 'sw'], ['docks', 'Piers and floating docks', 'sw'], ['fixtures', 'Dock hardware: bolts, hinges, hoops, rub rails (within 60 m)', 'sw'], ['weed', 'Seaweed on the shore (within 120 m)', 'sw'], ['stones', 'Stones: painted cobble and boulder fill (within 120 m; off until it is cheaper. In the editor, turning it on freezes the page for a while as it builds)', 'sw'], ['ledges', 'Ledges: painted rock ledge (the editor\'s Ledge brush)', 'sw'], ['windMotion', 'Wind motion: trees, grass, flags and loose gear sway in the wind', 'sw'], ['lamps', 'Lamps at night: street lamps, windows, nav lights lighting the water and fog', 'sw'], ['catspaws', 'Catspaws: ripples follow the gusts, glassy between them in light air', 'sw'], ['windShadow', 'Wind shadow: a slick in the lee of floats and boats', 'sw'], ['swash', 'Swash sheet: the thin sheet of water running up the shore', 'sw'], ['plants', 'Shrubs and marsh grass painted with the editor', 'sw'], ['buoys', 'Lobster buoys', 'sw'], ['droppings', 'Gull droppings and pavement wear', 'sw'], ['curve', "Earth's curve: boats go hull-down past the horizon", 'sw'], ['loom', 'Looming / mirage (0 normal air)', { lo: 0, hi: 1, step: 0.05 }], ['stain', 'Intertidal staining on docks, piles and seawalls', 'sw'], ['nightSky', 'Night sky: real stars, the Milky Way, meteors', 'sw'], ['cloudShadows', 'Cloud shadows on land and sea', 'sw'], ['aurora', 'Aurora', ['Now and then', 'Never', 'Tonight, strong']], ['edges', 'Path edges: walls, railings, fences, edging stones along the Shore Path', 'sw'], ['volSun', 'Volumetric sunlight near you (off until measured on the F readout)', 'sw'], ['shafts', 'Light shafts from clouds', 'sw'], ['granite', 'Granite veneer (rock textures, dikes, sills, lichen)', 'sw'], ['shoreFx', 'Seas on the shore: graded splashes, wet rock, foam deposits', 'sw'], ['currents', 'Tidal stream (boats drift with the tide)', 'sw']]],
     ...(typeof EDITOR !== 'undefined' ? [['Build', [['build', 'Build mode: free camera, layers, place and paint (` key)', 'sw']]]] : []),   /* the editor is its own page (editor.html); the game has no build mode */
     ['Readouts', [['fps', 'Frame rate and timing readout (F)', 'sw']]]];
   st.sec = 'vessel';
@@ -31867,7 +31940,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     if (typeof DCULL !== 'undefined') DCULL.on = !!DISP.distCull;   /* World, 31 Oct: 1,433 -> 983 draw calls at Friendship V's slip */
     if (W.terrain) { W.terrain.farLight = !!DISP.farLight; W.terrain.stones = !!DISP.groundStones; W.terrain.horizon = !!DISP.horizonShade; }
     if (NAV && NAV.dock && dockWanted !== !!DISP.instDock) { dockWanted = !!DISP.instDock; if (NAV.dock.on() !== dockWanted || !NAV.open) NAV.toggle(dockWanted); resize(); dockCluster(); }
-    if (HAS_DMG) { DAMAGE.on = !!DISP.damage; DAMAGE.visual = !!DISP.damageMarks; } if (typeof SOFTBODY !== 'undefined') { SOFTBODY.on = !!DISP.softbody; SOFTBODY.paint = !!DISP.sbPaint; if ('scrape' in SOFTBODY) SOFTBODY.scrape = !!DISP.sbScrape; if ('lips' in SOFTBODY) SOFTBODY.lips = !!DISP.sbLips; } if (typeof MODELS !== 'undefined' && MODELS.setWear) try { MODELS.setWear(!!DISP.boatWear); } catch (e) {} if (typeof traffic !== 'undefined' && traffic) { if (traffic.sailors) traffic.sailors.on = !!DISP.trSail; if (traffic.cutters) traffic.cutters.on = !!DISP.trCG; if (traffic.small) traffic.small.on = !!DISP.trSmall; if (traffic.cruise) traffic.cruise.on = !!DISP.trCruise; } if (typeof OSPREY_DRAW !== 'undefined') OSPREY_DRAW.model = !!DISP.ospModel; if (typeof JETWASH !== 'undefined') JETWASH.on = !!DISP.jetWash;
+    if (HAS_DMG) { DAMAGE.on = !!DISP.damage; DAMAGE.visual = !!DISP.damageMarks; } if (typeof SOFTBODY !== 'undefined') { SOFTBODY.on = !!DISP.softbody; SOFTBODY.paint = !!DISP.sbPaint; if ('scrape' in SOFTBODY) SOFTBODY.scrape = !!DISP.sbScrape; if ('lips' in SOFTBODY) SOFTBODY.lips = !!DISP.sbLips; if ('buckle' in SOFTBODY) SOFTBODY.buckle = !!DISP.sbBuckle; if ('snap' in SOFTBODY) SOFTBODY.snap = !!DISP.sbSnap; } if (typeof MODELS !== 'undefined' && MODELS.setWear) try { MODELS.setWear(!!DISP.boatWear); } catch (e) {} if (typeof traffic !== 'undefined' && traffic) { if (traffic.sailors) traffic.sailors.on = !!DISP.trSail; if (traffic.cutters) traffic.cutters.on = !!DISP.trCG; if (traffic.small) traffic.small.on = !!DISP.trSmall; if (traffic.cruise) traffic.cruise.on = !!DISP.trCruise; } if (typeof OSPREY_DRAW !== 'undefined') OSPREY_DRAW.model = !!DISP.ospModel; if (typeof JETWASH !== 'undefined') JETWASH.on = !!DISP.jetWash;
     if (typeof WFX !== 'undefined' && WFX.ocean && WFX.ocean.refl) { const r = WFX.ocean.refl, lv = +DISP.reflections || 0; r.on = lv > 0; if (r.on && r.setLevel) r.setLevel(['', 'low', 'medium', 'high', 'ultra'][Math.min(4, lv)]); }   /* Water, 1 Nov: a quality list, Low by default */
     if (P.lod) P.lod.on = !!DISP.farLod; if (typeof LOD !== 'undefined') LOD.perceptual = !!DISP.lodPerceptual;
     if (typeof CARS !== 'undefined') CARS.on = !!DISP.cars && !lite; if (typeof BUOYS !== 'undefined') BUOYS.on = !!DISP.buoys && !lite; if (typeof DECALS !== 'undefined') DECALS.on = !!DISP.droppings && !lite;   /* Assets */
@@ -31876,7 +31949,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     if (atmos.setNightSky) atmos.setNightSky(!!DISP.nightSky); if (atmos.setCloudShadows) atmos.setCloudShadows(!!DISP.cloudShadows); if (atmos.setAurora) atmos.setAurora([null, 0, 1][DISP.aurora | 0]);   /* Lighting's night sky */   /* World's edge system (roads.js EDGES) */
     if (atmos.setVolumetric) atmos.setVolumetric(!!DISP.volSun); if (atmos.setShafts) atmos.setShafts(!!DISP.shafts);   /* Lighting's switches, off by default (rule 9) */   /* Assets' fill brush (rule 9: off by default for now) */
     WIND.motion = DISP.windMotion ? 1 : 0; WIND.uniforms.uWindMotion.value = WIND.motion;   /* every swaying material multiplies by uWindMotion */
-    if (typeof DOCKS !== 'undefined') DOCKS.on = !!DISP.docks; if (typeof HARDWARE !== 'undefined') HARDWARE.on = !!DISP.fixtures;
+    if (typeof DOCKS !== 'undefined') { DOCKS.on = !!DISP.docks; if (DOCKS.preview) DOCKS.preview.on = !!DISP.site1Preview; } if (typeof HARDWARE !== 'undefined') HARDWARE.on = !!DISP.fixtures;
     if (typeof CURRENTS !== 'undefined') CURRENTS.on = !!DISP.currents;
     if (typeof EDITOR !== 'undefined' && !!EDITOR.on !== !!DISP.build) EDITOR.set(!!DISP.build);
   }

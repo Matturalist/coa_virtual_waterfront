@@ -33,7 +33,7 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | dock_pile_steel |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
 | dock_piling |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
 | friendship_v |  | tools/assets/vessels/build.py (procedural, from published particulars, deck plan and photographs) | CC0 |  |
-| grady_white_325 | Freedom 325 Grady White | BoatUS Foundation (https://sketchfab.com/boatusfoundation) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/freedom-325-grady-white-71ca8a73f97d44a98f92dd785e151b93 |
+| grady_white_325 | Dual-console sport boat, Grady-White Freedom 325 pattern | tools/assets/vessels/build.py (grady.py; procedural) | CC0 |  |
 | harbor_porpoise | Model 75A - Harbor Porpoise | DigitalLife3D (https://sketchfab.com/DigitalLife3D) | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) | https://sketchfab.com/3d-models/model-75a-harbor-porpoise-eb02e57f17d741329a66844a3a8d2094 |
 | harbor_seal | Spotted Harbor Seal | c4rn4g3 (https://sketchfab.com/c4rn4g3) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/spotted-harbor-seal-eff1b6181eca4a8aaca2cb0a19a1df38 |
 | hemlock_a | Realistic HD Mountain hemlock (2/43) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-mountain-hemlock-243-e4568ab8ec224d10b6a1ab8fbba3ea5c |
@@ -66,5 +66,8 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | razorbill | Guillemot 3d model free | iRahulRajput (https://sketchfab.com/rt699448) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/guillemot-3d-model-free-b3e4fddb5d034b389aa9eacea85ac7ba |
 | schooner | Schooner | Tobias.De.Maine (https://sketchfab.com/Tobias.De.Maine) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/schooner-56148c53e9664ee683b598fadb457992 |
 | schooner_coaster_small |  | tools/assets/vessels/build.py (lewis_french.py; procedural) | CC0 |  |
-| sloop | Sailboat | Sergei (https://sketchfab.com/sergeif) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/sailboat-76d0b1e24be14d2f9a524bfce3001aeb |
-| towboatus | Tow Boat | BoatUS Foundation (https://sketchfab.com/boatusfoundation) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/tow-boat-86939cf48b914951aa3c6ed2bc8bb446 |
+| sloop |  | tools/assets/vessels/build.py (sloop.py; procedural) | CC0 |  |
+| sloop_moored |  | tools/assets/vessels/build.py (sloop.py; procedural) | CC0 |  |
+| sloop_rig |  | tools/assets/vessels/build.py (sloop.py; procedural) | CC0 |  |
+| sloop_sailcloth |  | tools/assets/vessels/sloop.py | CC0 |  |
+| towboatus |  | tools/assets/vessels/build.py (towboat.py; procedural) | CC0 |  |

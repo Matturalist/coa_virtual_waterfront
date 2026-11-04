@@ -1,0 +1,12 @@
+{
+  "_doc": "What Display's 'Site 1: built, not yet placed (preview)' draws (DOCKS.preview in src/docks.js, CLAUDE.md rule 11): dock files Assets has built and World hasn't placed. Assets' list. Take a file out when World adds it to levels/downeast/docks.json. No ground cut, no colliders, no chart line retired: a look, not the finished placement. omit drops parts already drawn by the placed dock of that id; hides hides that placed dock's fixed pier.",
+  "level": "downeast",
+  "files": [
+    { "file": "ferry_terminal.json", "what": "the ferry terminal: piers, berth, linkspan, causeways (site 1 items 19, 27, 27a)" },
+    { "file": "west_street_north.json", "what": "the walls and rip-rap from the Regency to Bridge Street (item 29b)" },
+    { "file": "private_shore_riprap.json", "what": "the private shore's rip-rap (item 29a)" },
+    { "file": "oldfarm_steps.json", "what": "Oldfarm's steps (item 28)" },
+    { "file": "coa_ledges.json", "what": "the jointed ledge round the COA pier (K11, item 30)" },
+    { "file": "coa_pier.json", "what": "the COA pier as a steel truss (K6c)", "id": "coa_pier_truss", "omit": ["floats", "ramps", "moorings", "_moorings"], "hides": "coa_pier" }
+  ]
+}
