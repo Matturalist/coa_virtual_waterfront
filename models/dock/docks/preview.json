@@ -5,8 +5,6 @@
     { "file": "ferry_terminal.json", "what": "the ferry terminal: piers, berth, linkspan, causeways (site 1 items 19, 27, 27a)" },
     { "file": "west_street_north.json", "what": "the walls and rip-rap from the Regency to Bridge Street (item 29b)" },
     { "file": "private_shore_riprap.json", "what": "the private shore's rip-rap (item 29a)" },
-    { "file": "oldfarm_steps.json", "what": "Oldfarm's steps (item 28)" },
-    { "file": "coa_ledges.json", "what": "the jointed ledge round the COA pier (K11, item 30)" },
-    { "file": "coa_pier.json", "what": "the COA pier as a steel truss (K6c)", "id": "coa_pier_truss", "omit": ["floats", "ramps", "moorings", "_moorings"], "hides": "coa_pier" }
+    { "file": "oldfarm_steps.json", "what": "Oldfarm's steps (item 28)" }
   ]
 }

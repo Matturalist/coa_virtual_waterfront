@@ -3325,7 +3325,8 @@ const MODELS = (() => {
     #endif`;
   const SB_F = `uniform sampler2D uSbPaint; uniform vec3 uSbBare; uniform float uSbBareM; uniform float uSbShell; uniform float uSbCreaseK; uniform float uSbFacet; uniform float uSbSmear; uniform float uSbFibre; uniform float uSbTrack; uniform float uSbSnap; varying float vSbK; varying vec3 vSbRest; varying vec2 vSbUv; varying float vSbCrush; varying float vSbIn; float sbBareA = 0.0; float sbDull = 0.0; float sbGrain = 0.0; float sbCrease = 0.0; vec4 sbPaint;
     float sbH(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
-    float sbNs(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+    /* turned off the axes (S10, twenty-ninth slice): her rest frame's flat sheets cut an axis-aligned lattice in squares, and a threshold on that draws grey squares */
+    float sbNs(vec3 p) { p = mat3(0.0, 0.8, 0.6, -0.8, 0.36, -0.48, -0.6, -0.48, 0.64) * p; vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
       return mix(mix(mix(sbH(i), sbH(i + vec3(1, 0, 0)), f.x), mix(sbH(i + vec3(0, 1, 0)), sbH(i + vec3(1, 1, 0)), f.x), f.y), mix(mix(sbH(i + vec3(0, 0, 1)), sbH(i + vec3(1, 0, 1)), f.x), mix(sbH(i + vec3(0, 1, 1)), sbH(i + vec3(1, 1, 1)), f.x), f.y), f.z); }
     /* gelcoat's hairlines (S11): as gelcoat cracks, not a net of cells. Stars where something struck, spokes 1 to 4.5 cm; and runs of near-parallel cracks where the panel flexed, about 2 cm apart, broken off and starting again. Drawn at screen resolution, about a millimetre wide, fading as they go under a pixel. Only runs where a splat has said it crazed */
     float sbCraze(vec3 p) { vec3 fx = dFdx(p), fy = dFdy(p), n = normalize(cross(fx, fy)), t1 = normalize(cross(n, abs(n.z) < 0.9 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0))), t2 = cross(n, t1); float pw = max(length(fx), length(fy)), hw = max(0.0007, 0.75 * pw), k = min(1.0, 0.0016 / hw), o = 0.0;
@@ -12487,10 +12488,10 @@ function makeNav(opt) {
   pane.innerHTML = '<div class="navtabs" role="toolbar" aria-label="Instruments"></div><div class="grid"></div>';
   document.body.appendChild(pane);
   const tabs = pane.querySelector('.navtabs'), grid = pane.querySelector('.grid');
-  const INST = ['chart', 'radar', 'sounder', 'vhf', 'ais', 'bridge'], TITLE = { chart: 'Chart', radar: 'Radar', sounder: 'Sounder', vhf: 'VHF', ais: 'AIS', bridge: 'Helm' };
-  const show = { chart: true, radar: false, sounder: true, vhf: true, ais: false, bridge: true };
+  const INST = ['chart', 'radar', 'sounder', 'vhf', 'ais', 'bridge', 'log'], TITLE = { chart: 'Chart', radar: 'Radar', sounder: 'Sounder', vhf: 'VHF', ais: 'AIS', bridge: 'Helm', log: 'Log' };
+  const show = { chart: true, radar: false, sounder: true, vhf: true, ais: false, bridge: true, log: false };
   try { Object.assign(show, JSON.parse(localStorage.getItem('zp-nav-show') || '{}')); } catch (e) {}
-  const cards = {}; const DOCKORD = ['bridge', 'chart', 'sounder', 'radar', 'ais', 'vhf'];   /* left to right in the dock: controls, plotter, sounder, radar, AIS, radio */
+  const cards = {}; const DOCKORD = ['bridge', 'chart', 'sounder', 'radar', 'ais', 'log', 'vhf'];   /* left to right in the dock: controls, plotter, sounder, radar, AIS, radio */
   for (const id of INST) { const b = document.createElement('button'); b.textContent = TITLE[id]; b.dataset.id = id; b.onclick = () => { show[id] = !show[id]; layout(); }; tabs.appendChild(b); }
   /* the dock (Matt, 31 Oct): the standard setup is a strip locked to the bottom of the screen holding the helm controls, the plotter, the
      sounder or radar and the VHF side by side, so the view above stays clear. Its height is dragged from its top edge and remembered;
@@ -12507,7 +12508,7 @@ function makeNav(opt) {
     #navPane.dock .navtabs button { padding: 2px 8px; font-size: 11px; }
     #navPane.dock .grid { position: static; flex: 1; min-height: 0; display: flex; gap: 6px; padding: 0 6px 6px; pointer-events: auto; }
     #navPane.dock .card { position: relative; left: auto !important; top: auto !important; width: auto !important; height: auto !important; flex: 1 1 0; min-width: 0; min-height: 0; resize: none; box-shadow: none; }
-    #navPane.dock .card[data-id=chart] { flex: 2.1 1 0; } #navPane.dock .card[data-id=bridge] { flex: 1.9 1 0; } #navPane.dock .card[data-id=ais] { flex: 1.6 1 0; }
+    #navPane.dock .card[data-id=chart] { flex: 2.1 1 0; } #navPane.dock .card[data-id=bridge] { flex: 1.9 1 0; } #navPane.dock .card[data-id=ais] { flex: 1.6 1 0; } #navPane.dock .card[data-id=log] { flex: 1.8 1 0; }
     #navPane .dockslot { display: none; } #navPane.dock .dockslot:not(:empty) { display: flex; flex: none; align-items: stretch; overflow: auto; }
     #navPane.dock .dockslot > * { position: static !important; inset: auto !important; max-width: none !important; }
     #navPane.dock .card[data-id=chart] header, #navPane.dock .card[data-id=vhf] header { display: none; } #navPane .card[data-id=vhf] canvas { border: 0 !important; box-shadow: none !important; border-radius: 10px; }
@@ -12622,7 +12623,7 @@ function makeNav(opt) {
   const band = d => d < 0 ? 0 : d < 2 ? 1 : d < 5 ? 2 : d < 10 ? 3 : d < 20 ? 4 : d < 50 ? 5 : 6;
   /* the raster under the chart: north up, twice the screen across, filled a slice at a time */
   function startBase(cE, cN, s) { C.base = { cE, cN, s }; C.fill = 0; C.row = null; C.soundNext = []; C.prevRow = null; bx.fillStyle = '#e8eef2'; bx.fillRect(0, 0, base.width, base.height); C.img = bx.createImageData(base.width, 2); }
-  function swapBase() { shx.drawImage(base, 0, 0); C.shown = C.base; C.sound = C.soundNext; C.base = Object.assign({ done: true }, C.base); }
+  function swapBase() { C.swaps = (C.swaps || 0) + 1; shx.drawImage(base, 0, 0); C.shown = C.base; C.sound = C.soundNext; C.base = Object.assign({ done: true }, C.base); }
   function fillBase(budgetMs) {
     const B = C.base; if (!B || B.done) return; const t0 = performance.now(), W = base.width, step = 2, n = Math.ceil(W / step);
     /* a row at a time, but the time is checked every 64 samples, so a slice never runs much past its budget; a half-done row waits in C.row */
@@ -12675,7 +12676,8 @@ function makeNav(opt) {
     const feats = opt.feats ? opt.feats() : [], rr = v.rng * 1.5;
     cx.lineWidth = 1;
     for (const f of feats) {
-      if (f.line) { if (C.rngShow > 3) continue; cx.strokeStyle = '#2a2a2a'; cx.lineWidth = 2; cx.beginPath(); let first = true; for (const q of f.line) { const [E, Nn] = EN(q[0], q[1]); const [px, py] = toS(V, E, Nn); if (first) cx.moveTo(px, py); else cx.lineTo(px, py); first = false; } cx.stroke(); cx.lineWidth = 1; continue; }
+      if (f.line) { if (C.rngShow > 3) continue; if (!f._bb) { let a = 1e9, b = -1e9, c = 1e9, d = -1e9; for (const q of f.line) { const [E, Nn] = EN(q[0], q[1]); a = Math.min(a, E); b = Math.max(b, E); c = Math.min(c, Nn); d = Math.max(d, Nn); } f._bb = [a, b, c, d]; }
+        if (f._bb[1] < C.cE - rr || f._bb[0] > C.cE + rr || f._bb[3] < C.cN - rr || f._bb[2] > C.cN + rr) continue; cx.strokeStyle = '#2a2a2a'; cx.lineWidth = 2; cx.beginPath(); let first = true; for (const q of f.line) { const [E, Nn] = EN(q[0], q[1]); const [px, py] = toS(V, E, Nn); if (first) cx.moveTo(px, py); else cx.lineTo(px, py); first = false; } cx.stroke(); cx.lineWidth = 1; continue; }
       const [E, Nn] = EN(f.x, f.z); if (Math.abs(E - C.cE) > rr || Math.abs(Nn - C.cN) > rr) continue; const [px, py] = toS(V, E, Nn), p = f.p || {}, col = p.COLOUR && p.COLOUR.length ? +p.COLOUR[0] : 0;
       if (f.t === 'buoy' || f.t === 'mooring') { const c = col === 3 ? '#d8352a' : col === 4 ? '#2e9a46' : col === 6 ? '#e6c22a' : col === 2 ? '#1c1c1c' : '#f4f4f4';
         cx.fillStyle = c; cx.strokeStyle = '#222'; cx.beginPath();
@@ -12734,7 +12736,9 @@ function makeNav(opt) {
     fields.forEach((f, i) => { cx.fillStyle = '#8fa7b2'; cx.font = '600 10px IBM Plex Sans, sans-serif'; cx.textAlign = 'left'; cx.fillText(f[0], i * fw + 8, 14); cx.fillStyle = '#fff'; cx.font = '700 ' + fs + 'px Barlow Condensed, Arial Narrow, sans-serif'; cx.fillText(f[1], i * fw + 8, 38); const vw = cx.measureText(f[1]).width; cx.fillStyle = '#8fa7b2'; cx.font = '11px IBM Plex Sans'; cx.fillText(f[2], i * fw + 11 + vw, 38); });
     cx.fillStyle = 'rgba(12,20,28,.82)'; cx.fillRect(0, CHt - 24, CW, 24); cx.fillStyle = '#e2ecef'; cx.font = '12px IBM Plex Mono, monospace'; cx.textAlign = 'left';
     cx.fillText(ddm(ll[0], 'N', 'S', 2) + '  ' + ddm(ll[1], 'E', 'W', 3), 8, CHt - 8);
-    cx.textAlign = 'right'; cx.fillText((C.mode === 'north' ? 'NORTH UP' : C.mode === 'head' ? 'HEADING UP' : 'COURSE UP') + '   ' + nmFmt(C.rng * 2 * NM) + ' ' + (CW <= CHt ? 'across' : 'top to bottom'), CW - 8, CHt - 8);
+    cx.textAlign = 'right'; { const mode = C.mode === 'north' ? 'NORTH UP' : C.mode === 'head' ? 'HEADING UP' : 'COURSE UP', sc = nmFmt(C.rng * 2 * NM), right = KEYX() - 8,   /* on a narrow chart the scale text shortens rather than run over the position */
+      avail = right - 8 - cx.measureText(ddm(ll[0], 'N', 'S', 2) + '  ' + ddm(ll[1], 'E', 'W', 3)).width - 16;
+      const t = [mode + '   ' + sc + ' ' + (CW <= CHt ? 'across' : 'top to bottom'), mode + '  ' + sc, sc].find(q => cx.measureText(q).width <= avail); if (t) cx.fillText(t, right, CHt - 8); }
     /* a north arrow when not north-up */
     if (C.mode !== 'north') { cx.save(); cx.translate(KEYX() - 26, 70); cx.rotate(-V.rot); cx.fillStyle = '#d8352a'; cx.beginPath(); cx.moveTo(0, -12); cx.lineTo(5, 4); cx.lineTo(-5, 4); cx.fill(); cx.fillStyle = '#222'; cx.font = 'bold 10px sans-serif'; cx.textAlign = 'center'; cx.fillText('N', 0, 15); cx.restore(); }
     if (C.tool) { cx.fillStyle = 'rgba(194,20,168,.9)'; cx.fillRect(CW / 2 - 150, 54, 300, 26); cx.fillStyle = '#fff'; cx.font = '600 13px IBM Plex Sans'; cx.textAlign = 'center'; cx.fillText(C.tool === 'goto' ? 'Tap the chart to set a Go To point' : 'Tap the chart where the boat should be', CW / 2, 72); }
@@ -12806,7 +12810,7 @@ function makeNav(opt) {
   }
   /* the chart window: nothing in the header but the title; the controls are on the plotter */
   { const c = card('chart', 'Chart');
-    c.appendChild(cv); N._chartBtns = () => {};
+    c.appendChild(cv); for (const e of ['pointerdown', 'pointermove', 'pointerup', 'wheel']) cv.addEventListener(e, ev => { if (e !== 'pointermove' || ev.buttons) C.busy = Math.max(C.busy || 0, 0.3); }, { passive: true }); N._chartBtns = () => {};
     let drag = null;
     const pt = ev => { const r = cv.getBoundingClientRect(); return [(ev.clientX - r.left) / r.width * CW, (ev.clientY - r.top) / r.height * CHt]; };
     cv.addEventListener('pointerdown', ev => { const p = pt(ev); if (hitUI(p[0], p[1]) !== null || (C.menu && p[0] > KEYX() - MW - 8)) { drag = { ui: true }; return; } drag = { p, moved: false, c: [C.cE, C.cN] }; cv.setPointerCapture(ev.pointerId); });
@@ -12825,7 +12829,9 @@ function makeNav(opt) {
   const AS = { alerts: false, cpa: 0.25, tcpa: 10, range: 24, showB: true, showMoored: true, sound: true, lost: 6, vectors: 6, names: true };
   try { Object.assign(AS, JSON.parse(localStorage.getItem('zp-ais') || '{}')); } catch (e) {}
   const saveAS = () => { try { localStorage.setItem('zp-ais', JSON.stringify(AS)); } catch (e) {} };
+  let aisCache = null, aisCacheT = -1, aisCacheSel = null;
   function aisTargets() {
+    { const t = opt.simT(); if (aisCache && Math.abs(t - aisCacheT) < 0.25 && aisCacheSel === C.sel) return aisCache; aisCacheT = t; aisCacheSel = C.sel; }
     const o = own(), [oE, oN] = EN(o.x, o.z), ovE = Math.sin(cogT(o)) * o.sog, ovN = Math.cos(cogT(o)) * o.sog, now = opt.simT(), out = [];
     const add = (key, name, cls, x, z, sog, cogYaw, age, extra) => {
       const [E0, N0] = EN(x, z), ct = real ? (Math.PI - cogYaw + TAU) % TAU : (cogYaw + TAU) % TAU, vE = Math.sin(ct) * sog, vN = Math.cos(ct) * sog;
@@ -12845,7 +12851,7 @@ function makeNav(opt) {
     /* ships lying at anchor (World: traffic's T.shipsAtAnchor, e.g. Le Lyrial in Anchorage B): class A, navigational status 1, a mast ~30 m up */
     for (const sh of opt.shipsAtAnchor ? opt.shipsAtAnchor() : []) add('a' + (sh.mmsi || sh.id), sh.name, 'A', sh.x, sh.z, 0, sh.hdg || 0, 0, { mmsi: sh.mmsi || 0, call: sh.call || '', type: 'Passenger', L: sh.L, B: sh.B, dest: '', status: 'At anchor', h: 30 });
     for (const b of opt.fleet ? opt.fleet() : []) add('f' + b.id, b.name, b.cls || 'B', b.x, b.z, b.sog, b.cog, 0, { mmsi: b.mmsi, call: '', type: b.type || 'Other', L: b.L, B: b.B, dest: '', status: 'Under way using engine' });
-    return out;
+    return aisCache = out;
   }
   const aisTable = document.createElement('table'); aisTable.className = 'ais';
   const aisInfo = document.createElement('div'); aisInfo.className = 'hint';
@@ -13403,7 +13409,46 @@ function makeNav(opt) {
   { const c = card('vhf', 'VHF'); c.appendChild(fcv); }
   return { draw: drawFace, FF };
   })();
-  let tFace = 0, faceAcc = 0;
+  let tFace = 0, faceAcc = 0, chartSig = '', chartAge = 0, sdDrawn = -1, sdAge = 0, tVhfLcd = 0;
+
+  /* ======================= THE LOG (Boats' DAMAGE.logbook) ======================= */
+  /* Matt, 31 Oct: "the damage report … as a logbook entry … 'Sank' or 'lost at sea' … as if cataloging an actual incident". The page is
+     DAMAGE.logbook(b) for the boat being driven (the damage record whose body is under own()), redrawn once a second while shown, so
+     the fates change as the wreckage drifts, fetches up or sinks. Each new blow is a toast (DAMAGE.since) and the first one opens the
+     log; it stays reachable after she sinks (the Log tab). Cost: nothing until something is hit; then a read of DAMAGE.since a frame
+     and, while the log shows, one page a second. */
+  const logEl = document.createElement('div'); logEl.className = 'logpage';
+  { const css = document.createElement('style'); css.textContent = `#navPane .card[data-id=log] .body { align-items: stretch; overflow: auto; }
+    #navPane .logpage { font: 12px/1.45 var(--f-body); color: var(--fg); }
+    #navPane .logpage h3 { margin: 0 0 2px; font: 700 13px var(--f-display); letter-spacing: .06em; text-transform: uppercase; }
+    #navPane .logpage .sub { color: var(--muted); margin-bottom: 6px; }
+    #navPane .logpage table { width: 100%; border-collapse: collapse; }
+    #navPane .logpage td { vertical-align: top; padding: 3px 4px; border-bottom: 1px solid rgba(127,127,127,.18); }
+    #navPane .logpage td.t { font: 600 12px var(--f-mono); width: 3.6em; white-space: nowrap; color: var(--muted); }
+    #navPane .logpage h4 { margin: 10px 0 3px; font: 700 11px var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    #navPane .logpage th { text-align: left; font-weight: 600; color: var(--muted); padding: 2px 4px; border-bottom: 1px solid rgba(127,127,127,.35); }`; document.head.appendChild(css); }
+  { const c = card('log', 'Ship’s log'); c.appendChild(logEl); }
+  const hasDmg = () => typeof DAMAGE !== 'undefined' && DAMAGE && DAMAGE.boats;
+  function ownDamage() { if (!hasDmg()) return null; const o = own(); let best = null, bd = 4;
+    for (const st of DAMAGE.boats) { const b = st.b; if (!b || !b.rb) continue; try { const t = b.rb.translation(), d = Math.hypot(t.x - o.x, t.z - o.z); if (d < bd) { bd = d; best = b; } } catch (e) {} }
+    return best; }
+  const esc = t => String(t == null ? '' : t).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+  let logKey = '';
+  function drawLog() { const b = ownDamage(); let L = null; try { L = b ? DAMAGE.logbook(b) : null; } catch (e) { L = null; }
+    const o = own(), ll = latlon(o.x, o.z);
+    const html = !L ? '<h3>' + esc(o.name || 'Log') + '</h3><div class="sub">No damage record is kept for this boat.</div>'
+      : '<h3>' + esc(L.vessel) + '</h3><div class="sub">' + esc(L.date || '') + (L.date ? ' · ' : '') + esc(ddm(ll[0], 'N', 'S', 2) + ' ' + ddm(ll[1], 'E', 'W', 3)) + '</div>'
+        + (L.entries.length ? '<table>' + L.entries.map(e => '<tr><td class="t">' + esc(e.time) + '</td><td>' + esc(e.text) + '</td></tr>').join('') + '</table>' : '<div class="sub">No entries. Nothing has been struck.</div>')
+        + (L.gear.length ? '<h4>Gear lost or damaged</h4><table><tr><th>Item</th><th>Damage</th><th>Fate</th></tr>' + L.gear.map(g => '<tr><td>' + esc(g.item) + '</td><td>' + esc(g.damage) + '</td><td>' + esc(g.fate) + '</td></tr>').join('') + '</table>' : '');
+    if (html !== logKey) { logKey = html; logEl.innerHTML = html; } }
+  let dmgCur = null, tLog = 0, dmgToastT = 0;
+  function logStep(dt) { if (!hasDmg() || typeof DAMAGE.since !== 'function') return;
+    if (dmgCur == null) { dmgCur = DAMAGE.since(0).cursor; return; }   /* start from now: nothing that happened before the page opened */
+    dmgToastT -= dt; const r = DAMAGE.since(dmgCur); dmgCur = r.cursor; const mine = ownDamage();
+    for (const e of r.list) { if (e.type !== 'hit' || !mine || !mine.damage || e.boat !== mine.damage.id) continue;
+      if (!show.log) N.showInst('log', true);
+      if (dmgToastT <= 0 && e.text) { dmgToastT = 3; opt.toast && opt.toast((e.where ? e.where[0].toUpperCase() + e.where.slice(1) + ': ' : '') + e.text + '. The log has the full entry.'); } }
+    if (N.open && show.log) { tLog -= dt; if (tLog <= 0) { tLog = 1; drawLog(); } } }
 
   /* ======================= HELM (the vessel's own controls) ======================= */
   /* For a vessel built by Boats' VESSELS (src/vessels.js, docs/vessels.md), handed over as opt.helm() → the vessel object V: Friendship V's
@@ -13459,6 +13504,7 @@ function makeNav(opt) {
     if (BR.kind === 'jets') { const js = V.ctl.jets, nt = V.ctl.neutral != null ? V.ctl.neutral : 0.615;
       const ls = document.createElement('select'); ls.innerHTML = '<option value="single">Each jet alone</option><option value="pairs">Port pair · starboard pair</option><option value="all">All four together</option>'; ls.value = BR.link; ls.onchange = () => { BR.link = ls.value; saveBR(); }; ls.title = 'Which jets move together when you move one'; brHead.insertBefore(ls, brHead.querySelector('.x'));
       hb('Start all', () => V.ctl.startAll(), 'Crank and start all four engines'); hb('Stop all', () => V.ctl.stopAll());
+      if (opt.wipers && opt.wipers() != null) { const wb = hb('Wipers', () => { opt.wipers(!opt.wipers()); wb.setAttribute('aria-pressed', String(!!opt.wipers())); }, 'Windscreen wipers on or off (Shift+V)'); wb.setAttribute('aria-pressed', String(!!opt.wipers())); BR.dyn.push(() => wb.setAttribute('aria-pressed', String(!!opt.wipers()))); }
       hb('Centre nozzles', () => { for (const J of js) J.nozCmd = 0; redraw(); }); hb('All neutral', () => { for (const J of js) { J.bktCmd = nt; J.thr = 0; } redraw(); }, 'Buckets to neutral, throttles to idle: she sits still with the engines running');
       js.forEach((J, i) => { const col = document.createElement('div'); col.className = 'brcol'; col.innerHTML = '<b>' + (JNAME[i] || 'Jet ' + (i + 1)) + '</b>'; const row = document.createElement('div'); row.className = 'brrow';
         row.appendChild(lever({ dir: 'v', min: 0, max: 1, rest: 0, step: 0.025, label: 'THR', title: 'Throttle (idle to full)', detents: [{ v: 0, label: 'IDLE' }, { v: 0.5, label: '' }, { v: 1, label: 'FULL' }], get: () => J.thr, set: v => setJets(V, i, q => { q.thr = v; }), color: v => v > 0.85 ? '#f2a33a' : '#e8eef2' }).el);
@@ -13526,6 +13572,11 @@ function makeNav(opt) {
 
   /* ---------- helm screens: the same pictures, on the screens at the wheel ---------- */
   const helm = {};
+  /* each helm screen can be switched off and on (Matt, 2 Nov: "each should be toggle-able"): a dark screen wakes on a click; a lit one goes
+     dark from its OFF soft key (or, for a screen without keys, a click). N.helmPower(kind, on) is the same from Display; remembered. */
+  const helmOff = {}; try { Object.assign(helmOff, JSON.parse(localStorage.getItem('zp-helm-off') || '{}')); } catch (e) {}
+  const helmPow = (k, on) => { helmOff[k] = !on; try { localStorage.setItem('zp-helm-off', JSON.stringify(helmOff)); } catch (e) {} tHelm = 0; };
+  N.helmPower = (kind, on) => { if (on == null) return !helmOff[kind]; helmPow(kind, !!on); return !!on; };
   /* kinds: 'chart' (full), 'radsnd' (radar beside the sounder), 'combo' (chart with radar and sounder down the side), 'vhf' */
   N.helmCanvas = function (kind) {
     if (helm[kind]) return helm[kind];
@@ -13535,7 +13586,8 @@ function makeNav(opt) {
   /* draw a canvas into a box, cropping to cover it (no stretch); when the chart was sized for this box nothing is cropped */
   const cover = (x, src, sw, sh, dx, dy, dw, dh) => { const k = Math.max(dw / sw, dh / sh), cw = dw / k, ch = dh / k; x.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, dx, dy, dw, dh); };
   function drawHelm() {
-    for (const k in helm) { const h = helm[k], W = h.c.width, H = h.c.height, x = h.x; x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
+    for (const k in helm) { const h = helm[k], W = h.c.width, H = h.c.height, x = h.x;
+      if (helmOff[k]) { if (!h.dark) { x.fillStyle = '#000'; x.fillRect(0, 0, W, H); h.keys = []; h.tex.needsUpdate = true; h.dark = true; } continue; } h.dark = false; x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
       if (k === 'chart') { const sx = 0, sy = 46, sw = KEYX() - 8, sh = CHt - 46 - 24, k2 = Math.max(W / sw, (H - 22) / sh), cw = W / k2, ch = (H - 22) / k2; x.drawImage(cv, sx + (sw - cw) / 2, sy + (sh - ch) / 2, cw, ch, 0, 22, W, H - 22); }   /* the plotter's own data bar, keys and position strip cropped off: the NavNet frame replaces them */
       else if (k === 'radsnd') { x.drawImage(scv, 0, 0, SW, SH, 0, 0, W / 2, H); x.drawImage(rcv, 0, 0, RW, RW, W / 2, (H - W / 2) / 2, W / 2, W / 2); }   /* as on the Osprey: sounder left, radar right */
       else if (k === 'combo') { cover(x, cv, CW, CHt, 0, 0, H, H); x.drawImage(rcv, 0, 0, RW, RW, H, 0, W - H, W - H); x.drawImage(scv, 0, 0, SW, SH, H, W - H, W - H, H - (W - H)); }
@@ -13587,16 +13639,19 @@ function makeNav(opt) {
   function helmKeys(k, W, H) {
     const row = (list, x0, w, kh) => list.map((q, i) => ({ x: x0 + i * w / list.length, y: H - kh, w: w / list.length, h: kh, label: q[0], fn: q[1], on: q[2] }));
     const mt = C.mode === 'north' ? 'N UP' : C.mode === 'head' ? 'H UP' : 'C UP';
-    if (k === 'chart') return row([['−', () => zoomC(1)], ['+', () => zoomC(-1)], [mt, modeC], ['CTR', () => { C.follow = true; }], ['TRK', () => { C.trackOn = !C.trackOn; saveC(); }, C.trackOn], ['MOB', mob]], 0, W, 40);
+    const off = ['OFF', () => helmPow(k, false)];
+    if (k === 'chart') return row([['−', () => zoomC(1)], ['+', () => zoomC(-1)], [mt, modeC], ['CTR', () => { C.follow = true; }], ['TRK', () => { C.trackOn = !C.trackOn; saveC(); }, C.trackOn], ['MOB', mob], off], 0, W, 40);
     if (k === 'radsnd') return row([['RNG −', () => rngR(-1)], ['RNG +', () => rngR(1)], [RD.tx ? 'STBY' : 'TX', () => { RD.tx = !RD.tx; }]], 0, W / 2, 40)
-      .concat(row([['−', () => rngS(-1)], ['+', () => rngS(1)], ['AUTO', () => { SD.auto = !SD.auto; }, SD.auto], [SD.freq + 'k', () => { SD.freq = SD.freq === 200 ? 50 : 200; }]], W / 2, W / 2, 40));
-    if (k === 'combo') return row([['−', () => zoomC(1)], ['+', () => zoomC(-1)], [mt, modeC], ['RNG', () => rngR(RD.ri >= RR.length - 1 ? -RD.ri : 1)], ['MOB', mob]], 0, W, 40);
-    if (k === 'vhf') return row([['▼', () => chV(-1)], ['▲', () => chV(1)], ['16/9', () => { chV(0); VF.ci = CH.indexOf(curCh() === '16' ? '09' : '16'); saveV(); }], ['WX', () => { chV(0); VF.ci = CH.indexOf(/^WX/.test(curCh()) ? '16' : VF.wxCh); saveV(); }], ['SCAN', () => { VF.scan = !VF.scan; }, VF.scan]], 0, W, 26);
+      .concat(row([['−', () => rngS(-1)], ['+', () => rngS(1)], ['AUTO', () => { SD.auto = !SD.auto; }, SD.auto], [SD.freq + 'k', () => { SD.freq = SD.freq === 200 ? 50 : 200; }], off], W / 2, W / 2, 40));
+    if (k === 'combo') return row([['−', () => zoomC(1)], ['+', () => zoomC(-1)], [mt, modeC], ['RNG', () => rngR(RD.ri >= RR.length - 1 ? -RD.ri : 1)], ['MOB', mob], off], 0, W, 40);
+    if (k === 'vhf') return row([['▼', () => chV(-1)], ['▲', () => chV(1)], ['16/9', () => { chV(0); VF.ci = CH.indexOf(curCh() === '16' ? '09' : '16'); saveV(); }], ['WX', () => { chV(0); VF.ci = CH.indexOf(/^WX/.test(curCh()) ? '16' : VF.wxCh); saveV(); }], ['SCAN', () => { VF.scan = !VF.scan; }, VF.scan], off], 0, W, 26);
     return [];
   }
   /* a click or a wheel turn on a helm screen: u, v across it (0..1, v up). Returns true if it did something */
   N.helmInput = function (kind, u, v, type, d) {
     const h = helm[kind]; if (!h) return false; const W = h.c.width, H = h.c.height, px = u * W, py = (1 - v) * H;
+    if (type === 'click' && (helmOff[kind] || !(h.keys || []).length)) { helmPow(kind, !!helmOff[kind]); beep(1500, 0.03); return true; }   /* wake a dark screen; a screen with no keys toggles on a click */
+    if (helmOff[kind]) return false;
     if (type === 'click') { const q = (h.keys || []).find(q => px >= q.x && px < q.x + q.w && py >= q.y && py < q.y + q.h); if (q) { q.fn(); tHelm = 0; beep(1500, 0.03); return true; } return false; }
     if (type === 'wheel') { const s = d > 0 ? 1 : -1;
       if (kind === 'chart' || (kind === 'combo' && px < H)) zoomC(s); else if (kind === 'radsnd' && px < W / 2 || kind === 'combo') rngR(s); else if (kind === 'radsnd') rngS(s); else if (kind === 'vhf') chV(-s);
@@ -13660,7 +13715,7 @@ function makeNav(opt) {
     trackT += dt; const lp = C.track[C.track.length - 1]; if (!lp || Math.hypot(lp[0] - oE, lp[1] - oN) > 10 || trackT > 5 && Math.hypot(lp[0] - oE, lp[1] - oN) > 1) { C.track.push([oE, oN]); trackT = 0; if (C.track.length > 4000) C.track.splice(0, 1000); }
     if (C.track.length > 1 && Math.hypot(C.track[C.track.length - 2][0] - oE, C.track[C.track.length - 2][1] - oN) > 400) C.track.length = 0;   /* moved (teleported) */
     const want = id => (N.open && show[id]) || helmView;
-    vhfStep(dt); binocStep(dt);
+    vhfStep(dt); binocStep(dt); logStep(dt);
     if ((N._slT = (N._slT || 0) - dt) <= 0) { N._slT = 0.5; slLamp(opt.searchlight ? opt.searchlight() : null); const th = (own().id || '') + ''; if (pane.dataset.theme !== th) pane.dataset.theme = th; }
     tFirst -= dt; if (tFirst <= 0 && typeof FIRST !== 'undefined') { tFirst = 0.5;
       if (typeof DOCKLINES !== 'undefined' && DOCKLINES.lines && DOCKLINES.lines.some(l => l.state === 'made')) FIRST.tip('castoff');
@@ -13671,11 +13726,18 @@ function makeNav(opt) {
     C.rngT += dt; { const k = 1 - Math.exp(-dt / 0.12); C.rngShow *= Math.pow(C.rng / C.rngShow, k); if (Math.abs(C.rngShow / C.rng - 1) < 0.002) C.rngShow = C.rng; }
     /* the chart redraws every frame while it is being zoomed or panned (smooth), 15 times a second otherwise (about a quarter of the cost) */
     /* the depth raster fills in a slice of about a millisecond every frame the chart is wanted, apart from drawing, so a new raster never costs a spike */
-    if (want('chart')) fillBase(1.0);
-    C.busy = Math.max(0, (C.busy || 0) - dt); tChart -= dt; if (tChart <= 0 && (want('chart'))) { tChart = N.open && show.chart ? (C.busy > 0 || C.rngShow !== C.rng ? 0 : 1 / 15) : 0.1; drawChart(dt); }
+    /* Cost (Water, 1 Nov: NAV.update was 1.5–2 ms on Matt's Mac, drawChart hot): the raster fills 0.4 ms a frame; settled, the chart
+       redraws only when what it shows has moved (half a pixel, a fifth of a degree, a new range) or once a second for the AIS
+       targets, at most 6 times a second; it redraws every frame only while it is being zoomed or dragged. */
+    if (want('chart')) fillBase(0.4);
+    C.busy = Math.max(0, (C.busy || 0) - dt); tChart -= dt; chartAge += dt;
+    if (tChart <= 0 && want('chart')) { const moving = C.busy > 0 || C.rngShow !== C.rng;
+      const v = chartView(), sig = Math.round(v.oE * v.s * 2) + ',' + Math.round(v.oN * v.s * 2) + ',' + Math.round(v.rot * 286) + ',' + v.s.toFixed(5) + ',' + Math.round((own().sog || 0) * 10) + ',' + Math.round(C.cE * v.s * 2) + ',' + Math.round(C.cN * v.s * 2) + ',' + (C.swaps || 0) + ',' + (C.menu ? 1 : 0) + ',' + (C.wp ? C.wp.join() : '') + ',' + (C.mob ? 1 : 0) + ',' + CW + 'x' + CHt;
+      if (moving || sig !== chartSig || chartAge > 1) { chartSig = sig; chartAge = 0; drawChart(dt); }
+      tChart = N.open && show.chart ? (moving ? 0 : 1 / 6) : 0.15; }
     if (want('radar')) drawRadar();
-    if (want('sounder')) drawSounder();
-    if (want('vhf')) drawVHF();
+    if (want('sounder') && (SD.wx !== sdDrawn || (sdAge += dt) > 0.5)) { sdDrawn = SD.wx; sdAge = 0; drawSounder(); }   /* only when a ping has added a column */
+    if (helmView) { tVhfLcd -= dt; if (tVhfLcd <= 0) { tVhfLcd = 0.25; drawVHF(); } }   /* the old LCD is only the Osprey's overhead radio now; the window draws its own panel */
     if (N.open && show.vhf) { tFace -= dt; faceAcc += dt; if (tFace <= 0 || VFACE.FF.pressT > 0 || VFACE.FF.dHold > 0) { tFace = 0.1; VFACE.draw(faceAcc); faceAcc = 0; } }
     /* the Helm tab shows only while the vessel has a helm (Boats' VESSELS: docs/vessels.md) */
     if ((N._brT = (N._brT || 0) - dt) <= 0) { N._brT = 0.5; const has = !!hkind(hm()), tb = tabs.querySelector('button[data-id=bridge]'); if (tb) tb.style.display = has ? '' : 'none'; if (!has && cards.bridge && cards.bridge.parentNode) { cards.bridge.remove(); } else if (has && show.bridge && N.open && !cards.bridge.parentNode) layout(); }
@@ -15028,6 +15090,11 @@ async function loadLevel(base, files) {
   const tide = man.tide ? await (await get(man.tide)).json() : null;
   /* the hand-edit layer (docs/authored.md): patches for the terrain shader here; buildings/roads read their own parts */
   let authored = null; if (man.authored) { try { authored = await (await get(man.authored)).json(); } catch (e) { authored = null; } }
+  /* site layers (manifest site_authored, tools/site_walls.py): masks and brushes World places for a detail site from Assets' files (the COA
+     beach's cobble mask and stone stroke, 3 Nov), merged under Matt's own (authored.json): his win by id, and his are drawn on top */
+  for (const f of man.site_authored || []) { try { const S = await (await get(f)).json(); authored = authored || {};
+      for (const k of ['masks', 'brushes']) { const mine = authored[k] || [], ids = new Set(mine.map(q => q && q.id).filter(Boolean)); authored[k] = (S[k] || []).filter(q => q && !ids.has(q.id)).concat(mine); } }
+    catch (e) { console.warn('site layer', f, e); } }
   /* docks (docs/docks.md): Assets' styles, the level's dock.json files and its OSM piers (tools/osm_piers.py); world.js builds them */
   let docks = null; if (man.docks) { try { const styles = await (await fetch('textures/dock/styles.json', { cache: 'no-cache' })).json();
       const list = await Promise.all((man.docks.files || []).map(f => get(f).then(r => r.json()).catch(e => { console.warn('dock ' + f, e); return null; })));
@@ -15327,7 +15394,7 @@ const STRUCT = (() => {
   /* a ground patch: a height grid (h: centimetres NAVD 88, row-major, x0/z0 its first cell's centre, dx) laid onto the ground g, full weight
      inside and feathered to nothing over its last `feather_m` metres */
   const patch = (list, g) => { const grids = [];
-    for (const P of list || []) { if (!P || !P.h || P.off) continue; const { x0, z0, dx, nx, nz } = P, fe = P.feather_m || 3, dh = new Float32Array(nx * nz);
+    for (const P of list || []) { if (!P || !P.h || P.off) continue; const { x0, z0, dx, nx, nz } = P, fe = P.feather_m || 3, dh = new Float32Array(nx * nz), g1 = g; g = (x, z) => g1(x, z) + sumAt(grids, x, z);   /* each on the ones before it: where two overlap the later wins (the COA ledges over the beach) */
       for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) { const k = j * nx + i, v = P.h[k]; if (v == null) continue; const x = x0 + i * dx, z = z0 + j * dx;
         const e = Math.min(i, j, nx - 1 - i, nz - 1 - j) * dx, w = Math.min(1, e / fe), ws = w * w * (3 - 2 * w); dh[k] = (v / 100 - g(x, z)) * ws; }
       grids.push({ id: 'patch:' + P.id, kind: 'terrain', shape: 'grid', x0, z0, dx, nx, nz, dh, struct: P.id }); }
@@ -19530,6 +19597,7 @@ if (typeof module !== 'undefined') module.exports = { makePhysics, TUNE_DEFAULTS
      SOFTBODY.rakeRocks                  how many places a rake can be on her at once, each its own rock (2: both keels of a catamaran. 1: the hardest only). Each is another solid in the worker's contact loop; nothing on the main thread.
      SOFTBODY.tracks                     rubbed metal shows the tracks of what she slid on, and paint rubbed but not cut through goes matt (S10, twenty-third slice). Off: a stain with a chipped edge. A few noise reads on rubbed pixels only.
      SOFTBODY.buckle                     plate squeezed between its frames bows in or out, since metal doesn't shrink (S10, twenty-seventh slice; a boat whose structure has solver.buckle). Off: panels stay flat between their frames. A damaged boat's plating only.
+     SOFTBODY.unstick                    a free plate at rest above the water with the lattice under it crushed away falls instead of lying on her undamaged collider (S10, thirtieth slice).
      SOFTBODY.snap                       a fitting (rail, bracket, tube) pulled past solver.snap times its length has parted, and isn't drawn (S10, twenty-eighth slice; a boat whose structure has solver.snap). Off: it stretches as a straight rod.
      SOFTBODY.jag                        a torn metal edge goes in sharp tongues instead of along the plate's triangles (S10, twentieth slice). Off: as cut. A draw per torn shard into the paint texture when it tears, and a few noise reads on pixels within 30 cm of a tear.
      SOFTBODY.lips                       a rake peels two long lips along its path (S10, fifteenth slice). Off: each plate it opens hangs alone. No frame cost of its own.
@@ -20616,7 +20684,7 @@ function sbCore() {
 /* ---------- the door ---------- */
 const SOFTBODY = (() => {
   const core = sbCore(), recs = new Map();
-  const S = { on: true, bed: true, bedCrush: 1.5e5, paint: true, jag: true, tracks: true, buckle: true, snap: true, rake: true, rakeEnter: true, lips: true, shove: true, scrape: true, scrapeV: 0.5, scrapeN: 5e3, scrapeJ: 100e3, scrapeStep: 0.3, scrapeRate: 20, rakeV: 1, rakeDt: 0.1, rakeDepth: [0.15, 1, 3], rakeRocks: 2, rakeJoin: 2, hardJ: 20e3, ms: 0, maxFree: 16, create: core.SOFTBODY.create, DRIVER: core.DRIVER, ROTFIT: core.ROTFIT, workerSrc: () => '(' + sbCore.toString() + ')().workerMain(self);', onDebris: null };
+  const S = { on: true, bed: true, bedCrush: 1.5e5, bedSteep: 0.5, paint: true, jag: true, tracks: true, buckle: true, snap: true, unstick: true, rake: true, rakeEnter: true, lips: true, shove: true, scrape: true, scrapeV: 0.5, scrapeN: 5e3, scrapeJ: 100e3, scrapeStep: 0.3, scrapeRate: 20, rakeV: 1, rakeDt: 0.1, rakeDepth: [0.15, 1, 3], rakeRocks: 2, rakeJoin: 2, hardJ: 20e3, ms: 0, maxFree: 16, create: core.SOFTBODY.create, DRIVER: core.DRIVER, ROTFIT: core.ROTFIT, workerSrc: () => '(' + sbCore.toString() + ')().workerMain(self);', onDebris: null };
   /* hardJ: below this a blow only marks her (damage.js does that) and nothing is fetched. 20 kJ is 75 t's bow at about 1 m/s on her effective mass: past a hard docking, about where 8 mm plate starts to dish between frames. ASSUMED */
   /* scrape: a slide marks her (below). scrapeV m/s and scrapeN newtons: less than this leaves paint alone. scrapeJ: friction work that wires a boat that has had no hard blow; below it damage.js's marks do. scrapeStep m and scrapeRate a second: the most marks one contact lays. All ASSUMED, by eye */
   let hit = 0, rate = 0, src = null;   /* hit: boats wired; the frame returns at once while it is 0 */
@@ -20637,6 +20705,8 @@ const SOFTBODY = (() => {
   /* the bed at a level point. Below the shoreline the grid is `water / unclassified`, so the nearest shore class within 64 m stands for it, and past that a slope over 1 in 5 is rock and the rest is `seabed`, a guess: the level has no bottom-type layer (requests.md, World). Charted rocks have their own colliders and don't come here */
   function bedAt(x, z) { const L = typeof LEVEL !== 'undefined' ? LEVEL : null, C = L && L.data && L.data.habitat && L.data.habitat.classes; if (!L || !L.habAt || !C) return BEDS.rock;
     const nameOf = id => { const c = C[id] && C[id].id === id ? C[id] : C.find(k => k.id === id); return c ? c.name : ''; }, cls = (a, b) => { const h = L.habAt(a, b); return h > 0 ? nameOf(h) : null; };
+    /* S10, twenty-ninth slice: no sediment stands on a face this steep, whatever the grid says (loose sand's angle of repose is about 34 deg, 0.67; soft mud far less). The grids are 4 and 30 m land-cover classes: at the cliff foot (560, -160) a 50 deg face was 'emergent freshwater wetland', so a 30 kn blow on it counted as mud and did nothing at all. Rise across 12 m of her contact, on ground that also smooths a real face, so 0.5 (ASSUMED, by eye of the 4 m grid); a marsh bank or a steep cobble beach stays under it */
+    if (L.navd && S.bedSteep) { const d = 6; let lo = L.navd(x, z), hi = lo; for (let k = 0; k < 8; k++) { const h = L.navd(x + d * Math.cos(k * Math.PI / 4), z + d * Math.sin(k * Math.PI / 4)); if (h < lo) lo = h; if (h > hi) hi = h; } if (isFinite(hi - lo) && hi - lo > S.bedSteep * 2 * d) return BEDS.rock; }
     let nm = cls(x, z); if (nm) return bedOfClass(nm);
     for (const r of [8, 16, 32, 64]) for (let k = 0; k < 8; k++) { nm = cls(x + r * Math.cos(k * Math.PI / 4), z + r * Math.sin(k * Math.PI / 4)); if (nm) return bedOfClass(nm); }
     if (L.navd) { const d = 10, sx = (L.navd(x + d, z) - L.navd(x - d, z)) / (2 * d), sz = (L.navd(x, z + d) - L.navd(x, z - d)) / (2 * d); if (isFinite(sx + sz) && Math.hypot(sx, sz) > 0.2) return BEDS.rock; }
@@ -20724,6 +20794,14 @@ const SOFTBODY = (() => {
     else if (m.type === 'rest') { rec.asleep = true; rec.drv = m.stats.driver; rec.rest = m.stats; }
     S.ms += performance.now() - a; }
 
+  /* a plate that came off and landed on nothing. Rapier's collider is her undamaged shape (damage doesn't reshape it), so a plate let go over a crushed bow lands on the deck that used to be there and stays in the air, bollards and all, metres ahead of the wreck (seen on Le Lyrial, S10 thirtieth slice: 8 m over the sea, at rest). So: a free plate that has stopped, above the water, where the lattice that stood under it has moved away, stops touching anything and falls. Twice a second, only while such a plate is at rest: its rest nodes against where they are now */
+  const UNSTICK_R = 2.5, UNSTICK_MOVED = 0.8;   /* m: the lattice within R of it, under it; moved further than this counts as gone (both ASSUMED: R is a plate's reach on her coarsest sections, 0.8 m is well beyond a dent) */
+  function unstick(rec, now) { if (now - (rec.unstuckT || 0) < 500) return; rec.unstuckT = now; const sb = rec.sb, ns = sb.S.nodes, pos = sb.nodes, q = rec.b.rb.rotation(), t = rec.b.rb.translation(), qi = inv(q), v0 = rec.b.rb.linvel();
+    for (const f of rec.free) { const e = f.e; if (f.fell || e.removed || !(e.t > 0.5)) continue; const v = e.rb.linvel(); if (Math.hypot(v.x - v0.x, v.y - v0.y, v.z - v0.z) > 0.3) continue;
+      const et = e.rb.translation(), l = qrot(qi, [et.x - t.x, et.y - t.y, et.z - t.z]); if (l[1] < 0.5) continue; const x = l[0] + rec.org[0], y = l[1] + rec.org[1], z = l[2] + rec.org[2]; let n = 0, moved = 0;
+      for (let i = 0; i < ns.length; i++) { const p = ns[i].p, dy = y - p[1]; if (dy < -0.5 || dy > 3 || Math.abs(p[0] - x) > UNSTICK_R || Math.abs(p[2] - z) > UNSTICK_R) continue; n++; const dx = pos[3 * i] - p[0], dY = pos[3 * i + 1] - p[1], dz = pos[3 * i + 2] - p[2]; if (dx * dx + dY * dY + dz * dz > UNSTICK_MOVED * UNSTICK_MOVED) moved++; }
+      if (n && moved * 2 >= n) { f.fell = true; e.col.setCollisionGroups(0); e.rb.wakeUp(); e.rb.setAngvel({ x: (Math.random() - 0.5) * 2, y: (Math.random() - 0.5) * 2, z: (Math.random() - 0.5) * 2 }, true); } } }
+
   /* a part has come off: a body of its own in the water, and its plate follows that body */
   function letGo(rec, d) {
     const b = rec.b, P = rec.P, q = b.rb.rotation(), t = b.rb.translation(), at = d.at || d.c || [0, 0, 0], l = qrot(q, [at[0] - rec.org[0], at[1] - rec.org[1], at[2] - rec.org[2]]), r = { id: d.id, what: d.what || 'a plate of her shell', why: d.why, material: d.material || 'aluminium', m: d.m, V: d.V, air: d.air || 0, leakS: d.leakS || 0, fitting: d.fitting || null, at };
@@ -20752,6 +20830,7 @@ const SOFTBODY = (() => {
       if (Q.shoves.length) { sb.shoved(Q.shoves); Q.shoves.length = 0; } if (Q.broken.length) { sb.broken(Q.broken); Q.broken.length = 0; }
       if (Q.debris.length) { for (const d of Q.debris) letGo(rec, d); Q.debris.length = 0; }
       if (Q.splats.length) { if (S.paint) { const kK = (sb.S.solver || {}).scrapeK || 1; for (const s of Q.splats) { if (s.snap) s.strength = Math.min(1, s.strength * kK); sb.splat(s); } } Q.splats.length = 0; }
+      if (rec.free.length && S.unstick) unstick(rec, a);
       if (rec.free.length) { const q = rec.b.rb.rotation(), t = rec.b.rb.translation(), qi = inv(q), st = []; for (let i = rec.free.length - 1; i >= 0; i--) { const f = rec.free[i], e = f.e; if (e.removed) { st.push({ id: f.id, state: 'gone' }); rec.free.splice(i, 1); continue; } const et = e.rb.translation(), l = qrot(qi, [et.x - t.x, et.y - t.y, et.z - t.z]), rq = mulq(qi, mulq(e.rb.rotation(), mulq(inv(f.q0), q))); st.push({ id: f.id, state: 'free', at: [l[0] + rec.org[0], l[1] + rec.org[1], l[2] + rec.org[2]], q: [rq.x, rq.y, rq.z, rq.w] }); } sb.plates(st); }
       if (rec.wind && rec.w && rec.drv && rec.drv.loose > 0 && a - rec.windT > 1000) { rec.windT = a; const u = rec.wind(), qi = inv(rec.b.rb.rotation()), v = rec.b.rb.linvel(); rec.w.postMessage({ type: 'wind', v: qrot(qi, [u.x - v.x, (u.y || 0) - v.y, u.z - v.z]) }); }
       sb.tick(renderer, 8, camera); }
@@ -22782,7 +22861,7 @@ const DOCKS = (() => {
      origin at the module's centre at DECK level, +z along the module, +y up. The float's waterline sits at y = -freeboard. */
   D.MODULES.float = function (opt, style, wear) {
     if (style.float && style.float.pontoon === 'concrete') return concreteFloat(opt, style, wear);
-    const W = opt.width_m, L = opt.length_m, fb = opt.freeboard_m, g = new Geo(), seed = opt.seed || 1;
+    const W = opt.width_m, L = opt.length_m, fb = opt.freeboard_m, g = new Geo(), far = new Geo(), seed = opt.seed || 1;
     const s = style.float; const plankW = s.plank_w_m || 0.14, gap = s.plank_gap_m || 0.012, deckT = 0.04;
     /* planks across the width, running along x (the short way), as on every Maine float */
     g.material(deckMat(style, wear, 'float'));
@@ -22804,7 +22883,7 @@ const DOCKS = (() => {
     /* posts along the open edges (style.float.posts or dock.look.posts: { on, pitch_m, height_m, size_m, mat, cap }) */
     const PO = s.posts && s.posts.on !== false && s.posts.on != null ? s.posts : null;
     if (PO) { const pm = PO.mat || s.frame_mat || 'wood_frame', pms = style._mats && style._mats[pm], ps = PO.size_m || 0.15, ph = PO.height_m || 0.6, pp = Math.max(0.6, PO.pitch_m || 2.4); g.material(pm);
-      const post = (x, z, inward) => { const k = fk++, hh = ph * (0.97 + 0.06 * hash(seed, k, 41)); g.plank([x, hh / 2, z], [ps, hh, ps], pms, seed, k); if (PO.cap) g.plank([x, hh + 0.02, z], [ps + 0.05, 0.04, ps + 0.05], pms, seed, k + 9000);
+      const post = (x, z, inward) => { const k = fk++, hh = ph * (0.97 + 0.06 * hash(seed, k, 41)); g.plank([x, hh / 2, z], [ps, hh, ps], pms, seed, k); if (!(k & 1)) { far.material(pm); far.box([x, hh / 2, z], [ps, hh, ps], 1); } if (PO.cap) g.plank([x, hh + 0.02, z], [ps + 0.05, 0.04, ps + 0.05], pms, seed, k + 9000);
         g.perches.push({ p: [x, hh + (PO.cap ? 0.04 : 0), z], r: ps / 2 + (PO.cap ? 0.025 : 0), kind: 'post', square: true, deck: 0, inward, seed: seed * 31 + k }); };
       for (const sx of [-1, 1]) if (!joined[sx > 0 ? 'stbd' : 'port']) { const n = Math.max(1, Math.round((L - ps) / pp)); for (let i = 0; i <= n; i++) post(sx * (W / 2 - ps / 2), -L / 2 + ps / 2 + i * (L - ps) / n, [-sx, 0, 0]); }
       for (const sz of [-1, 1]) if (!joined[sz > 0 ? 'bow' : 'stern']) { const n = Math.max(1, Math.round((W - ps) / pp)); for (let i = 1; i < n; i++) post(-W / 2 + ps / 2 + i * (W - ps) / n, sz * (L / 2 - ps / 2), [0, 0, -sz]); } }
@@ -22813,7 +22892,7 @@ const DOCKS = (() => {
     const PL = s.plates && (s.plates.n || 0) > 0 ? s.plates : null;
     if (PL) { g.material(PL.mat || 'paint_yellow'); const r = (PL.d_m || 0.5) / 2;
       for (let i = 0; i < PL.n; i++) { const z = -L / 2 + (i + 0.5) * L / PL.n + (hash(seed, i, 61) - 0.5) * 0.6, x = (hash(seed, i, 67) - 0.5) * Math.max(0, W - 2 * r - 0.6);
-        g.tube([x, 0.0, z], [x, 0.006, z], r, 20, 1, 'end'); } }
+        g.tube([x, 0.0, z], [x, 0.006, z], r, 20, 1, 'end'); far.material(PL.mat || 'paint_yellow'); far.tube([x, 0.0, z], [x, 0.006, z], r, 6, 1, 'end'); } }
     /* pontoons: black plastic drums (town pier) or logs or poly floats, below the skirt down to the waterline and under */
     g.material(s.pontoon_mat || 'pontoon');
     const draft = (s.pontoon_draft_m || 0.35), pr = s.pontoon_r_m || 0.28, rows = 2, perRow = Math.max(2, Math.round(L / (s.pontoon_pitch_m || 1.5)));
@@ -22833,7 +22912,11 @@ const DOCKS = (() => {
     for (const f of (opt.hoops || [])) for (const sx of [-1, 1]) fix(hw, 'pile_hoop', hwFrame([sx * (W / 2 + 0.3), -0.02, -L / 2 + f * L], [0, 1, 0], [sx, 0, 0]), { strap: 0.3 - 0.05 }, seed * 13 + f * 10 + sx, rust);
     hw.finish();
     const sockets = floatSockets(opt, W, L, fb);
-    g.finish(); return { geometry: g, hardware: hw, sockets, size: [W, fb + draft, L], meta: { freeboard_m: fb, draft_m: draft, kind: 'float' } };
+    /* far (site 1 item 30, thirteenth slice): the deck as one quad, the texture's rows still at plank width and the planks' mean shade; the skirt or frame as a box; the pontoons as a box. Past s.far_m a plank is under a pixel */
+    { const dm = deckMat(style, wear, 'float'), MD = style._mats && style._mats[dm], lm = 1 - 0.04 * wear.deck, under = skirtH > 0 ? skirtH : 0.2; far.material(dm); far.tint(lm, lm, lm); far.uvMap = (u, v) => [u / ((MD && MD.span_m) || 2), v / ((plankW + gap) * ((MD && MD.rows) || 8))]; far.quad([-W / 2, 0, L / 2], [W / 2, 0, L / 2], [W / 2, 0, -L / 2], [-W / 2, 0, -L / 2], 1); far.uvMap = null; far.tint(1, 1, 1);
+      far.material(skirtH > 0 ? skMat : s.frame_mat || 'wood_frame'); far.box([0, -(deckT + under) / 2 - 0.005, 0], skirtH > 0 ? [W, deckT + under - 0.01, L] : [W - 0.5, deckT + under - 0.01, L - 0.1], 1);
+      const pb = -fb - pr, pt = -deckT - under; if (pt > pb) { far.material(s.pontoon_mat || 'pontoon'); far.box([0, (pt + pb) / 2, 0], [Math.max(0.2, W - 0.9 + 2 * pr), pt - pb, L - 0.2], 1); } }
+    g.finish(); far.finish(); return { geometry: g, hardware: hw, far, far_m: opt.far_m || s.far_m || 150, cutoff_m: opt.cutoff_m || s.cutoff_m || 2500, sockets, size: [W, fb + draft, L], meta: { freeboard_m: fb, draft_m: draft, kind: 'float' } };
   };
   /* a float module's sockets: cleats along both edges, the edges, the joins, the pile hoops, the ramp landing, dressing spots */
   function floatSockets(opt, W, L, fb) {
@@ -22913,7 +22996,13 @@ const DOCKS = (() => {
       for (let i = 0; i < PL.n; i++) { const z = -L / 2 + (i + 0.5) * L / PL.n + (hash(seed, i, 61) - 0.5) * 0.6, x = (hash(seed, i, 67) - 0.5) * Math.max(0, W - 2 * r - 0.6);
         g.tube([x, 0.0, z], [x, 0.006, z], r, 20, 1, 'end'); } }
     const sockets = floatSockets(opt, W, L, fb).map(sk => sk.kind === 'hoop' ? Object.assign(sk, { pos: [sk.pos[0] + Math.sign(sk.pos[0]) * wt, sk.pos[1], sk.pos[2]] }) : sk);
-    g.finish(); return { geometry: g, hardware: hw, sockets, size: [W, Hd, L], meta: { freeboard_m: fb, draft_m: C.draft_m, kind: 'float', build: 'concrete' } };
+    /* far: the deck and the hull's four sides, one quad each from the same windows of the scan; the walers as a band, since they are what reads along the side */
+    const far = new Geo(); { const big = Math.max(W, L) + 1; far.material(C.deck_mat); castFace(far, [x0, 0, z1], [x1, 0, z1], [x1, 0, z0], [x0, 0, z0], big, paverWindow(seed, 1));
+      far.material(C.hull_mat); const yb = -Hd, yt = -c, P = (sx, sy, sz) => [sx < 0 ? x0 : x1, sy < 0 ? yb : yt, sz < 0 ? z0 : z1]; castFace(far, P(-1, -1, 1), P(1, -1, 1), P(1, 1, 1), P(-1, 1, 1), big, hwin); castFace(far, P(1, -1, -1), P(-1, -1, -1), P(-1, 1, -1), P(1, 1, -1), big, hwin); castFace(far, P(1, -1, 1), P(1, -1, -1), P(1, 1, -1), P(1, 1, 1), big, hwin); castFace(far, P(-1, -1, -1), P(-1, -1, 1), P(-1, 1, 1), P(-1, 1, -1), big, hwin);
+      if (C.line_w_m > 0) { far.material(C.line_mat); for (const [side, sx] of [['port', -1], ['stbd', 1]]) if (open[side]) { const x = sx * (W / 2 - C.line_inset_m); far.quad([x - C.line_w_m, 0.004, z1 - 0.15], [x + C.line_w_m, 0.004, z1 - 0.15], [x + C.line_w_m, 0.004, z0 + 0.15], [x - C.line_w_m, 0.004, z0 + 0.15], 1); } }
+      far.material(C.waler_mat); for (const [side, sx] of [['port', -1], ['stbd', 1]]) if (open[side]) far.box([sx * (W / 2 + wt / 2), wy, 0], [wt, wh, L], 1);
+      const PLf = s.plates && (s.plates.n || 0) > 0 ? s.plates : null; if (PLf) { const r = (PLf.d_m || 0.5) / 2; far.material(PLf.mat || 'paint_yellow'); for (let i = 0; i < PLf.n; i++) { const z = -L / 2 + (i + 0.5) * L / PLf.n + (hash(seed, i, 61) - 0.5) * 0.6, x = (hash(seed, i, 67) - 0.5) * Math.max(0, W - 2 * r - 0.6); far.tube([x, 0.0, z], [x, 0.006, z], r, 6, 1, 'end'); } } }
+    far.finish(); g.finish(); return { geometry: g, hardware: hw, far, far_m: opt.far_m || s.far_m || 150, cutoff_m: opt.cutoff_m || s.cutoff_m || 2500, sockets, size: [W, Hd, L], meta: { freeboard_m: fb, draft_m: C.draft_m, kind: 'float', build: 'concrete' } };
   }
 
   /* The ramp (gangway). `camber_m` is the "ramp customisation" slider Matt asked for (17 Oct): the rise of the deck at
@@ -22957,7 +23046,12 @@ const DOCKS = (() => {
     const hw = new Geo(); hw.material('galv');   // a strap hinge each side at the pier end, barrel across the ramp; bolts where the posts meet the deck
     for (const sx of [-1, 1]) fix(hw, 'strap_hinge', hwFrame([sx * (W / 2 - 0.16), 0.002, L - 0.02], [0, 1, 0], [0, 0, -1]), { len: 0.32, w: 0.07, bolts: 3 }, 100 + sx, opt.rust || 0);
     for (const sx of [-1, 1]) for (let z = 0; z <= L + 0.01; z += s.post_pitch_m || 1.6) { const zz = Math.min(z, L); fix(hw, 'hex_bolt', hwFrame([sx * (W / 2 - 0.03), arc(zz) + 0.0, zz + 0.04], [0, 1, 0]), { d: 0.01 }, 200 + zz * 5 + sx, opt.rust || 0); }
-    hw.finish(); g.finish(); return { geometry: g, hardware: hw, sockets: [{ name: 'roller', kind: 'roller', pos: [0, -0.12, 0.15] }, { name: 'hinge', kind: 'hinge', pos: [0, 0, L] }], size: [W, 1.1 + cam, L], meta: { kind: 'ramp', camber_m: cam, ramp_kind: opt.kind || 'gangway' } };
+    /* far: the deck on three chords (one if straight), the rails and chord on the same, a post and a diagonal every second panel, three-sided */
+    const far = new Geo(), NF = cam > 0.001 ? 3 : 1, fh = W / 2, rf = Math.max(rr * 1.3, 0.04), pf = (s.post_pitch_m || 1.6) * 2, ft = 0.87; far.material(s.deck_mat || 'alu'); far.tint(ft, ft, ft);   /* the treads' dark strips, averaged */
+    for (let i = 0; i < NF; i++) { const z0 = i * L / NF, z1 = (i + 1) * L / NF, y0 = arc(z0), y1 = arc(z1); far.quad([-fh, y0, z0], [fh, y0, z0], [fh, y1, z1], [-fh, y1, z1], 0.5); far.quad([-fh, y1 - T, z1], [fh, y1 - T, z1], [fh, y0 - T, z0], [-fh, y0 - T, z0], 0.5); far.quad([fh, y0 - T, z0], [fh, y0, z0], [fh, y1, z1], [fh, y1 - T, z1], 0.5); far.quad([-fh, y1 - T, z1], [-fh, y1, z1], [-fh, y0, z0], [-fh, y0 - T, z0], 0.5); }
+    far.tint(1, 1, 1); far.material(s.rail_mat || 'alu'); for (const sx of [-1, 1]) { const x = sx * (W / 2 - 0.03); for (const y of s.truss ? [0.06, RH] : [0.55, RH]) for (let i = 0; i < NF; i++) { const z0 = i * L / NF, z1 = (i + 1) * L / NF; far.tube([x, arc(z0) + y, z0], [x, arc(z1) + y, z1], rf, 3, 0.1, 'none'); }
+      for (let z = 0; z <= L + 0.01; z += pf) { const zz = Math.min(z, L), zn = Math.min(zz + pf, L); far.tube([x, arc(zz), zz], [x, arc(zz) + RH, zz], rf, 3, 0.1, 'none'); if (s.truss && zn > zz) { const mid = (zz + zn) / 2 < L / 2, lo = mid ? zn : zz, hi = mid ? zz : zn; far.tube([x, arc(lo) + 0.06, lo], [x, arc(hi) + RH, hi], rf, 3, 0.1, 'none'); } } }
+    far.finish(); hw.finish(); g.finish(); return { geometry: g, hardware: hw, far, far_m: opt.far_m || s.far_m || 150, cutoff_m: opt.cutoff_m || s.cutoff_m || 2500, sockets: [{ name: 'roller', kind: 'roller', pos: [0, -0.12, 0.15] }, { name: 'hinge', kind: 'hinge', pos: [0, 0, L] }], size: [W, 1.1 + cam, L], meta: { kind: 'ramp', camber_m: cam, ramp_kind: opt.kind || 'gangway' } };
   };
 
   /* a steel hinge plate cantilevered off the pier face when a ramp is skewed: a galvanised plate on two channel outriggers,
@@ -23287,7 +23381,13 @@ const DOCKS = (() => {
     const sockets = []; for (let i = 0; i < Math.max(1, Math.floor(L / 10)); i++) sockets.push({ name: `ramp_hinge[${i}]`, kind: 'ramp_hinge', pos: [W / 2 + 0.2, 0, -L / 2 + (i + 0.5) * L / Math.max(1, Math.floor(L / 10))], yaw: Math.PI / 2 });
     for (let i = 0; i < Math.floor(L / 4); i++) sockets.push({ name: `edge.water.cleat[${i}]`, kind: 'cleat', pos: [W / 2 - 0.15, 0.05, -L / 2 + (i + 0.5) * L / Math.floor(L / 4)], yaw: Math.PI / 2 });
     for (let i = 0; i < Math.floor(L / 8); i++) sockets.push({ name: `dress[${i}]`, kind: 'dress', pos: [-W / 2 + 0.8, 0.05, -L / 2 + (i + 0.5) * L / Math.floor(L / 8)], yaw: 0 });
-    g.finish(); return { geometry: g, hardware: hw, sockets, size: [W + 0.3, H, L], meta: { kind: 'pier' } };
+    /* far (site 1 item 30, thirteenth slice): the deck as one quad, the fender face, each bent's cap and its two outer piles on four sides, the fender piles that stand proud, the rail's top. Past far_m a plank and a brace are under a pixel */
+    const far = new Geo(), dmF = deckMat(style, wear, 'pier'), MDF = style._mats && style._mats[dmF]; far.material(dmF); far.tint(1 - 0.04 * wear.deck, 1 - 0.04 * wear.deck, 1 - 0.04 * wear.deck); far.uvMap = (u, v) => [u / ((MDF && MDF.span_m) || 2), v / ((pw + gap) * ((MDF && MDF.rows) || 8))]; far.quad([-W / 2, 0.025, L / 2], [W / 2, 0.025, L / 2], [W / 2, 0.025, -L / 2], [-W / 2, 0.025, -L / 2], 1); far.uvMap = null; far.tint(1, 1, 1);
+    far.material(s.fender_mat || 'wood_frame'); far.box([W / 2 + 0.08, -0.5, 0], [0.16, 1.2, L], 0.5);
+    far.material(s.pile_mat || 'pile_wood'); for (let b = 0; b < nB; b++) { const z = -L / 2 + Math.min(L, b * bent); for (const x of [-W / 2 + 0.3, W / 2 - 0.3]) far.tube([x, -H, z], [x, -0.35, z], pileR, 4, 1, 'none'); far.box([0, -0.25, z], [W, 0.3, 0.3], 0.5);
+      if (s.fender_piles && hash(seed, b, 41) < s.fender_piles) { const ps = seed * 977 + b, up = 0.4 + 1.0 * hash(ps, 5, 1); far.tube([W / 2 + 0.3, -H, z], [W / 2 + 0.3, up, z], pileR, 4, 1, 'end'); } }
+    if (s.rail) { far.material(s.rail_mat || 'alu'); far.tube([-W / 2 + 0.05, 1.05, -L / 2], [-W / 2 + 0.05, 1.05, L / 2], 0.03, 3, 0.1, 'none'); }
+    far.finish(); g.finish(); return { geometry: g, hardware: hw, far: D.farInline ? far : null, far_m: opt.far_m || s.far_m || 150, cutoff_m: opt.cutoff_m || s.cutoff_m || 2500, sockets, size: [W + 0.3, H, L], meta: { kind: 'pier' } };
   };
   /* ---------- the waterfront kit (Bar Harbor, 18 Oct; docs/docks.md "Waterfront") ----------
      platform: a deck built out over the water on a grid of timber piles — the restaurant and inn decks along West Street
@@ -23572,7 +23672,7 @@ const DOCKS = (() => {
        block      { at, y, yaw_deg, pitch_deg, roll_deg, size: [l, h, d], tint, rough, mat }  a stone come out of the wall, lying on the beach; rough (m) puts its corners off true, split not sawn
        erratic    { at, y, size: [x, h, z], yaw_deg, seed, tint, stain_navd, pinch, cuts, detail, uv_m, far }  one sculpted boulder, y is its foot
        outcrop    { plan: [[x, z], ...], dem: { x0, z0, dx, nx, nz, cm: [...] }, joints: [{ strike_deg, spacing_m, jitter, persist }, { ... }, { strike_deg, chance }], bed: { dip_deg, dip_dir_deg, thickness_m },
-                    step_from, step, lift_m, jit_m, tilt, chamfer_m, top: [r, g, b], face: [r, g, b], vary, seed, far_k, uv_m }  jointed bedded ledge you can walk on (K11): real joint blocks, not a height field; see OUTCROP below
+                    step_from, step, lift_m, jit_m, tilt, lean, chamfer_m, max_courses, top: [r, g, b], face: [r, g, b], vary, seed, far_k, uv_m, uv_face_m, bed_tops, weed: { lo, hi, chance } }  jointed bedded ledge you can walk on (K11): real joint blocks, not a height field; see OUTCROP below
        ring_bolt  { at, y, yaw_deg }  a mooring ring on an eye bolt let into the cap, for a boat nobody ties there now
        paving     { poly: [[x, z], ...], y, mat, uv_m, tint, t_m, far }  a paved floor on a convex outline, the scan laid across it; kept in the far tier unless far is false
        cafe_table { at, y, yaw_deg, umbrella, r_m, tint }  a terrace table, four chairs (frames in the hardware tier), an umbrella if asked
@@ -23611,6 +23711,7 @@ const DOCKS = (() => {
     const pa = p => p[0] * Na[0] + p[1] * Na[1], pb = p => p[0] * Nb[0] + p[1] * Nb[1], As = it.plan.map(pa), Bs = it.plan.map(pb), A0 = Math.min(...As), A1 = Math.max(...As), B0 = Math.min(...Bs), B1 = Math.max(...Bs);
     const bed = it.bed || { dip_deg: 28, dip_dir_deg: 130, thickness_m: 0.5 }, dd = bed.dip_dir_deg * Math.PI / 180, td = Math.tan(bed.dip_deg * Math.PI / 180), gBed = [-td * Math.sin(dd), td * Math.cos(dd)];
     const uvm = it.uv_m || 1.5, jit = it.jit_m != null ? it.jit_m : 0.12, step0 = it.step_from != null ? it.step_from : 0.6, stepA = it.step != null ? it.step : 1, lift = it.lift_m != null ? it.lift_m : 0.1, chamfer = it.chamfer_m != null ? it.chamfer_m : 0.09, gap = 0.012, vary = it.vary != null ? it.vary : 0.14;
+    const lean = it.lean != null ? it.lean : 0.09, uvf = it.uv_face_m || uvm, flatB = norm3([-gBed[0], 1, -gBed[1]]), maxC = it.max_courses || 5;
     const TOP = it.top || [1, 1, 1], FACE = it.face || [1, 1, 1]; let blocks = 0, n = 0;
     /* one convex piece: the four joints, its top, its bed, its chamfers */
     const piece = (a0, a1, b0, b1, top, dTop, yBase, extra, tn, chA, ix) => { const xs = [], zs = []; for (const a of [a0, a1]) for (const b of [b0, b1]) { const det = Na[0] * Nb[1] - Na[1] * Nb[0], x = (a * Nb[1] - b * Na[1]) / det, z = (b * Na[0] - a * Nb[0]) / det; xs.push(x); zs.push(z); }
@@ -23618,16 +23719,41 @@ const DOCKS = (() => {
       let F = [{ v: [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]], n: [0, -1, 0] }, { v: [[x0, y1, z0], [x0, y1, z1], [x1, y1, z1], [x1, y1, z0]], n: [0, 1, 0] }, { v: [[x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0]], n: [-1, 0, 0] }, { v: [[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]], n: [1, 0, 0] }, { v: [[x0, y0, z0], [x0, y1, z0], [x1, y1, z0], [x1, y0, z0]], n: [0, 0, -1] }, { v: [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], n: [0, 0, 1] }];
       const ca = (a0 + a1) / 2, cb = (b0 + b1) / 2, det = Na[0] * Nb[1] - Na[1] * Nb[0], cx = (ca * Nb[1] - cb * Na[1]) / det, cz = (cb * Na[0] - ca * Nb[0]) / det, cy = (dTop - top[0] * cx - top[2] * cz) / top[1];
       /* each joint: plan normal o, o.p = dist on the joint, leaning a little off plumb about the block's own height */
-      const SD = [[Na, -1, -a0, 1], [Na, 1, a1, 2], [Nb, -1, -b0, 3], [Nb, 1, b1, 4]].map(([N, sg, dist, q]) => { const v = norm3([N[0] * sg, 0.09 * (hash(hs, ix + q, 61) - 0.5), N[1] * sg]), hv = Math.hypot(v[0], v[2]); return { v, o: [N[0] * sg, N[1] * sg], dist, D: dist * hv + v[1] * cy }; });
+      const SD = [[Na, -1, -a0, 1], [Na, 1, a1, 2], [Nb, -1, -b0, 3], [Nb, 1, b1, 4]].map(([N, sg, dist, q]) => { const v = norm3([N[0] * sg, lean * (hash(hs, ix + q, 61) - 0.5), N[1] * sg]), hv = Math.hypot(v[0], v[2]); return { v, o: [N[0] * sg, N[1] * sg], dist, D: dist * hv + v[1] * cy }; });
       for (const S of SD) F = cutConvex(F, S.v, S.D);
       for (const [v, d] of extra || []) F = cutConvex(F, v, d);
       F = cutConvex(F, top, dTop);
       if (chA > 0) for (const S of SD) { const cn = norm3([top[0] + S.v[0], top[1] + S.v[1], top[2] + S.v[2]]), e = S.dist - (S.o[0] * cx + S.o[1] * cz) - chA, ex = cx + S.o[0] * e, ez = cz + S.o[1] * e, ey = (dTop - top[0] * ex - top[2] * ez) / top[1]; F = cutConvex(F, cn, cn[0] * ex + cn[1] * ey + cn[2] * ez); }
       for (const f of F) { const nf = f.n; if (nf[1] < -0.3) continue; let V = f.v; const c0 = sub(V[1], V[0]), c1 = sub(V[2], V[0]); if (dot3(cross(c0, c1), nf) < 0) V = V.slice().reverse();
-        const up = nf[1] > 0.55, t0 = norm3(cross(Math.abs(nf[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0], nf)), b0_ = cross(nf, t0), ru = hash(hs, ix, 66) * 6.2832, cr = Math.cos(ru), sr = Math.sin(ru), t = [t0[0] * cr + b0_[0] * sr, t0[1] * cr + b0_[1] * sr, t0[2] * cr + b0_[2] * sr], bt = cross(nf, t), o = hash(hs, ix, 67), o2 = hash(hs, ix, 68), base = G.pos.length / 3; G.material(up ? 'bhf_top' : 'bhf_face');
-        const shade = 0.82 + 2 * vary * hash(hs, ix, 69); for (const p of V) { const dk = up ? 1 : 0.62 + 0.38 * Math.min(1, Math.max(0, (p[1] - y0) / 1.2)); G.tint(tn[up ? 0 : 1][0] * shade * dk, tn[up ? 0 : 1][1] * shade * dk, tn[up ? 0 : 1][2] * shade * dk); G._emit(p, nf); G.uv.push(dot3(p, t) / uvm + o, dot3(p, bt) / uvm + o2); }
+        const up0 = nf[1] > 0.55, bedTop = up0 && tn[2] > 0.4 && it.bed_tops, up = up0 && !bedTop, t0 = norm3(cross(Math.abs(nf[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0], nf)), b0_ = cross(nf, t0), ru = hash(hs, ix, 66) * 6.2832, cr = Math.cos(ru), sr = Math.sin(ru), t = [t0[0] * cr + b0_[0] * sr, t0[1] * cr + b0_[1] * sr, t0[2] * cr + b0_[2] * sr], bt = cross(nf, t), o = hash(hs, ix, 67), o2 = hash(hs, ix, 68), base = G.pos.length / 3; const weedy = up0 && tn[3]; G.material(weedy ? 'rockweed_mat' : up ? 'bhf_top' : 'bhf_face');
+        /* a face shows the bedding's edges: the scan's thin beds lie along the bedding, on the same level from block to block, so a bed runs on across a joint with only a small slip */
+        const bk = dot3(flatB, nf), bp = up ? null : bedTop ? norm3([Math.sin(dd), 0.3, -Math.cos(dd)]) : norm3([flatB[0] - nf[0] * bk, flatB[1] - nf[1] * bk, flatB[2] - nf[2] * bk]), ft = up ? null : norm3(cross(bp, nf)), slip = 0.025 * (hash(hs, ix, 70) - 0.5);
+        const shade = weedy ? 0.75 + 0.5 * hash(hs, ix, 69) : (bedTop ? it.bed_tops : 1) * (0.82 + 2 * vary * hash(hs, ix, 69)); for (const p of V) { const dk = up || bedTop ? 1 : 0.62 + 0.38 * Math.min(1, Math.max(0, (p[1] - y0) / 1.2)); if (weedy) G.tint(shade, shade, shade); else G.tint(tn[up ? 0 : 1][0] * shade * dk, tn[up ? 0 : 1][1] * shade * dk, tn[up ? 0 : 1][2] * shade * dk); G._emit(p, nf); if (up) G.uv.push(dot3(p, t) / uvm + o, dot3(p, bt) / uvm + o2); else G.uv.push(dot3(p, ft) / uvf + o, dot3(p, bp) / uvf + slip); }
         for (let i = 1; i < V.length - 1; i++) G.idx.push(base, base + i, base + i + 1); }
       G.tint(1, 1, 1); };
+    /* K11's skin (`it.skin`; Matt's `_ledge_barnacles_eyebolts`, `_pier_head_ledge`): a whaleback isn't plates. It is one worn surface with thin cracks, and where the blocks stand clear they are loaves, not bricks.
+       So a cell here is a small grid, not a flat face: it follows the lidar by `follow` (1: the surface carries on across the crack; 0: the block's own bed, a step), bulges by `bulge_m`, rolls down at its edges over `round_m` into a crack `gap_m` wide,
+       and the same warp, relief and scan run through all the cells, so a sheet of them reads as one rock and its joints wander. A crack's edge is tinted dark, as dirt and shade make it. Sides are one strip of the face scan, down into the ground. Smooth normals, so this is the one K11 surface that isn't flat-faced.
+       About 100-250 triangles a cell. Rigid-body solids are as a block's. */
+    const SK = it.skin, sn = (x, z, a, b, c) => Math.sin(a * x + b * z + c + sd), warpX = (x, z) => x + SK.wobble_m * (sn(x, z, 0.83, 0.57, 1.1) + 0.5 * sn(x, z, 1.9, -1.3, 2.3) + 0.25 * sn(x, z, 4.1, 3.3, 0.4)), warpZ = (x, z) => z + SK.wobble_m * (sn(x, z, -0.61, 0.91, 3.7) + 0.5 * sn(x, z, 1.4, 2.1, 5.1) + 0.25 * sn(x, z, -3.7, 4.3, 1.9));
+    const relief = (x, z) => SK.relief_m * (sn(x, z, 1.7, 0.9, 0.7) + 0.5 * sn(x, z, -2.9, 3.7, 4.2) + 0.22 * sn(x, z, 7.3, 5.9, 2.2)), patch = (x, z) => 1 + (SK.patch != null ? SK.patch : 0.12) * (sn(x, z, 0.47, -0.71, 0.3) * 0.6 + sn(x, z, 1.5, 1.1, 2.9) * 0.4);
+    /* `tuck`, a line along the rock's free edge: within 1.6 m of it the rock rolls down into the ground instead of ending in a wall */
+    const tuck = (x, z) => { const L = SK && SK.tuck; if (!L) return 0; let m = 1e9; for (let i = 1; i < L.length; i++) { const ax = L[i - 1][0], az = L[i - 1][1], bx = L[i][0] - ax, bz = L[i][1] - az, t = Math.max(0, Math.min(1, ((x - ax) * bx + (z - az) * bz) / (bx * bx + bz * bz || 1))); m = Math.min(m, Math.hypot(x - ax - bx * t, z - az - bz * t)); } const q = Math.max(0, 1 - m / 1.6); return (SK.tuck_m != null ? SK.tuck_m : 0.8) * q * q; };
+    const skinCell = (a0, a1, b0, b1, ix, cx, cz, y0, hc, top, tn, weedy) => { const gp = SK.gap_m * (0.5 + hash(hs, ix, 101)), s0 = a0 + gp, s1 = a1 - gp, t0 = b0 + gp, t1 = b1 - gp, ls = s1 - s0, lt = t1 - t0; if (ls < 0.08 || lt < 0.08) return;
+      const rr = Math.min(0.45 * Math.min(ls, lt), SK.round_m * (0.6 + 0.8 * hash(hs, ix, 102))), ce = SK.cell_m, fine = rr > 0.1, lines = (lo, hi) => { const L = fine ? [lo, lo + rr * 0.3, lo + rr] : [lo, lo + rr], mid = hi - lo - 2 * rr, m = Math.max(1, Math.round(mid / ce)); for (let i = 1; i < m; i++) L.push(lo + rr + mid * i / m); if (fine) L.push(hi - rr, hi - rr * 0.3, hi); else L.push(hi - rr, hi); return L; };
+      const S = lines(s0, s1), T = lines(t0, t1), nu = S.length, nv = T.length, det = Na[0] * Nb[1] - Na[1] * Nb[0], f = SK.follow, bu = SK.bulge_m * (0.5 + hash(hs, ix, 103)), pr = hash(hs, ix, 104) < (SK.proud_chance || 0) ? (SK.proud_m || 0) * (0.4 + 0.6 * hash(hs, ix, 105)) : 0;
+      const P = [], D = []; for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) { const u = S[i], w = T[j], x0 = (u * Nb[1] - w * Na[1]) / det, z0 = (w * Na[0] - u * Nb[0]) / det, x = warpX(x0, z0), z = warpZ(x0, z0), d = Math.min(u - s0, s1 - u, w - t0, t1 - w), e = d < rr ? 1 - d / rr : 0, drop = rr * (1 - Math.sqrt(Math.max(0, 1 - e * e))), us = (u - s0) / ls * 2 - 1, vs = (w - t0) / lt * 2 - 1;
+          const y = y0 + pr + f * (h(x, z) - hc) + (1 - f) * (-(top[0] * (x - cx) + top[2] * (z - cz)) / top[1]) + relief(x, z) + bu * (1 - us * us) * (1 - vs * vs) - drop - tuck(x, z); P.push([x, y, z]); D.push(d); }
+      const at = (i, j) => P[j * nu + i], up = (() => { const c = cross(sub(at(1, 0), at(0, 0)), sub(at(0, 1), at(0, 0))); return c[1] > 0 ? 1 : -1; })(), base = G.pos.length / 3, sh = (0.82 + 2 * vary * hash(hs, ix, 69));
+      G.material(weedy ? 'rockweed_mat' : 'bhf_top');
+      for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) { const q = at(i, j), nor = norm3(cross(sub(at(Math.min(nu - 1, i + 1), j), at(Math.max(0, i - 1), j)), sub(at(i, Math.min(nv - 1, j + 1)), at(i, Math.max(0, j - 1))))), N = up > 0 ? nor : [-nor[0], -nor[1], -nor[2]], d = D[j * nu + i], cr = weedy ? 1 : (SK.crack_tint != null ? SK.crack_tint : 0.5) + (1 - (SK.crack_tint != null ? SK.crack_tint : 0.5)) * Math.min(1, d / Math.max(0.02, rr)), pa = patch(q[0], q[2]) * sh * cr;
+          G.tint(weedy ? pa : tn[0][0] * pa, weedy ? pa : tn[0][1] * pa, weedy ? pa : tn[0][2] * pa); G._emit(q, N); G.uv.push(q[0] / uvm, q[2] / uvm); }
+      for (let j = 0; j < nv - 1; j++) for (let i = 0; i < nu - 1; i++) { const a = base + j * nu + i, b = a + 1, c = a + nu, e = c + 1; if (up > 0) G.idx.push(a, b, c, b, e, c); else G.idx.push(a, c, b, b, c, e); }
+      /* the sides, down into the ground: only what a step or a wide crack shows */
+      G.material('bhf_face'); const side = (L, o) => { const b2 = G.pos.length / 3, nn = norm3([o[0], 0, o[1]]); let run = 0; for (let k = 0; k < L.length; k++) { const q = L[k]; if (k) run += Math.hypot(q[0] - L[k - 1][0], q[2] - L[k - 1][2]); const yb = q[1] - (SK.skirt_m != null ? SK.skirt_m : 0.8) - pr, dk = 0.82 * sh; G.tint(tn[1][0] * dk, tn[1][1] * dk, tn[1][2] * dk); G._emit(q, nn); G.uv.push(run / uvf, q[1] / uvf); const d2 = dk * 0.62; G.tint(tn[1][0] * d2, tn[1][1] * d2, tn[1][2] * d2); G._emit([q[0], yb, q[2]], nn); G.uv.push(run / uvf, yb / uvf); }
+          if (L.length < 2) return; const u = sub(L[1], L[0]), flip = dot3(cross(u, [0, -1, 0]), nn) < 0; for (let k = 0; k < L.length - 1; k++) { const a = b2 + 2 * k; if (flip) G.idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); else G.idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); } };
+      const row = j => { const r = []; for (let i = 0; i < nu; i++) r.push(at(i, j)); return r; }, col = i => { const r = []; for (let j = 0; j < nv; j++) r.push(at(i, j)); return r; };
+      side(col(0), [-Na[0], -Na[1]]); side(col(nu - 1), [Na[0], Na[1]]); side(row(0), [-Nb[0], -Nb[1]]); side(row(nv - 1), [Nb[0], Nb[1]]); G.tint(1, 1, 1); };
     /* the strips */
     let a = A0 - hash(hs, 1, 71) * J[0].spacing_m, strip = 0, prev = null;
     while (a < A1) { const wa = J[0].spacing_m * k0 * (1 + (J[0].jitter || 0.5) * (2 * hash(hs, strip, 72) - 1)), a1 = a + wa; const breaks = []; const pers = J[1].persist != null ? J[1].persist : 0.5;
@@ -23642,15 +23768,17 @@ const DOCKS = (() => {
         y0 += (lift + jit * (hash(hs, ix, 80) - 0.5) + (k > 0.3 ? 0.12 * k : 0)) * edge - 0.3 * (1 - edge);
         const gX = gx + (gBed[0] - gx) * k + tl(), gZ = gz + (gBed[1] - gz) * k + tl(), top = norm3([-gX, 1, -gZ]), dTop = top[0] * cx + top[1] * y0 + top[2] * cz;
         const ring = Math.min(h(cx + 1.3, cz), h(cx - 1.3, cz), h(cx, cz + 1.3), h(cx, cz - 1.3), hc), vis = y0 - ring, tb = (bed.thickness_m || 0.5) * (0.7 + 0.6 * hash(hs, ix, 81)), yB = ring - 0.6;
-        const tn = [TOP, FACE], cA = near ? chamfer * (0.6 + 0.9 * hash(hs, ix, 82)) * (1 - 0.5 * k) : 0, extra = []; blocks++;
+        const W = it.weed, wee = W && y0 > W.lo && y0 < W.hi && hash(hs, ix, 87) < W.chance * Math.min(1, Math.min(y0 - W.lo, W.hi - y0) / 0.5 + 0.35), tn = [TOP, FACE, k, wee], skinned = near && SK;
+        if (skinned) { skinCell(a + gap, a1 - gap, b0 + gap, b1 - gap, ix, cx, cz, y0, hc, top, tn, wee); n++; if (opt.solids) opt.solids.push([+cx.toFixed(2), +cz.toFixed(2), +(Math.min(la, lb) / 2).toFixed(2), +y0.toFixed(2)]); continue; }
+        const cA = near ? chamfer * (0.6 + 0.9 * hash(hs, ix, 82)) * (1 - 0.5 * k) : 0, extra = []; blocks++;
         /* a third joint cuts some blocks across, and the cut-off part sits a little lower */
         if (J3 && hash(hs, ix, 83) < (J3.chance != null ? J3.chance : 0.25) && la * lb > 0.5) { const an = (J3.strike_deg + (J3.spread_deg != null ? J3.spread_deg : 30) * (2 * hash(hs, ix, 86) - 1)) * Math.PI / 180, Nc = [Math.cos(an), Math.sin(an)], dn = Nc[0] * cx + Nc[1] * cz + (hash(hs, ix, 84) - 0.5) * 0.7 * Math.min(la, lb), n3 = [Nc[0], 0, Nc[1]];
           piece(a + gap, a1 - gap, b0 + gap, b1 - gap, top, dTop, yB, [[n3, dn - gap]], tn, cA, ix);
           piece(a + gap, a1 - gap, b0 + gap, b1 - gap, top, dTop - 0.03 - 0.1 * hash(hs, ix, 85), yB, [[[-n3[0], 0, -n3[2]], -dn - gap]], tn, cA, ix + 7); n += 2; }
-        else { const nc = near ? Math.min(5, Math.floor(vis / tb)) : 0;
+        else { const nc = near ? Math.min(maxC, Math.floor(vis / tb)) : 0;
           if (nc >= 1) { const flat = norm3([-gBed[0], 1, -gBed[1]]), at = y => flat[0] * cx + flat[1] * y + flat[2] * cz; let ox = 0, yq = y0;   /* courses along the bedding, each standing a little proud or back of the one above */
             for (let q = 0; q <= nc; q++) { const yn = yq - tb * (0.85 + 0.3 * hash(hs, ix, 90 + q)), lower = q < nc ? [[[-flat[0], -flat[1], -flat[2]], -at(yn)]] : null;
-              piece(a + gap - ox, a1 - gap + ox, b0 + gap - ox, b1 - gap + ox, q === 0 ? top : flat, q === 0 ? dTop : at(yq - 0.008), yB, lower, tn, q === 0 ? cA : cA * 0.5, ix + q * 3); yq = yn; ox = 0.2 * (hash(hs, ix, 95 + q) - 0.35); n++; } }
+              piece(a + gap - ox, a1 - gap + ox, b0 + gap - ox, b1 - gap + ox, q === 0 ? top : flat, q === 0 ? dTop : at(yq - 0.008), yB, lower, tn, q === 0 ? cA : 0, ix + q * 3); yq = yn; ox = 0.2 * (hash(hs, ix, 95 + q) - 0.35); n++; } }
           else { piece(a + gap, a1 - gap, b0 + gap, b1 - gap, top, dTop, yB, null, tn, cA, ix); n++; } }
         if (opt.solids) opt.solids.push([+cx.toFixed(2), +cz.toFixed(2), +(Math.min(la, lb) / 2).toFixed(2), +y0.toFixed(2)]); }
       a = a1; strip++; }
@@ -24730,12 +24858,17 @@ const DOCKS = (() => {
       const sto = stainOf(mode); if (spec.stain_k != null) sto.strength *= spec.stain_k;   /* a surface that takes less of it (UHMW: ships scrub it and little sticks) */
       D.stainMaterial(m, sto, { units: U, droppings: typeof DECALS !== 'undefined' ? 0 : built.wear.droppings, float: mode === 'float' });   /* droppings are decals now (decals.js); the shader specks only without it */
       matCache[key] = m; return m; };
-    for (const p of built.parts) { const g = new THREE.BufferGeometry(); const pos = new Float32Array(p.geometry.pos.map(v => v * U));
-      g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(p.geometry.nor, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(p.geometry.uv, 2)); g.setAttribute('color', new THREE.Float32BufferAttribute(p.geometry.col, 3)); g.setIndex(p.geometry.idx);
-      for (const gr of p.geometry.groups) g.addGroup(gr.start, gr.count, gr.materialIndex); g.computeBoundingSphere();
-      const mode = p.kind === 'float' || p.ride || p.swing ? 'float' : '', mesh = new THREE.Mesh(g, p.materials.map(n => matFor(n, mode))); mesh.name = 'dock:' + built.id + ':' + p.id; mesh.userData.hard = mode !== 'float' && !p.noShadow;   /* the seaweed brush grows on fixed parts (weed.js); floats move with the tide */ mesh.castShadow = !p.noShadow; mesh.receiveShadow = true; mesh.userData.part = p; group.add(mesh);
+    for (const p of built.parts) { const g = new THREE.BufferGeometry();
+      /* floats and ramps ride on World's bodies and hinge groups, which take the near mesh and transform its geometry (world.js buildDocks), so their far tier can't be a mesh of its own: its triangles go in the same geometry, behind the near ones, and D.update swaps geometry.groups. A swap costs an assignment and the transforms carry both */
+      const F = D.farInline && (p.kind === 'float' || p.kind === 'ramp') && p.far && p.far.idx.length ? p.far : null, G = p.geometry, nv = G.pos.length / 3, ni = G.idx.length, mnames = p.materials.slice();
+      const pos = new Float32Array((F ? G.pos.concat(F.pos) : G.pos).map(v => v * U));
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(F ? G.nor.concat(F.nor) : G.nor, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(F ? G.uv.concat(F.uv) : G.uv, 2)); g.setAttribute('color', new THREE.Float32BufferAttribute(F ? G.col.concat(F.col) : G.col, 3)); g.setIndex(F ? G.idx.concat(F.idx.map(i => i + nv)) : G.idx);
+      for (const gr of G.groups) g.addGroup(gr.start, gr.count, gr.materialIndex); g.computeBoundingSphere();
+      if (F) g.userData.tiers = { near: g.groups, far: F.groups.map(gr => { const nm = F.mats[gr.materialIndex]; let k = mnames.indexOf(nm); if (k < 0) k = mnames.push(nm) - 1; return { start: gr.start + ni, count: gr.count, materialIndex: k }; }) };
+      const mode = p.kind === 'float' || p.ride || p.swing ? 'float' : '', mesh = new THREE.Mesh(g, mnames.map(n => matFor(n, mode)));
+      if (F) mesh.userData.swap = { far_m: p.far_m || 150, cutoff_m: p.cutoff_m || 2500, near: true }; mesh.name = 'dock:' + built.id + ':' + p.id; mesh.userData.hard = mode !== 'float' && !p.noShadow;   /* the seaweed brush grows on fixed parts (weed.js); floats move with the tide */ mesh.castShadow = !p.noShadow; mesh.receiveShadow = true; mesh.userData.part = p; group.add(mesh);
       /* a far tier (the concrete wharf): its own mesh, swapped with the near one by distance in D.update; the near one is kept out of D.merge so the swap can hide it */
-      if (p.far && p.far.idx.length) { const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(p.far.pos.map(v => v * U)), 3)); fg.setAttribute('normal', new THREE.Float32BufferAttribute(p.far.nor, 3)); fg.setAttribute('uv', new THREE.Float32BufferAttribute(p.far.uv, 2)); fg.setAttribute('color', new THREE.Float32BufferAttribute(p.far.col, 3)); fg.setIndex(p.far.idx);
+      if (!F && p.far && p.far.idx.length && p.kind !== 'float' && p.kind !== 'ramp') { const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(p.far.pos.map(v => v * U)), 3)); fg.setAttribute('normal', new THREE.Float32BufferAttribute(p.far.nor, 3)); fg.setAttribute('uv', new THREE.Float32BufferAttribute(p.far.uv, 2)); fg.setAttribute('color', new THREE.Float32BufferAttribute(p.far.col, 3)); fg.setIndex(p.far.idx);
         for (const gr of p.far.groups) fg.addGroup(gr.start, gr.count, gr.materialIndex); fg.computeBoundingSphere();
         const fmesh = new THREE.Mesh(fg, p.far.mats.map(n => matFor(n, mode))); fmesh.name = mesh.name + ':far'; fmesh.castShadow = !p.noShadow; fmesh.receiveShadow = true; fmesh.visible = false; fmesh.userData.tierFar = true;
         mesh.userData.noMerge = true; mesh.userData.tier = { far: fmesh, far_m: p.far_m || 250, cutoff_m: p.cutoff_m || 3000, near: true }; group.add(fmesh);  if (p.ride) mesh.userData.ride = fmesh.userData.ride = true; if (p.swing) mesh.userData.swing = fmesh.userData.swing = p.swing; }
@@ -24754,33 +24887,41 @@ const DOCKS = (() => {
      'hard'), so World's lookups, perchesOf and the droppings decals parented to them keep working. D.update merges each group
      the first time it sees it; D.mergeOn = false keeps the old one-mesh-per-part drawing (switch, rule 9). */
   D.mergeOn = true;
+  D.farInline = true;   /* floats and ramps have a far tier and a cutoff (switch, rule 9; read at build) */
   D.TIER_CELL_M = 300;
+  D.FILL_RANGE_M = 300;   /* a dock's instanced fills (cleats, coils, the dock box) stop at their manifest entry's cutoff_m; this for one with none */
   D.merge = function (grp) {
     if (!grp || grp.userData.dockMerged) return 0; grp.userData.dockMerged = true;
     const src = grp.children.filter(m => m.isMesh && !m.isInstancedMesh && (m.userData.part || m.userData.hardware) && !m.userData.merged && !m.userData.noMerge && !m.userData.tierFar && m.geometry && m.geometry.index
       && ['position', 'normal', 'uv', 'color'].every(a => m.geometry.attributes[a]));
     const buckets = new Map();
-    for (const m of src) { const key = (m.userData.hardware ? 'hw' : 'part') + '|' + (m.userData.hard ? 1 : 0) + '|' + (m.receiveShadow ? 1 : 0) + '|' + (m.castShadow ? 1 : 0);
+    for (const m of src) { let key = (m.userData.hardware ? 'hw' : 'part') + '|' + (m.userData.hard ? 1 : 0) + '|' + (m.receiveShadow ? 1 : 0) + '|' + (m.castShadow ? 1 : 0);
+      /* inline far tiers swap by the merged sphere, so by place too in a group that spans a file; a run's body is one place, centred on its own origin */
+      if (m.userData.swap) { if (!m.geometry.boundingSphere) m.geometry.computeBoundingSphere(); const c = m.geometry.boundingSphere.center, cm = D.TIER_CELL_M * (D.units || 1); key += '|swap' + (grp.position.x || grp.position.z ? '' : '|' + Math.floor(c.x / cm) + '|' + Math.floor(c.z / cm)); }
       (buckets.get(key) || buckets.set(key, []).get(key)).push(m); }
     /* one merged mesh from a list of meshes, one group per material; the sources are hidden from every layer and point at it */
     const mergeList = list => {
-      const mats = [], byMat = [], P = [], N = [], T = [], C = [], v = new THREE.Vector3(), nm = new THREE.Matrix3(); let base = 0, before = 0;
+      const mats = [], byMat = [], byFar = [], P = [], N = [], T = [], C = [], v = new THREE.Vector3(), nm = new THREE.Matrix3(); let base = 0, before = 0;
       for (const m of list) { m.updateMatrix(); const g = m.geometry, ms = Array.isArray(m.material) ? m.material : [m.material], idx = g.index.array, M = m.matrix, ident = M.equals(new THREE.Matrix4());
         nm.getNormalMatrix(M); const pa = g.attributes.position, na = g.attributes.normal;
         for (let i = 0; i < pa.count; i++) { if (ident) { P.push(pa.getX(i), pa.getY(i), pa.getZ(i)); N.push(na.getX(i), na.getY(i), na.getZ(i)); }
           else { v.fromBufferAttribute(pa, i).applyMatrix4(M); P.push(v.x, v.y, v.z); v.fromBufferAttribute(na, i).applyMatrix3(nm).normalize(); N.push(v.x, v.y, v.z); } }
         for (const a of g.attributes.uv.array) T.push(a); for (const a of g.attributes.color.array) C.push(a);
-        const groups = g.groups.length ? g.groups : [{ start: 0, count: idx.length, materialIndex: 0 }]; before += groups.length;
-        for (const gr of groups) { const mat = ms[gr.materialIndex] || ms[0]; let k = mats.indexOf(mat); if (k < 0) { mats.push(mat); byMat.push([]); k = mats.length - 1; }
-          const out = byMat[k]; for (let i = gr.start; i < gr.start + gr.count; i++) out.push(idx[i] + base); }
+        const TG = g.userData.tiers, groups = TG ? TG.near : g.groups.length ? g.groups : [{ start: 0, count: idx.length, materialIndex: 0 }]; before += groups.length;
+        const lay = (grs, into) => { for (const gr of grs) { const mat = ms[gr.materialIndex] || ms[0]; let k = mats.indexOf(mat); if (k < 0) { mats.push(mat); byMat.push([]); byFar.push([]); k = mats.length - 1; }
+          const out = into[k]; for (let i = gr.start; i < gr.start + gr.count; i++) out.push(idx[i] + base); } };
+        lay(groups, byMat); if (TG) lay(TG.far, byFar);
         base += pa.count; }
       const mg = new THREE.BufferGeometry(); mg.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); mg.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3));
       mg.setAttribute('uv', new THREE.Float32BufferAttribute(T, 2)); mg.setAttribute('color', new THREE.Float32BufferAttribute(C, 3));
-      const I = []; byMat.forEach((a, k) => { mg.addGroup(I.length, a.length, k); for (const x of a) I.push(x); }); mg.setIndex(I); mg.computeBoundingSphere();
+      const I = []; byMat.forEach((a, k) => { if (!a.length) return; mg.addGroup(I.length, a.length, k); for (const x of a) I.push(x); });
+      const swapped = list.filter(m => m.userData.swap); if (swapped.length) { const fg = []; byFar.forEach((a, k) => { if (!a.length) return; fg.push({ start: I.length, count: a.length, materialIndex: k }); for (const x of a) I.push(x); }); mg.userData.tiers = { near: mg.groups, far: fg }; }
+      mg.setIndex(I); mg.computeBoundingSphere();
       const f = list[0], mm = new THREE.Mesh(mg, mats); mm.name = grp.name + ':merged' + (f.userData.hardware ? ':hw' : ''); mm.castShadow = f.castShadow; mm.receiveShadow = f.receiveShadow;
       mm.userData.hard = !!f.userData.hard; mm.userData.hardware = mm.userData.hw0 = !!f.userData.hardware; mm.userData.merged = true; mm.userData.parts = list.map(m => m.userData.part).filter(Boolean);
       const obr = list.find(m => m.onBeforeRender !== THREE.Object3D.prototype.onBeforeRender); if (obr) mm.onBeforeRender = obr.onBeforeRender;   /* the OSM floats ride the tide from it */
       for (const m of list) { m.layers.disableAll(); m.userData.hard = false; m.userData.hardware = false; m.userData.mergedInto = mm; }
+      if (swapped.length) mm.userData.swap = { far_m: Math.min(...swapped.map(m => m.userData.swap.far_m)), cutoff_m: Math.max(...swapped.map(m => m.userData.swap.cutoff_m)), near: true };
       grp.add(mm); return [mm, before - mats.length]; };
     let saved = 0;
     for (const list of buckets.values()) { if (list.length < 2) continue; saved += mergeList(list)[1]; }
@@ -24838,11 +24979,16 @@ const DOCKS = (() => {
       /* what floats free of a float run's body (a berth's pneumatic fenders, K2): up and down with the tide, one assignment each */
       if (typeof LEVEL !== 'undefined' && LEVEL.tide != null) for (const m of grp.children) { if (m.userData.ride) m.position.y = LEVEL.tide * (D.units || 1); else if (m.userData.swing) swingTo(m, m.userData.swing, LEVEL.tide); }
       if (grp.userData.dockMerged && grp.userData.mergeShown !== D.mergeOn) mergeShow(grp, D.mergeOn); if (typeof DECALS !== 'undefined') for (const m of grp.children) for (const c of m.children) if (c.userData.decal) DECALS.cull(c, camPos);
-      for (const m of grp.children) { const T = m.userData.tier; if (!T) continue;   /* near / far tier by distance to the part's bounding sphere, 5% hysteresis; nothing past cutoff_m */
+      for (const m of grp.children) { const S = m.userData.swap; if (S) {   /* an inline far tier: which of the geometry's groups draw */
+          if (grp.userData.mergeShown ? m.userData.mergedInto : m.userData.merged) continue;
+          const bs = m.geometry.boundingSphere, d = Math.max(0, Math.hypot(bs.center.x + grp.position.x - camPos.x, bs.center.y + grp.position.y - camPos.y, bs.center.z + grp.position.z - camPos.z) - bs.radius) / (D.units || 1), near = d < S.far_m * (S.near ? 1.05 : 0.95);
+          if (near !== S.near) { S.near = near; m.geometry.groups = near ? m.geometry.userData.tiers.near : m.geometry.userData.tiers.far; } m.visible = near || d < S.cutoff_m; continue; }
+        const T = m.userData.tier; if (!T) continue;   /* near / far tier by distance to the part's bounding sphere, 5% hysteresis; nothing past cutoff_m */
         if (grp.userData.mergeShown && m.userData.mergedInto) continue;   /* merged away: the merged tiered mesh swaps for it */
         if (m.userData.merged && !grp.userData.mergeShown) { m.visible = T.far.visible = false; continue; }   /* merge switched off: the parts swap themselves */
         const bs = m.geometry.boundingSphere, u = D.units || 1, d = Math.max(0, Math.hypot(bs.center.x + grp.position.x - camPos.x, bs.center.y + grp.position.y - camPos.y, bs.center.z + grp.position.z - camPos.z) - bs.radius) / u;
         T.near = d < T.far_m * (T.near ? 1.05 : 0.95); m.visible = T.near; T.far.visible = !T.near && d < T.cutoff_m; }
+      for (const m of grp.children) if (m.isInstancedMesh && m.name.startsWith('dock fill ') && m.geometry.boundingSphere) { let C = m.userData.fillCut; if (C == null) { const e = typeof MODELS !== 'undefined' && MODELS.entry ? MODELS.entry(m.name.slice(10)) : null; C = m.userData.fillCut = ((e && e.cutoff_m) || D.FILL_RANGE_M) * (D.units || 1); } const bs = m.geometry.boundingSphere; m.visible = Math.hypot(bs.center.x + grp.position.x - camPos.x, bs.center.y + grp.position.y - camPos.y, bs.center.z + grp.position.z - camPos.z) < C + bs.radius; }
       for (const m of grp.children) if (m.userData.hardware) { const c = m.geometry.boundingSphere.center, dx = c.x + grp.position.x - camPos.x, dy = c.y + grp.position.y - camPos.y, dz = c.z + grp.position.z - camPos.z; m.visible = dx * dx + dy * dy + dz * dz < R2 + m.geometry.boundingSphere.radius * m.geometry.boundingSphere.radius; } }
   };
 
@@ -27007,6 +27153,9 @@ function structSolids(list, navd, Y0) { const statics = [], slips = [], qY = a =
   return { statics, slips }; }
 
 function buildDocks(scene, LD, navd, Y0, W, waterNow) {
+  /* W.sitePreview.on (read every frame; Display "COA ledges and beach stones (preview)", wired by the Publisher): shows or hides the
+     placed dock files marked preview in docks.json (the COA ledges, 3 Nov). Their colliders stay, so a hull still meets the rock. */
+  if (!W.sitePreview) { let on = true; W.sitePreview = { groups: [], get on() { return on; }, set on(v) { v = !!v; if (v === on) return; on = v; for (const g of this.groups) g.visible = v; } }; }
   const U = 10, DK = LD.docks; DOCKS.styles = DK.styles; DOCKS.units = U;
   const opt = DK.opt || {}, deckY = opt.deck_navd_m || 4.5, R = opt.radius_m || 2500, loader = new THREE.TextureLoader(), mats = {};
   const out = { entries: new Map(), rects: [] }, cover = [], landings = [];
@@ -27032,6 +27181,15 @@ function buildDocks(scene, LD, navd, Y0, W, waterNow) {
       W.statics.push({ kind: 'cyl', hh: (top - bed) / 2, r: 0.16, x, y: (top + bed) / 2 + Y0, z, bounce: 0.15, name: 'pile' }); } }
     W.statics.push({ kind: 'box', hx: Wd / 2, hy: 0.15, hz: L / 2, x: cx, y: deck - 0.1 + Y0, z: cz, q, name: 'pier deck' });
     const [fx, fz] = at(Wd / 2 + 0.08, 0); W.statics.push({ kind: 'box', hx: 0.08, hy: 0.6, hz: L / 2, x: fx, y: deck - 0.5 + Y0, z: fz, q, name: 'pier fender' }); };
+  /* a truss pier (Assets, 3 Nov: the COA pier is a steel truss on one sheet-pile cell, and a Zodiac runs under it): no pile rows; the
+     deck, and the cell a cylinder from the bed to its top that strikes like a wall. The cell's place is in the pier's frame (z_m along
+     from the shore end, x across) */
+  const trussStatics = (p, h) => { const sx = Math.sin(h), cxh = Math.cos(h), q = { x: 0, y: Math.sin(h / 2), z: 0, w: Math.cos(h / 2) }, L = p.length_m, Wd = p.width_m, deck = p.deck_navd_m;
+    W.statics.push({ kind: 'box', hx: Wd / 2, hy: 0.15, hz: L / 2, x: p.at[0], y: deck - 0.1 + Y0, z: p.at[1], q, name: 'pier deck' });
+    const c = p.cell; if (c) { const lz = -L / 2 + c.z_m, lx = c.x || 0, x = p.at[0] + cxh * lx + sx * lz, z = p.at[1] - sx * lx + cxh * lz, bed = Math.min(c.bed_navd != null ? c.bed_navd : navd(x, z), navd(x, z)), top = c.top_navd;
+      W.statics.push({ kind: 'cyl', hh: (top - bed) / 2, r: c.r_m + 0.05, x, y: (top + bed) / 2 + Y0, z, bounce: 0.05, name: 'sheet-pile cell' }); }
+    const a = p.abutment; if (a) { const lz = -L / 2 + a.z_m, x = p.at[0] + sx * lz, z = p.at[1] + cxh * lz;
+      W.statics.push({ kind: 'box', hx: a.W / 2, hy: (a.top_navd - a.foot_navd) / 2, hz: a.L / 2, x, y: (a.top_navd + a.foot_navd) / 2 + Y0, z, q, name: 'abutment' }); } };
   /* merge geometry-kit meshes (docks.js Geo) into one, one group per material: a whole harbour's piers in a handful of draw calls */
   const mergeGeo = list => { const o = { pos: [], nor: [], uv: [], col: [], idx: [], groups: [], mats: [] }, by = new Map();
     for (const g of list) { if (!g || !g.idx.length) continue; const base = o.pos.length / 3;
@@ -27058,7 +27216,7 @@ function buildDocks(scene, LD, navd, Y0, W, waterNow) {
   for (const dk of DK.list) {
     const dock = JSON.parse(JSON.stringify(dk)), p = dock.pier;
     if (p) { const h = (p.heading_deg || 0) * Math.PI / 180, lo = lowest(p.at[0], p.at[1], h, p.length_m, p.width_m); p.height_m = Math.max(1.5, p.deck_navd_m - lo + 0.3);
-      out.rects.push({ x: p.at[0], z: p.at[1], h, L: p.length_m + 2, W: p.width_m + 2, pier: true }); pierStatics(p.at[0], p.at[1], h, p.length_m, p.width_m, p.deck_navd_m, (DK.styles[dock.style] || {}).pier && DK.styles[dock.style].pier.bent_pitch_m); }
+      out.rects.push({ x: p.at[0], z: p.at[1], h, L: p.length_m + 2, W: p.width_m + 2, pier: true }); if (p.variant === 'truss') trussStatics(p, h); else pierStatics(p.at[0], p.at[1], h, p.length_m, p.width_m, p.deck_navd_m, (DK.styles[dock.style] || {}).pier && DK.styles[dock.style].pier.bent_pitch_m); }
     /* the waterfront kit's pile platforms (Stewman's deck; tools/waterfront_kit.py): solid like a pier (deck box, pile rows), and a
        cover rect so no charted or OSM pier is drawn over one. z = 0 is the platform's shore edge, depth_m runs out along its heading */
     for (const pf of dock.platforms || []) { const h = (pf.heading_deg || 0) * Math.PI / 180, cx = pf.at[0] + Math.sin(h) * pf.depth_m / 2, cz = pf.at[1] + Math.cos(h) * pf.depth_m / 2;
@@ -27078,10 +27236,16 @@ function buildDocks(scene, LD, navd, Y0, W, waterNow) {
         for (const part in dock.style_patch) st[part] = Object.assign(st[part] || {}, dock.style_patch[part]); DK.styles[key] = st; } dock.style = key; }
     let built; try { built = DOCKS.build(dock); } catch (e) { console.warn('dock ' + dock.id, e); continue; }
     const grp = DOCKS.toThree(built, { units: U, loader, materials: mats, waterY: waterNow * U }); grp.position.y = Y0 * U; scene.add(grp); W.dockGroups.push(grp);
+    if (dock.preview) { W.sitePreview.groups.push(grp); grp.visible = W.sitePreview.on; }   /* rule 11: a placed site file new to Matt, behind Display's preview switch */
     const pierFills = built.fills.filter(f => f.socket && f.socket.part === 'pier'); fillInto(grp, pierFills, (a, y) => [a[0], a[1], a[2], y]);
     /* every float module and ramp of the file covers its water, so the charted pier lines under it are not drawn again (pierBuilt).
        A file of floats and gangways with no fixed pier (the downtown floats) added no rect before, and the 2016-chart boxes came
        back over it at fixed-pier height (Publisher, 19 Oct) */
+    /* blocks a boat strikes (Assets' K11 rock and the like: part.meta.solids, each [x, z, r, top] in level metres, NAVD): a rock cylinder
+       from the bed to the block's top, bucketed by physics with the other small statics and on only near a boat (Matt, 3 Nov: "lots of
+       rocks under the surface that a zodiac could hit": the COA ledges) */
+    for (const q of built.parts) for (const b of (q.meta && q.meta.solids) || []) { const [x, z, r, top] = b, bed = Math.min(navd(x, z), top - 0.3);
+      W.statics.push({ kind: 'cyl', hh: (top - bed) / 2, r, x, y: (top + bed) / 2 + Y0, z, bounce: 0.05, what: 'rock', material: 'granite', name: 'ledge block' }); }
     for (const q of built.parts) { if (q.kind === 'float' && q.frame && q.size) cover.push({ x: q.frame[3], z: q.frame[11], h: Math.atan2(q.frame[2], q.frame[10]), L: q.size[2] + 2, W: q.size[0] + 2 }); }
     for (const r of dock.ramps || []) { if (!r.hinge) continue; const dr = (r.dir_deg || 0) * Math.PI / 180, Lr = r.length_m || 10;
       cover.push({ x: r.hinge[0] + Math.sin(dr) * Lr / 2, z: r.hinge[1] + Math.cos(dr) * Lr / 2, h: dr, L: Lr + 4, W: (r.width_m || 1.2) + 4 }); }
@@ -30887,6 +31051,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
   const orbit = new THREE.OrbitControls(camera, canvas); orbit.enabled = false; orbit.enableDamping = true; orbit.dampingFactor = 0.08; orbit.maxDistance = 900; orbit.minDistance = 8;
   let drag = null;
   /* the instrument screens at the helm can be worked from the helm view: a click on a soft key, the wheel over a screen */
+  let ospScreens = null;   /* the Osprey model's screen nodes, found once her fit-out has loaded */
   const helmScreens = [], hRay = new THREE.Raycaster(), hNdc = new THREE.Vector2();
   const screenHit = ev => { if (st.cam !== 1 || !NAV || !helmScreens.length) return null; const r = canvas.getBoundingClientRect(); hNdc.set((ev.clientX - r.left) / r.width * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
     hRay.setFromCamera(hNdc, camera); const vis = helmScreens.filter(m => { let o = m; while (o) { if (!o.visible) return false; o = o.parent; } return true; }); const h = hRay.intersectObjects(vis, false)[0]; return h && h.uv ? h : null; };
@@ -31099,7 +31264,8 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
   const tidesAhead = () => { if (!LEVEL.tideFn || !LEVEL.clock) return []; const T = LEVEL.tideFn, now = LEVEL.clock.t0 + SEA.t * 1000 * LEVEL.clock.speed, out = []; let p = T.at(now - 360e3), c = T.at(now);
     for (let k = 1; k < 260 && out.length < 3; k++) { const n = T.at(now + k * 360e3); if ((c > p && c >= n) || (c < p && c <= n)) out.push({ high: c > p, time: new Date(now + (k - 1) * 360e3).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }), ft: (c - T.mllw) * 3.28084 }); p = c; c = n; } return out; };
   let NAV = null;
-  try { NAV = makeNav({ real: !!LEVEL.navd, shipsAtAnchor: () => traffic && traffic.on && traffic.shipsAtAnchor ? traffic.shipsAtAnchor() : [],   /* Instruments, 30 Oct: Le Lyrial at anchor on AIS and radar */ helm: () => (act && act.big && act.V) || null,   /* Instruments' Helm window: the driven vessel's VESSELS object */
+  try { NAV = makeNav({ real: !!LEVEL.navd, shipsAtAnchor: () => traffic && traffic.on && traffic.shipsAtAnchor ? traffic.shipsAtAnchor() : [],   /* Instruments, 30 Oct: Le Lyrial at anchor on AIS and radar */ helm: () => (act && act.big && act.V) || null,
+    wipers: on => { const e = act; if (!(e && e.big && e.anim && (e.anim.wipers || []).length)) return null; if (on != null) e.wipers = !!on; return !!e.wipers; },   /* Instruments, 3 Nov: the Helm header's Wipers switch */   /* Instruments' Helm window: the driven vessel's VESSELS object */
     own: () => { const b = act.b, t = b.rb.translation(), v = b.rb.linvel(), sog = Math.hypot(v.x, v.z), hdg = yawOf(b.rb), I = NAVINFO[act.id] || NAVINFO.custom; return { x: t.x, z: t.z, hdg, sog, cog: sog > 0.25 ? Math.atan2(v.x, v.z) : hdg, antenna: I.ant, draft: I.draft, id: act.id, name: act.name, tele: b.tele }; },
     slips: () => W.slips || [], diesel: () => DS,   /* Instruments: the ramp strip (World's slips, the boat's trim and skeg depth) and the glow-plug tip */
     chartDepth: (x, z) => LEVEL.navd ? (LEVEL.tideFn.mllw - LEVEL.navd(x, z)) : -seabedH(x, z),
@@ -31131,6 +31297,14 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     const hs = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.17), scrMat('vhf')); hs.position.set(1.5, 0.25, -0.02); hs.userData.navKind = 'vhf'; helmScreens.push(hs); pod.add(hs);
     const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 1.6, 6), blk); ant.position.set(1.62, 1.4, -0.2); pod.add(ant);
     B.root.add(pod);
+    /* the Osprey's new wheelhouse (Assets O10, Instruments 3 Nov): each canvas on its screen_* node, whose UVs run 0..1 over the glass;
+       looked for once a second until the fit-out has loaded, then never again */
+    let tries = 0; ospScreens = () => { if (++tries % 60) return; const spec = typeof MODELS !== 'undefined' && MODELS.entry && MODELS.entry('osprey_wheelhouse'), want = spec && spec.screens && spec.screens.screens || []; if (!want.length) return; const found = {};
+      OS.root.traverse(x => { const w = want.find(q => q.node === x.name); if (!w || found[w.node]) return; let m = x.isMesh ? x : null; if (!m) x.traverse(c => { if (!m && c.isMesh) m = c; }); if (m) found[w.node] = [m, w.canvas]; });
+      if (Object.keys(found).length < want.length) return;
+      for (const k in found) { const [m, kind] = found[k]; const uv = m.geometry.attributes.uv; if (uv) { for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - uv.getY(i)); uv.needsUpdate = true; }   /* glTF's v runs down the glass; a canvas texture's runs up */
+        m.material = scrMat(kind); m.userData.navKind = kind; helmScreens.push(m); }
+      ospScreens = null; };
   } catch (e) { console.warn('helm screens off', e); } }
   /* hauling the Zodiac aboard the Osprey (Boats' ospreyHaul / ospreyLaunch, Matt 2 Nov): a prompt while it's possible, H does it */
   const HAS_HAUL = typeof ospreyHaulCheck === 'function';
@@ -31552,7 +31726,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
   const tuneTips = () => attachTips($('tuneGroups'), row => { const i = row.querySelector('input[id^="tu-"]'); return i ? i.id.slice(3) : null; }, (k, row) => (row.querySelector('output') || {}).textContent || '');
   /* settings are split three ways: the boat you are driving, the world (wind, sea, sky), and how it is drawn */
   const VESSEL_GROUPS = new Set(['Boat', 'Hydrostatics', 'Hydrodynamics', 'Lower unit & steering', 'Propeller', 'Contacts']);
-  const DISP_DEF = { instDock: 1, damage: 1, damageMarks: 1, softbody: 1, sbPaint: 1, sbScrape: 1, sbLips: 1, sbBuckle: 1, sbSnap: 1, site1Preview: 0, boatWear: 1, ospHaul: 1, trSail: 1, trCG: 1, trSmall: 1, trCruise: 1, ospModel: 1, jetWash: 1, reflections: 1, farLod: 1, lodPerceptual: 0, distCull: 1, farLight: 1, groundStones: 1, horizonShade: 1, shake: 1, buffet: 1, shadows: 2, clouds: 1, foamMap: 1, birds: 1, mammals: 1, traffic: 1, fps: 0, forest: 1, buildings: 1, roads: 1, shoreFx: 1, granite: 1, treeModels: 1, lamps: 1, currents: 1, build: typeof EDITOR_PAGE !== 'undefined' ? 1 : 0, docks: 1, fixtures: 1, weed: 1, windMotion: 1, stones: 0, ledges: 1, volSun: 0, shafts: 0, catspaws: 1, windShadow: 1, swash: 1, plants: 1, edges: 1, stain: 1, nightSky: 1, cloudShadows: 1, aurora: 0, buoys: 1, droppings: 1, cars: 1, curve: 1, loom: 0 };
+  const DISP_DEF = { instDock: 1, damage: 1, damageMarks: 1, softbody: 1, sbPaint: 1, sbScrape: 1, sbLips: 1, sbBuckle: 1, sbSnap: 1, site1Preview: 0, coaLedges: 1, boatWear: 1, ospHaul: 1, trSail: 1, trCG: 1, trSmall: 1, trCruise: 1, ospModel: 1, jetWash: 1, reflections: 1, farLod: 1, lodPerceptual: 0, distCull: 1, farLight: 1, groundStones: 1, horizonShade: 1, shake: 1, buffet: 1, shadows: 2, clouds: 1, foamMap: 1, birds: 1, mammals: 1, traffic: 1, fps: 0, forest: 1, buildings: 1, roads: 1, shoreFx: 1, granite: 1, treeModels: 1, lamps: 1, currents: 1, build: typeof EDITOR_PAGE !== 'undefined' ? 1 : 0, docks: 1, fixtures: 1, weed: 1, windMotion: 1, stones: 0, ledges: 1, volSun: 0, shafts: 0, catspaws: 1, windShadow: 1, swash: 1, plants: 1, edges: 1, stain: 1, nightSky: 1, cloudShadows: 1, aurora: 0, buoys: 1, droppings: 1, cars: 1, curve: 1, loom: 0 };
   const DISP = Object.assign({}, DISP_DEF); try { Object.assign(DISP, JSON.parse(localStorage.getItem('zodiac-display') || '{}')); } catch (e) {}
   /* 19 Oct: the editor froze building painted cobbles; Stones starts off once on every machine (editor_page.js has the why) */
   try { if (!localStorage.getItem('zp-stones-off-1019')) { DISP.stones = 0; localStorage.setItem('zp-stones-off-1019', '1'); localStorage.setItem('zodiac-display', JSON.stringify(DISP)); } } catch (e) {}
@@ -31562,7 +31736,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     ['Lighting', [['shadows', 'Shadows', ['Off', 'Medium (1024)', 'High (2048)', 'Ultra (4096)']]]],
     ['Effects', [['clouds', 'Cloud detail', ['Low (half rate)', 'Full']], ['foamMap', 'Wind foam and windrows (foam that drifts and lasts)', 'sw'], ['birds', 'Seabirds and shorebirds', 'sw'], ['mammals', 'Seals, porpoises, dolphins and whales', 'sw']]],
     ['Scenery', [['forest', 'Forest detail (how far each tier of tree detail reaches; 1 = as designed)', { lo: 0.25, hi: 3, step: 0.05 }],
-      ['treeModels', 'Modelled trees near the camera (off: simple trees everywhere)', 'sw'], ['buildings', 'Towns: buildings and façades', 'sw'], ['roads', 'Roads, poles and lamps', 'sw'], ['farLod', 'Far boats and buoys simplified (off: full physics everywhere, much slower)', 'sw'], ['instDock', 'Instruments docked along the bottom (off: free windows)', 'sw'], ['damage', 'Crash damage: hulls dent, crack and leak (off: they bounce)', 'sw'], ['damageMarks', 'Damage marks on the hull', 'sw'], ['softbody', 'Structural damage: plates fold and tear, fittings break off (a hit boat only)', 'sw'], ['ospModel', 'Osprey: Assets\' model (off: the old code-built boat)', 'sw'], ['sbPaint', 'Scraped paint on a crushed hull', 'sw'], ['sbScrape', 'Damage: slides scrape paint (a grounding or a hard rub)', 'sw'], ['sbLips', 'Damage: rock peels long lips (preview)', 'sw'], ['sbBuckle', 'Damage: plate dents between frames (preview)', 'sw'], ['sbSnap', 'Damage: rails and fittings part when overstretched (preview)', 'sw'], ['site1Preview', 'Site 1: built, not yet placed (preview; boats pass through, can cost over 1 ms near the ferry terminal)', 'sw'], ['boatWear', 'Faint wear on boats (preview)', 'sw'], ['ospHaul', 'Haul small boats aboard the Osprey (preview)', 'sw'], ['trSail', 'Harbour sailboats (preview)', 'sw'], ['trCG', 'Coast Guard boats (preview)', 'sw'], ['trSmall', 'Small boats: tenders and RIBs (preview)', 'sw'], ['trCruise', 'Cruise ships (preview)', 'sw'], ['jetWash', 'Jet wash behind the jets', 'sw'], ['reflections', 'Reflections of boats, docks and shore in the sea', ['Off', 'Low', 'Medium', 'High', 'Ultra']], ['lodPerceptual', 'Detail by screen size, changed while the camera swings (Assets, trial)', 'sw'], ['distCull', 'Small things near the camera only (poles, lamps, shore rubble, piles)', 'sw'], ['farLight', 'Ground lit by its own roughness from afar', 'sw'], ['groundStones', 'Stones and blocks drawn into beaches and granite', 'sw'], ['horizonShade', 'Hills shade the land behind them', 'sw'], ['cars', 'Cars driving the roads', 'sw'], ['docks', 'Piers and floating docks', 'sw'], ['fixtures', 'Dock hardware: bolts, hinges, hoops, rub rails (within 60 m)', 'sw'], ['weed', 'Seaweed on the shore (within 120 m)', 'sw'], ['stones', 'Stones: painted cobble and boulder fill (within 120 m; off until it is cheaper. In the editor, turning it on freezes the page for a while as it builds)', 'sw'], ['ledges', 'Ledges: painted rock ledge (the editor\'s Ledge brush)', 'sw'], ['windMotion', 'Wind motion: trees, grass, flags and loose gear sway in the wind', 'sw'], ['lamps', 'Lamps at night: street lamps, windows, nav lights lighting the water and fog', 'sw'], ['catspaws', 'Catspaws: ripples follow the gusts, glassy between them in light air', 'sw'], ['windShadow', 'Wind shadow: a slick in the lee of floats and boats', 'sw'], ['swash', 'Swash sheet: the thin sheet of water running up the shore', 'sw'], ['plants', 'Shrubs and marsh grass painted with the editor', 'sw'], ['buoys', 'Lobster buoys', 'sw'], ['droppings', 'Gull droppings and pavement wear', 'sw'], ['curve', "Earth's curve: boats go hull-down past the horizon", 'sw'], ['loom', 'Looming / mirage (0 normal air)', { lo: 0, hi: 1, step: 0.05 }], ['stain', 'Intertidal staining on docks, piles and seawalls', 'sw'], ['nightSky', 'Night sky: real stars, the Milky Way, meteors', 'sw'], ['cloudShadows', 'Cloud shadows on land and sea', 'sw'], ['aurora', 'Aurora', ['Now and then', 'Never', 'Tonight, strong']], ['edges', 'Path edges: walls, railings, fences, edging stones along the Shore Path', 'sw'], ['volSun', 'Volumetric sunlight near you (off until measured on the F readout)', 'sw'], ['shafts', 'Light shafts from clouds', 'sw'], ['granite', 'Granite veneer (rock textures, dikes, sills, lichen)', 'sw'], ['shoreFx', 'Seas on the shore: graded splashes, wet rock, foam deposits', 'sw'], ['currents', 'Tidal stream (boats drift with the tide)', 'sw']]],
+      ['treeModels', 'Modelled trees near the camera (off: simple trees everywhere)', 'sw'], ['buildings', 'Towns: buildings and façades', 'sw'], ['roads', 'Roads, poles and lamps', 'sw'], ['farLod', 'Far boats and buoys simplified (off: full physics everywhere, much slower)', 'sw'], ['instDock', 'Instruments docked along the bottom (off: free windows)', 'sw'], ['damage', 'Crash damage: hulls dent, crack and leak (off: they bounce)', 'sw'], ['damageMarks', 'Damage marks on the hull', 'sw'], ['softbody', 'Structural damage: plates fold and tear, fittings break off (a hit boat only)', 'sw'], ['ospModel', 'Osprey: Assets\' model (off: the old code-built boat)', 'sw'], ['sbPaint', 'Scraped paint on a crushed hull', 'sw'], ['sbScrape', 'Damage: slides scrape paint (a grounding or a hard rub)', 'sw'], ['sbLips', 'Damage: rock peels long lips (preview)', 'sw'], ['sbBuckle', 'Damage: plate dents between frames (preview)', 'sw'], ['sbSnap', 'Damage: rails and fittings part when overstretched (preview)', 'sw'], ['site1Preview', 'Site 1: built, not yet placed (preview; boats pass through, can cost over 1 ms near the ferry terminal)', 'sw'], ['coaLedges', 'COA ledges (preview; hides the drawn rock only, a hull still hits it)', 'sw'], ['boatWear', 'Faint wear on boats (preview)', 'sw'], ['ospHaul', 'Haul small boats aboard the Osprey (preview)', 'sw'], ['trSail', 'Harbour sailboats (preview)', 'sw'], ['trCG', 'Coast Guard boats (preview)', 'sw'], ['trSmall', 'Small boats: tenders and RIBs (preview)', 'sw'], ['trCruise', 'Cruise ships (preview)', 'sw'], ['jetWash', 'Jet wash behind the jets', 'sw'], ['reflections', 'Reflections of boats, docks and shore in the sea', ['Off', 'Low', 'Medium', 'High', 'Ultra']], ['lodPerceptual', 'Detail by screen size, changed while the camera swings (Assets, trial)', 'sw'], ['distCull', 'Small things near the camera only (poles, lamps, shore rubble, piles)', 'sw'], ['farLight', 'Ground lit by its own roughness from afar', 'sw'], ['groundStones', 'Stones and blocks drawn into beaches and granite', 'sw'], ['horizonShade', 'Hills shade the land behind them', 'sw'], ['cars', 'Cars driving the roads', 'sw'], ['docks', 'Piers and floating docks', 'sw'], ['fixtures', 'Dock hardware: bolts, hinges, hoops, rub rails (within 60 m)', 'sw'], ['weed', 'Seaweed on the shore (within 120 m)', 'sw'], ['stones', 'Stones: painted cobble and boulder fill (within 120 m; off until it is cheaper. In the editor, turning it on freezes the page for a while as it builds)', 'sw'], ['ledges', 'Ledges: painted rock ledge (the editor\'s Ledge brush)', 'sw'], ['windMotion', 'Wind motion: trees, grass, flags and loose gear sway in the wind', 'sw'], ['lamps', 'Lamps at night: street lamps, windows, nav lights lighting the water and fog', 'sw'], ['catspaws', 'Catspaws: ripples follow the gusts, glassy between them in light air', 'sw'], ['windShadow', 'Wind shadow: a slick in the lee of floats and boats', 'sw'], ['swash', 'Swash sheet: the thin sheet of water running up the shore', 'sw'], ['plants', 'Shrubs and marsh grass painted with the editor', 'sw'], ['buoys', 'Lobster buoys', 'sw'], ['droppings', 'Gull droppings and pavement wear', 'sw'], ['curve', "Earth's curve: boats go hull-down past the horizon", 'sw'], ['loom', 'Looming / mirage (0 normal air)', { lo: 0, hi: 1, step: 0.05 }], ['stain', 'Intertidal staining on docks, piles and seawalls', 'sw'], ['nightSky', 'Night sky: real stars, the Milky Way, meteors', 'sw'], ['cloudShadows', 'Cloud shadows on land and sea', 'sw'], ['aurora', 'Aurora', ['Now and then', 'Never', 'Tonight, strong']], ['edges', 'Path edges: walls, railings, fences, edging stones along the Shore Path', 'sw'], ['volSun', 'Volumetric sunlight near you (off until measured on the F readout)', 'sw'], ['shafts', 'Light shafts from clouds', 'sw'], ['granite', 'Granite veneer (rock textures, dikes, sills, lichen)', 'sw'], ['shoreFx', 'Seas on the shore: graded splashes, wet rock, foam deposits', 'sw'], ['currents', 'Tidal stream (boats drift with the tide)', 'sw']]],
     ...(typeof EDITOR !== 'undefined' ? [['Build', [['build', 'Build mode: free camera, layers, place and paint (` key)', 'sw']]]] : []),   /* the editor is its own page (editor.html); the game has no build mode */
     ['Readouts', [['fps', 'Frame rate and timing readout (F)', 'sw']]]];
   st.sec = 'vessel';
@@ -31949,7 +32123,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     if (atmos.setNightSky) atmos.setNightSky(!!DISP.nightSky); if (atmos.setCloudShadows) atmos.setCloudShadows(!!DISP.cloudShadows); if (atmos.setAurora) atmos.setAurora([null, 0, 1][DISP.aurora | 0]);   /* Lighting's night sky */   /* World's edge system (roads.js EDGES) */
     if (atmos.setVolumetric) atmos.setVolumetric(!!DISP.volSun); if (atmos.setShafts) atmos.setShafts(!!DISP.shafts);   /* Lighting's switches, off by default (rule 9) */   /* Assets' fill brush (rule 9: off by default for now) */
     WIND.motion = DISP.windMotion ? 1 : 0; WIND.uniforms.uWindMotion.value = WIND.motion;   /* every swaying material multiplies by uWindMotion */
-    if (typeof DOCKS !== 'undefined') { DOCKS.on = !!DISP.docks; if (DOCKS.preview) DOCKS.preview.on = !!DISP.site1Preview; } if (typeof HARDWARE !== 'undefined') HARDWARE.on = !!DISP.fixtures;
+    if (typeof DOCKS !== 'undefined') { DOCKS.on = !!DISP.docks; if (DOCKS.preview) DOCKS.preview.on = !!DISP.site1Preview; } if (W.sitePreview) W.sitePreview.on = !!DISP.coaLedges;   /* World, 4 Nov: the COA truss's ledges */ if (typeof HARDWARE !== 'undefined') HARDWARE.on = !!DISP.fixtures;
     if (typeof CURRENTS !== 'undefined') CURRENTS.on = !!DISP.currents;
     if (typeof EDITOR !== 'undefined' && !!EDITOR.on !== !!DISP.build) EDITOR.set(!!DISP.build);
   }
@@ -32172,6 +32346,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     st.A += dt * 360 * (S.crank > 0 ? 1.1 : S.rpm / 60);
     B.vis = st.timeScale; B.dtReal = rdt; B.update(st.A, S, dt);
     OS.update(dt, DS.propRpm * Math.PI / 30, O.steer);
+    if (ospScreens) ospScreens();
     /* the whip aerials feel the boat's motion at their bases */
     if (OS.whipStep && dt > 0) { const rb = O.rb, t0 = rb.translation(), r0 = rb.rotation(), lv = rb.linvel(), av = rb.angvel(), cm = comOf(rb);
       whipQ.set(r0.x, r0.y, r0.z, r0.w); whipQi.copy(whipQ).invert();
