@@ -488,6 +488,27 @@
    "r": 2.0,
    "drop": true,
    "why": "survey 4.16: the Golden Anchor building, drawn as a landmark now; Harborside point (Assets, 1 Nov; tools/harborside_point.py)"
+  },
+  {
+   "at": [
+    -1976.1,
+    10.3
+   ],
+   "r": 3.0,
+   "drop": true,
+   "why": "the ferry terminal's ramp building, demolished 2022 (Assets, item 27)",
+   "by": "ferry_terminal"
+  }
+ ],
+ "drop_roads": [
+  {
+   "name": "Ells Pier",
+   "near": [
+    -322.0,
+    920.0
+   ],
+   "why": "the town pier is a parking lot with painted bays, not a loop road (Assets, waterfront-photos.md Q2, survey row 4.63)",
+   "by": "town_pier_top"
   }
  ]
 }

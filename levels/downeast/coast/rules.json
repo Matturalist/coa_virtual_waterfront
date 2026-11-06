@@ -1,0 +1,1287 @@
+{
+ "_doc": "Per-stretch rules for the 6 cm coast (World, tools/coast_band.py data; 5 Nov). measured: from the 2021 lidar band at 1 m (shore classes from MGS/NWI/NLCD via the level habitat grids; bedrock from the level geology grid; face_strikes_deg: the strikes of steep rock faces, deg clockwise from north, weighted; ledge_relief_cm: the 1 m roughness of the ledge, p50 and p90; steep/cliff share: band cells over 45 and 65 deg). palette: k-means of photo crops, each naming its photo and crop (fractions of the image). The 6 cm generator (Lighting rockworld / Water edge kit) reads these; World does not invent the numbers it lacks: null means not yet measured.",
+ "source_band": "levels/downeast/coast/coast.json",
+ "flight": {
+  "dates_utc": [
+   "2021-05-13 22:30",
+   "2021-05-24 18:30"
+  ],
+  "water_navd_m": [
+   -1.33,
+   -1.65
+  ],
+  "note": "NOAA CO-OPS 8413320 verified water level at the flight times (gps time in the lidar): both flights near low water, so the lidar ground reaches down to about -1.3..-1.7 m NAVD; below that the level ground (CUDEM) stands"
+ },
+ "stretches": {
+  "ferry_regency": {
+   "name": "Ferry terminal to the Regency (Site 1)",
+   "measured": {
+    "band_m2": 78458,
+    "shore": {
+     "ledge (rocky intertidal)": 0.504,
+     "gravel / cobble beach": 0.197,
+     "man-made shore / riprap": 0.114,
+     "mud flat": 0.091,
+     "mixed sand-gravel beach": 0.056,
+     "mussel bar / coarse flat": 0.028
+    },
+    "bedrock": {
+     "Bar Harbor Formation": 0.923,
+     "gabbro and diorite": 0.07
+    },
+    "face_strikes_deg": [
+     {
+      "deg": 132.5,
+      "weight": 1.0
+     },
+     {
+      "deg": 57.5,
+      "weight": 0.45
+     }
+    ],
+    "ledge_relief_cm_p50_p90": [
+     11,
+     95
+    ],
+    "steep_share": 0.088,
+    "cliff_share": 0.021
+   },
+   "palette": [
+    {
+     "what": "coa_ledge",
+     "crop": [
+      0.0,
+      0.55,
+      1.0,
+      1.0
+     ],
+     "pixels": 1598243,
+     "palette": [
+      {
+       "hex": "#52554e",
+       "share": 0.457
+      },
+      {
+       "hex": "#797b77",
+       "share": 0.265
+      },
+      {
+       "hex": "#2d2f2b",
+       "share": 0.183
+      },
+      {
+       "hex": "#c1c1c0",
+       "share": 0.095
+      }
+     ],
+     "median": "#595c56",
+     "repo": "docs/look/matt_3nov_coa_shore_ledges_autumn.jpg",
+     "license": "Matt's photo"
+    },
+    {
+     "what": "coa_cobbles",
+     "crop": [
+      0.0,
+      0.3,
+      1.0,
+      1.0
+     ],
+     "pixels": 2569907,
+     "palette": [
+      {
+       "hex": "#9a9692",
+       "share": 0.308
+      },
+      {
+       "hex": "#63615f",
+       "share": 0.293
+      },
+      {
+       "hex": "#262422",
+       "share": 0.208
+      },
+      {
+       "hex": "#d2cec6",
+       "share": 0.191
+      }
+     ],
+     "median": "#7e7c79",
+     "repo": "docs/look/matt_3nov_coa_beach_cobbles.jpg",
+     "license": "Matt's photo"
+    }
+   ],
+   "photos": []
+  },
+  "west_street_bar": {
+   "name": "West Street and the Bar Island bar (Site 1)",
+   "measured": {
+    "band_m2": 150736,
+    "shore": {
+     "ledge (rocky intertidal)": 0.427,
+     "mussel bar / coarse flat": 0.174,
+     "sand beach / spit / dune": 0.126,
+     "mud flat": 0.097,
+     "man-made shore / riprap": 0.084,
+     "gravel / cobble beach": 0.076
+    },
+    "bedrock": {
+     "Bar Harbor Formation": 0.845,
+     "gabbro and diorite": 0.155
+    },
+    "face_strikes_deg": [
+     {
+      "deg": 87.5,
+      "weight": 1.0
+     },
+     {
+      "deg": 177.5,
+      "weight": 0.89
+     },
+     {
+      "deg": 137.5,
+      "weight": 0.86
+     }
+    ],
+    "ledge_relief_cm_p50_p90": [
+     3,
+     15
+    ],
+    "steep_share": 0.048,
+    "cliff_share": 0.015
+   },
+   "palette": [
+    {
+     "what": "mudflat_cobble",
+     "crop": [
+      0.0,
+      0.6,
+      1.0,
+      1.0
+     ],
+     "pixels": 437629,
+     "palette": [
+      {
+       "hex": "#45453d",
+       "share": 0.306
+      },
+      {
+       "hex": "#202017",
+       "share": 0.261
+      },
+      {
+       "hex": "#a5a8ac",
+       "share": 0.253
+      },
+      {
+       "hex": "#747471",
+       "share": 0.18
+      }
+     ],
+     "median": "#515049",
+     "commons": "https://commons.wikimedia.org/wiki/File:The_sandbar_connecting_Bar_Island_to_the_mainland_at_low_tide..jpg",
+     "title": "File:The sandbar connecting Bar Island to the mainland at low tide..jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/43581314@N08\">Tim Sackton</a> from Somerville, MA"
+    }
+   ],
+   "photos": [
+    {
+     "n": 42,
+     "commons": "https://commons.wikimedia.org/wiki/File:The_sandbar_connecting_Bar_Island_to_the_mainland_at_low_tide..jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "Tim Sackton from Somerville, MA",
+     "x": -649.0,
+     "z": 895.3
+    },
+    {
+     "n": 27,
+     "commons": "https://commons.wikimedia.org/wiki/File:Bar_Harbor_shoreline_and_the_Porcupines.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Nucleosynth",
+     "x": -54.3,
+     "z": 1155.2
+    }
+   ]
+  },
+  "shore_path": {
+   "name": "Town pier, the Shore Path, Sols Cliff (Site 1)",
+   "measured": {
+    "band_m2": 285662,
+    "shore": {
+     "ledge (rocky intertidal)": 0.373,
+     "gravel / cobble beach": 0.265,
+     "mixed sand-gravel beach": 0.134,
+     "developed, open / low": 0.056,
+     "mixed forest": 0.049,
+     "evergreen forest": 0.041,
+     "man-made shore / riprap": 0.034
+    },
+    "bedrock": {
+     "Bar Harbor Formation": 0.558,
+     "gabbro and diorite": 0.442
+    },
+    "face_strikes_deg": [
+     {
+      "deg": 177.5,
+      "weight": 1.0
+     },
+     {
+      "deg": 92.5,
+      "weight": 0.77
+     },
+     {
+      "deg": 137.5,
+      "weight": 0.7
+     }
+    ],
+    "ledge_relief_cm_p50_p90": [
+     12,
+     106
+    ],
+    "steep_share": 0.095,
+    "cliff_share": 0.017
+   },
+   "palette": [
+    {
+     "what": "bh_formation_ledge",
+     "crop": [
+      0.0,
+      0.7,
+      1.0,
+      1.0
+     ],
+     "pixels": 644890,
+     "palette": [
+      {
+       "hex": "#e2d5c1",
+       "share": 0.295
+      },
+      {
+       "hex": "#b4a490",
+       "share": 0.293
+      },
+      {
+       "hex": "#2b201b",
+       "share": 0.218
+      },
+      {
+       "hex": "#6f6051",
+       "share": 0.195
+      }
+     ],
+     "median": "#a99b86",
+     "commons": "https://commons.wikimedia.org/wiki/File:Balance_Rock,_Bar_Harbor.jpg",
+     "title": "File:Balance Rock, Bar Harbor.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Seasider53&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Seasider53 (page does not exist)\">Seasider53</a>"
+    },
+    {
+     "what": "beach_cobble",
+     "crop": [
+      0.0,
+      0.72,
+      1.0,
+      1.0
+     ],
+     "pixels": 285010,
+     "palette": [
+      {
+       "hex": "#51453d",
+       "share": 0.337
+      },
+      {
+       "hex": "#78695e",
+       "share": 0.329
+      },
+      {
+       "hex": "#22160f",
+       "share": 0.18
+      },
+      {
+       "hex": "#a29183",
+       "share": 0.153
+      }
+     ],
+     "median": "#64564d",
+     "commons": "https://commons.wikimedia.org/wiki/File:Bar_Harbor_(6234972042).jpg",
+     "title": "File:Bar Harbor (6234972042).jpg",
+     "license": "CC BY 2.0",
+     "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/37804979@N00\">Tony Hisgett</a> from Birmingham, UK"
+    }
+   ],
+   "photos": [
+    {
+     "n": 27,
+     "commons": "https://commons.wikimedia.org/wiki/File:Bar_Harbor_shoreline_and_the_Porcupines.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Nucleosynth",
+     "x": -54.3,
+     "z": 1155.2
+    },
+    {
+     "n": 52,
+     "commons": "https://commons.wikimedia.org/wiki/File:Balance_Rock,_Bar_Harbor.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Seasider53",
+     "x": -14.4,
+     "z": 1254.4
+    },
+    {
+     "n": 110,
+     "commons": "https://commons.wikimedia.org/wiki/File:Bar_Harbor_(6234972042).jpg",
+     "license": "CC BY 2.0",
+     "artist": "Tony Hisgett from Birmingham, UK",
+     "x": -172.1,
+     "z": 1033.3
+    }
+   ]
+  },
+  "compass_schooner": {
+   "name": "Compass Harbor to Schooner Head",
+   "measured": {
+    "band_m2": 212441,
+    "shore": {
+     "ledge (rocky intertidal)": 0.751,
+     "gravel / cobble beach": 0.171,
+     "boulder beach / ramp": 0.037
+    },
+    "bedrock": {
+     "gabbro and diorite": 0.536,
+     "shatter zone breccia": 0.304,
+     "Bar Harbor Formation": 0.16
+    },
+    "face_strikes_deg": [
+     {
+      "deg": 177.5,
+      "weight": 1.0
+     },
+     {
+      "deg": 92.5,
+      "weight": 0.49
+     }
+    ],
+    "ledge_relief_cm_p50_p90": [
+     34,
+     127
+    ],
+    "steep_share": 0.178,
+    "cliff_share": 0.039
+   },
+   "palette": [],
+   "photos": []
+  },
+  "great_head_sand": {
+   "name": "Great Head and Sand Beach",
+   "measured": {
+    "band_m2": 108236,
+    "shore": {
+     "sand beach / spit / dune": 0.349,
+     "ledge (rocky intertidal)": 0.261,
+     "high salt marsh": 0.216,
+     "boulder beach / ramp": 0.084,
+     "mud flat": 0.061,
+     "mussel bar / coarse flat": 0.028
+    },
+    "bedrock": {
+     "shatter zone breccia": 0.76,
+     "Cadillac Granite": 0.15,
+     "gabbro and diorite": 0.075
+    },
+    "face_strikes_deg": [
+     {
+      "deg": 177.5,
+      "weight": 1.0
+     },
+     {
+      "deg": 152.5,
+      "weight": 0.75
+     },
+     {
+      "deg": 87.5,
+      "weight": 0.47
+     }
+    ],
+    "ledge_relief_cm_p50_p90": [
+     46,
+     127
+    ],
+    "steep_share": 0.101,
+    "cliff_share": 0.024
+   },
+   "palette": [
+    {
+     "what": "granite_slab",
+     "crop": [
+      0.0,
+      0.62,
+      0.35,
+      1.0
+     ],
+     "pixels": 109403,
+     "palette": [
+      {
+       "hex": "#f1d5bc",
+       "share": 0.337
+      },
+      {
+       "hex": "#ccac92",
+       "share": 0.301
+      },
+      {
+       "hex": "#917964",
+       "share": 0.188
+      },
+      {
+       "hex": "#4d3727",
+       "share": 0.174
+      }
+     ],
+     "median": "#cdac92",
+     "commons": "https://commons.wikimedia.org/wiki/File:Newport_Cove_-_Bar_Harbor,_Maine,_USA_-_September_27,_2023_01.jpg",
+     "title": "File:Newport Cove - Bar Harbor, Maine, USA - September 27, 2023 01.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:GiorgioGaleotti\" title=\"User:GiorgioGaleotti\">Giorgio Galeotti</a>"
+    },
+    {
+     "what": "sand",
+     "crop": [
+      0.1,
+      0.65,
+      1.0,
+      1.0
+     ],
+     "pixels": 387063,
+     "palette": [
+      {
+       "hex": "#8a7657",
+       "share": 0.407
+      },
+      {
+       "hex": "#a8916f",
+       "share": 0.252
+      },
+      {
+       "hex": "#6e5b40",
+       "share": 0.251
+      },
+      {
+       "hex": "#362a1c",
+       "share": 0.09
+      }
+     ],
+     "median": "#887355",
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_10_52_View_west-southwest_from_the_middle_of_Sand_Beach_within_Acadia_National_Park_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "title": "File:2017-07-27 08 10 52 View west-southwest from the middle of Sand Beach within Acadia National Park in Bar Harbor, Hancock County, Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>"
+    },
+    {
+     "what": "dark_rock",
+     "crop": [
+      0.35,
+      0.4,
+      1.0,
+      1.0
+     ],
+     "pixels": 445293,
+     "palette": [
+      {
+       "hex": "#0e0e0d",
+       "share": 0.364
+      },
+      {
+       "hex": "#272523",
+       "share": 0.273
+      },
+      {
+       "hex": "#44423e",
+       "share": 0.249
+      },
+      {
+       "hex": "#666462",
+       "share": 0.114
+      }
+     ],
+     "median": "#272523",
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_coast.jpg",
+     "title": "File:Acadia coast.jpg",
+     "license": "CC BY-SA 3.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Ymblanter\" title=\"User:Ymblanter\">Ymblanter</a>"
+    }
+   ],
+   "photos": [
+    {
+     "n": 43,
+     "commons": "https://commons.wikimedia.org/wiki/File:Newport_Cove_-_Bar_Harbor,_Maine,_USA_-_September_27,_2023_01.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Giorgio Galeotti",
+     "x": 1193.9,
+     "z": 8044.6
+    },
+    {
+     "n": 44,
+     "commons": "https://commons.wikimedia.org/wiki/File:Newport_Cove_-_Bar_Harbor,_Maine,_USA_-_September_27,_2023_02.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Giorgio Galeotti",
+     "x": 1193.3,
+     "z": 8040.8
+    },
+    {
+     "n": 53,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_10_52_View_west-southwest_from_the_middle_of_Sand_Beach_within_Acadia_National_Park_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 1314.6,
+     "z": 7821.9
+    },
+    {
+     "n": 149,
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_coast.jpg",
+     "license": "CC BY-SA 3.0",
+     "artist": "Ymblanter",
+     "x": 1286.3,
+     "z": 7748.3
+    },
+    {
+     "n": 65,
+     "commons": "https://commons.wikimedia.org/wiki/File:Newport_Cove_-_Bar_Harbor,_Maine,_USA_-_September_27,_2023_03.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Giorgio Galeotti",
+     "x": 1193.2,
+     "z": 8040.7
+    }
+   ]
+  },
+  "ocean_path": {
+   "name": "Ocean Path to Thunder Hole",
+   "measured": {
+    "band_m2": 40237,
+    "shore": {
+     "ledge (rocky intertidal)": 0.805,
+     "high salt marsh": 0.068,
+     "boulder beach / ramp": 0.063,
+     "gravel / cobble beach": 0.057
+    },
+    "bedrock": {
+     "Cadillac Granite": 0.921,
+     "shatter zone breccia": 0.051
+    },
+    "face_strikes_deg": [
+     {
+      "deg": 32.5,
+      "weight": 1.0
+     },
+     {
+      "deg": 87.5,
+      "weight": 0.74
+     },
+     {
+      "deg": 147.5,
+      "weight": 0.7
+     }
+    ],
+    "ledge_relief_cm_p50_p90": [
+     37,
+     127
+    ],
+    "steep_share": 0.193,
+    "cliff_share": 0.033
+   },
+   "palette": [
+    {
+     "what": "granite_dry_tops",
+     "crop": [
+      0.0,
+      0.6,
+      1.0,
+      1.0
+     ],
+     "pixels": 408534,
+     "palette": [
+      {
+       "hex": "#7c7269",
+       "share": 0.319
+      },
+      {
+       "hex": "#544c42",
+       "share": 0.235
+      },
+      {
+       "hex": "#a4988e",
+       "share": 0.233
+      },
+      {
+       "hex": "#232216",
+       "share": 0.214
+      }
+     ],
+     "median": "#6f665d",
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_18_30_View_northeast_from_an_overlook_along_the_Park_Loop_Road_between_Sand_Beach_and_Thunder_Hole_within_Acadia_National_Park_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "title": "File:2017-07-27 08 18 30 View northeast from an overlook along the Park Loop Road between Sand Beach and Thunder Hole within Acadia National Park in Bar Harbor, Hancock County, Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>"
+    },
+    {
+     "what": "granite_dry_tops",
+     "crop": [
+      0.0,
+      0.62,
+      1.0,
+      1.0
+     ],
+     "pixels": 439474,
+     "palette": [
+      {
+       "hex": "#1f1410",
+       "share": 0.359
+      },
+      {
+       "hex": "#402d25",
+       "share": 0.264
+      },
+      {
+       "hex": "#9a8276",
+       "share": 0.199
+      },
+      {
+       "hex": "#6a544a",
+       "share": 0.179
+      }
+     ],
+     "median": "#402e25",
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_21_26_View_east-southeast_from_an_overlook_along_the_Park_Loop_Road_just_south_of_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "title": "File:2017-07-27 08 21 26 View east-southeast from an overlook along the Park Loop Road just south of Thunder Hole within Acadia National Park, in Bar Harbor, Hancock County, Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>"
+    },
+    {
+     "what": "weed_band",
+     "crop": [
+      0.0,
+      0.62,
+      1.0,
+      1.0
+     ],
+     "pixels": 458910,
+     "palette": [
+      {
+       "hex": "#181511",
+       "share": 0.431
+      },
+      {
+       "hex": "#2f2b21",
+       "share": 0.36
+      },
+      {
+       "hex": "#554f40",
+       "share": 0.145
+      },
+      {
+       "hex": "#8b867b",
+       "share": 0.064
+      }
+     ],
+     "median": "#27241c",
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_31_07_View_east-southeast_from_an_overlook_along_the_Park_Loop_Road_between_Thunder_Hole_and_Monument_Cove_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "title": "File:2017-07-27 08 31 07 View east-southeast from an overlook along the Park Loop Road between Thunder Hole and Monument Cove within Acadia National Park, in Bar Harbor, Hancock County, Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>"
+    },
+    {
+     "what": "weed_band",
+     "crop": [
+      0.3,
+      0.6,
+      1.0,
+      1.0
+     ],
+     "pixels": 323720,
+     "palette": [
+      {
+       "hex": "#18150f",
+       "share": 0.385
+      },
+      {
+       "hex": "#2e2b20",
+       "share": 0.35
+      },
+      {
+       "hex": "#4f4a3a",
+       "share": 0.149
+      },
+      {
+       "hex": "#757877",
+       "share": 0.117
+      }
+     ],
+     "median": "#2a271d",
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_31_04_View_east_from_an_overlook_along_the_Park_Loop_Road_between_Thunder_Hole_and_Monument_Cove_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "title": "File:2017-07-27 08 31 04 View east from an overlook along the Park Loop Road between Thunder Hole and Monument Cove within Acadia National Park, in Bar Harbor, Hancock County, Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>"
+    },
+    {
+     "what": "chasm_walls",
+     "crop": [
+      0.0,
+      0.0,
+      0.5,
+      0.6
+     ],
+     "pixels": 655310,
+     "palette": [
+      {
+       "hex": "#534b3d",
+       "share": 0.339
+      },
+      {
+       "hex": "#2a251d",
+       "share": 0.288
+      },
+      {
+       "hex": "#8b806f",
+       "share": 0.206
+      },
+      {
+       "hex": "#d2c2ad",
+       "share": 0.167
+      }
+     ],
+     "median": "#584f42",
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_23_56_Waves_crashing_in_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "title": "File:2017-07-27 08 23 56 Waves crashing in Thunder Hole within Acadia National Park, in Bar Harbor, Hancock County, Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>"
+    }
+   ],
+   "photos": [
+    {
+     "n": 14,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_18_30_View_northeast_from_an_overlook_along_the_Park_Loop_Road_between_Sand_Beach_and_Thunder_Hole_within_Acadia_National_Park_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 1029.3,
+     "z": 8485.0
+    },
+    {
+     "n": 15,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_18_32_View_east_from_an_overlook_along_the_Park_Loop_Road_between_Sand_Beach_and_Thunder_Hole_within_Acadia_National_Park_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 1024.0,
+     "z": 8487.8
+    },
+    {
+     "n": 17,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_18_36_View_south-southeast_from_an_overlook_along_the_Park_Loop_Road_between_Sand_Beach_and_Thunder_Hole_within_Acadia_National_Park_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 1024.0,
+     "z": 8493.6
+    },
+    {
+     "n": 18,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_18_38_View_south_from_an_overlook_along_the_Park_Loop_Road_between_Sand_Beach_and_Thunder_Hole_within_Acadia_National_Park_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 1024.0,
+     "z": 8493.6
+    },
+    {
+     "n": 20,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_31_04_View_east_from_an_overlook_along_the_Park_Loop_Road_between_Thunder_Hole_and_Monument_Cove_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 839.6,
+     "z": 8887.7
+    },
+    {
+     "n": 21,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_31_07_View_east-southeast_from_an_overlook_along_the_Park_Loop_Road_between_Thunder_Hole_and_Monument_Cove_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 844.4,
+     "z": 8882.2
+    },
+    {
+     "n": 23,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_23_55_Waves_crashing_in_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 912.2,
+     "z": 8788.5
+    },
+    {
+     "n": 24,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_23_56_Waves_crashing_in_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 912.2,
+     "z": 8782.7
+    },
+    {
+     "n": 28,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_21_12_View_south-southeast_from_an_overlook_along_the_Park_Loop_Road_just_south_of_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 862.5,
+     "z": 8840.4
+    },
+    {
+     "n": 29,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_21_25_View_east-northeast_from_an_overlook_along_the_Park_Loop_Road_just_south_of_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 871.5,
+     "z": 8833.0
+    },
+    {
+     "n": 30,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_21_23_View_northeast_from_an_overlook_along_the_Park_Loop_Road_just_south_of_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 871.5,
+     "z": 8833.0
+    },
+    {
+     "n": 31,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_21_26_View_east-southeast_from_an_overlook_along_the_Park_Loop_Road_just_south_of_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 871.5,
+     "z": 8833.0
+    },
+    {
+     "n": 32,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_21_28_View_southeast_from_an_overlook_along_the_Park_Loop_Road_just_south_of_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 874.0,
+     "z": 8831.2
+    },
+    {
+     "n": 33,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_21_31_View_south_from_an_overlook_along_the_Park_Loop_Road_just_south_of_Thunder_Hole_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 874.0,
+     "z": 8831.2
+    }
+   ]
+  },
+  "otter_cliffs": {
+   "name": "Monument Cove, Boulder Beach and Otter Cliffs",
+   "measured": {
+    "band_m2": 33094,
+    "shore": {
+     "ledge (rocky intertidal)": 0.699,
+     "gravel / cobble beach": 0.169,
+     "boulder beach / ramp": 0.133
+    },
+    "bedrock": {
+     "Cadillac Granite": 0.905,
+     "shatter zone breccia": 0.095
+    },
+    "face_strikes_deg": [
+     {
+      "deg": 2.5,
+      "weight": 1.0
+     }
+    ],
+    "ledge_relief_cm_p50_p90": [
+     31,
+     127
+    ],
+    "steep_share": 0.17,
+    "cliff_share": 0.032
+   },
+   "palette": [
+    {
+     "what": "granite_dry_tops",
+     "crop": [
+      0.0,
+      0.55,
+      1.0,
+      1.0
+     ],
+     "pixels": 551149,
+     "palette": [
+      {
+       "hex": "#2e221a",
+       "share": 0.307
+      },
+      {
+       "hex": "#816c5d",
+       "share": 0.252
+      },
+      {
+       "hex": "#9d897a",
+       "share": 0.224
+      },
+      {
+       "hex": "#59483a",
+       "share": 0.217
+      }
+     ],
+     "median": "#6a5748",
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_34_27_View_north_from_an_overlook_along_the_Park_Loop_Road_between_Monument_Cove_and_Boulder_Beach_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "title": "File:2017-07-27 08 34 27 View north from an overlook along the Park Loop Road between Monument Cove and Boulder Beach within Acadia National Park, in Bar Harbor, Hancock County, Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>"
+    },
+    {
+     "what": "granite_dry_tops",
+     "crop": [
+      0.3,
+      0.6,
+      1.0,
+      1.0
+     ],
+     "pixels": 321466,
+     "palette": [
+      {
+       "hex": "#1e1814",
+       "share": 0.268
+      },
+      {
+       "hex": "#72655e",
+       "share": 0.266
+      },
+      {
+       "hex": "#443b30",
+       "share": 0.24
+      },
+      {
+       "hex": "#90837d",
+       "share": 0.226
+      }
+     ],
+     "median": "#5a4f46",
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_34_40_View_south-southeast_from_an_overlook_along_the_Park_Loop_Road_between_Monument_Cove_and_Boulder_Beach_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "title": "File:2017-07-27 08 34 40 View south-southeast from an overlook along the Park Loop Road between Monument Cove and Boulder Beach within Acadia National Park, in Bar Harbor, Hancock County, Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Famartin\" title=\"User:Famartin\">Famartin</a>"
+    },
+    {
+     "what": "cliff_face",
+     "crop": [
+      0.27,
+      0.42,
+      0.45,
+      0.62
+     ],
+     "pixels": 44337,
+     "palette": [
+      {
+       "hex": "#4d4d4f",
+       "share": 0.328
+      },
+      {
+       "hex": "#656362",
+       "share": 0.325
+      },
+      {
+       "hex": "#f4f4f4",
+       "share": 0.193
+      },
+      {
+       "hex": "#837e7a",
+       "share": 0.153
+      }
+     ],
+     "median": "#656463",
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park_-_Maine_(7254920270).jpg",
+     "title": "File:Acadia National Park - Maine (7254920270).jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/7327243@N05\">Doug Kerr</a> from Albany, NY, United States"
+    },
+    {
+     "what": "boulders_wet",
+     "crop": [
+      0.0,
+      0.6,
+      1.0,
+      1.0
+     ],
+     "pixels": 409146,
+     "palette": [
+      {
+       "hex": "#120e0d",
+       "share": 0.434
+      },
+      {
+       "hex": "#84756d",
+       "share": 0.214
+      },
+      {
+       "hex": "#534131",
+       "share": 0.212
+      },
+      {
+       "hex": "#c0b1a8",
+       "share": 0.14
+      }
+     ],
+     "median": "#47372a",
+     "commons": "https://commons.wikimedia.org/wiki/File:Boulder_Beach_Acadia_October_2021_002.jpg",
+     "title": "File:Boulder Beach Acadia October 2021 002.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "<a href=\"//commons.wikimedia.org/wiki/User:King_of_Hearts\" title=\"User:King of Hearts\">King of Hearts</a>"
+    },
+    {
+     "what": "boulders_dry",
+     "crop": [
+      0.0,
+      0.62,
+      1.0,
+      1.0
+     ],
+     "pixels": 415914,
+     "palette": [
+      {
+       "hex": "#0d0806",
+       "share": 0.327
+      },
+      {
+       "hex": "#30261f",
+       "share": 0.312
+      },
+      {
+       "hex": "#59493e",
+       "share": 0.251
+      },
+      {
+       "hex": "#937d6d",
+       "share": 0.109
+      }
+     ],
+     "median": "#322820",
+     "commons": "https://commons.wikimedia.org/wiki/File:Boulder_beach_(31046066528).jpg",
+     "title": "File:Boulder beach (31046066528).jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/17094005@N00\">Christian Collins</a>"
+    }
+   ],
+   "photos": [
+    {
+     "n": 0,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_34_27_View_north_from_an_overlook_along_the_Park_Loop_Road_between_Monument_Cove_and_Boulder_Beach_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 751.4,
+     "z": 9354.6
+    },
+    {
+     "n": 1,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_34_31_View_north-northeast_from_an_overlook_along_the_Park_Loop_Road_between_Monument_Cove_and_Boulder_Beach_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 751.4,
+     "z": 9354.6
+    },
+    {
+     "n": 4,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_34_40_View_south-southeast_from_an_overlook_along_the_Park_Loop_Road_between_Monument_Cove_and_Boulder_Beach_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 752.1,
+     "z": 9356.4
+    },
+    {
+     "n": 5,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_34_45_View_south-southwest_from_an_overlook_along_the_Park_Loop_Road_between_Monument_Cove_and_Boulder_Beach_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 752.1,
+     "z": 9356.4
+    },
+    {
+     "n": 26,
+     "commons": "https://commons.wikimedia.org/wiki/File:Boulder_beach_(31046066528).jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "Christian Collins",
+     "x": 740.0,
+     "z": 9499.4
+    },
+    {
+     "n": 40,
+     "commons": "https://commons.wikimedia.org/wiki/File:Boulder_Beach_Acadia_October_2021_002.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "King of Hearts",
+     "x": 766.6,
+     "z": 9495.0
+    },
+    {
+     "n": 41,
+     "commons": "https://commons.wikimedia.org/wiki/File:Boulder_Beach_Acadia_October_2021_003.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "King of Hearts",
+     "x": 771.0,
+     "z": 9498.0
+    },
+    {
+     "n": 46,
+     "commons": "https://commons.wikimedia.org/wiki/File:Boulder_Beach_Acadia_October_2021_001.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "King of Hearts",
+     "x": 768.5,
+     "z": 9493.3
+    },
+    {
+     "n": 194,
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park_-_Maine_(7254915254).jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "Doug Kerr from Albany, NY, United States",
+     "x": 693.5,
+     "z": 9520.5
+    },
+    {
+     "n": 195,
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park_-_Maine_(7254918144).jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "Doug Kerr from Albany, NY, United States",
+     "x": 693.5,
+     "z": 9520.5
+    },
+    {
+     "n": 196,
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park_-_Maine_(7254920270).jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "Doug Kerr from Albany, NY, United States",
+     "x": 693.5,
+     "z": 9520.5
+    },
+    {
+     "n": 197,
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park_-_Maine_(7254930284).jpg",
+     "license": "CC BY-SA 2.0",
+     "artist": "Doug Kerr from Albany, NY, United States",
+     "x": 693.5,
+     "z": 9520.5
+    }
+   ]
+  },
+  "otter_point": {
+   "name": "Otter Point",
+   "measured": {
+    "band_m2": 33452,
+    "shore": {
+     "ledge (rocky intertidal)": 1.0
+    },
+    "bedrock": {
+     "shatter zone breccia": 0.809,
+     "Cadillac Granite": 0.191
+    },
+    "face_strikes_deg": [
+     {
+      "deg": 42.5,
+      "weight": 1.0
+     },
+     {
+      "deg": 2.5,
+      "weight": 0.94
+     },
+     {
+      "deg": 87.5,
+      "weight": 0.86
+     }
+    ],
+    "ledge_relief_cm_p50_p90": [
+     44,
+     127
+    ],
+    "steep_share": 0.227,
+    "cliff_share": 0.048
+   },
+   "palette": [],
+   "photos": [
+    {
+     "n": 198,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_39_56_View_north_from_the_Otter_Cliffs_Overlook_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 857.0,
+     "z": 9872.2
+    },
+    {
+     "n": 202,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_40_09_View_south_from_the_Otter_Cliffs_Overlook_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": null,
+     "z": null
+    },
+    {
+     "n": 203,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_40_56_View_north_from_the_Otter_Cliffs_Overlook_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 857.0,
+     "z": 9873.9
+    },
+    {
+     "n": 204,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_40_59_View_northeast_from_the_Otter_Cliffs_Overlook_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": 857.0,
+     "z": 9876.1
+    },
+    {
+     "n": 207,
+     "commons": "https://commons.wikimedia.org/wiki/File:2017-07-27_08_41_13_View_south_from_the_Otter_Cliffs_Overlook_within_Acadia_National_Park,_in_Bar_Harbor,_Hancock_County,_Maine.jpg",
+     "license": "CC BY-SA 4.0",
+     "artist": "Famartin",
+     "x": null,
+     "z": null
+    },
+    {
+     "n": 209,
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park,_Otter_Cliff.jpg",
+     "license": "Public domain",
+     "artist": "National Park Service / Matthew Lambert (Acadia Youth Technology Team) \n\nderivat",
+     "x": null,
+     "z": null
+    },
+    {
+     "n": 210,
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park_(8111099735).jpg",
+     "license": "CC BY 2.0",
+     "artist": "Jeff Gunn from Atlanta, USA",
+     "x": null,
+     "z": null
+    },
+    {
+     "n": 211,
+     "commons": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park_(8111100321).jpg",
+     "license": "CC BY 2.0",
+     "artist": "Jeff Gunn from Atlanta, USA",
+     "x": null,
+     "z": null
+    }
+   ]
+  }
+ },
+ "preview_colours": {
+  "_doc": "For the 1 m preview mesh only (world.js W.coastBand): one colour per shore class id, each a photo median from the palettes above (which crop: see the note). Classes no photo has sampled yet draw default (the COA ledge grey).",
+  "1": "#6f665d",
+  "2": "#47372a",
+  "3": "#7e7c79",
+  "4": "#64564d",
+  "5": "#887355",
+  "6": "#515049",
+  "8": "#45453d",
+  "12": "#595c56",
+  "default": "#595c56",
+  "note": {
+   "1": "ocean_path granite_dry_tops (photo 14)",
+   "2": "otter_cliffs boulders_wet (photo 40)",
+   "3": "COA cobbles (Matt, matt_3nov_coa_beach_cobbles)",
+   "4": "shore_path beach_cobble (photo 110)",
+   "5": "great_head_sand sand (photo 53)",
+   "6": "west_street_bar mudflat_cobble (photo 42)",
+   "8": "mudflat_cobble, its main cluster",
+   "12": "COA ledge (Matt, matt_3nov_coa_shore_ledges_autumn)"
+  }
+ }
+}

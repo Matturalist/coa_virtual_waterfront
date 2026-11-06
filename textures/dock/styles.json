@@ -1025,6 +1025,22 @@
     0.67,
     0.408
    ]
+  },
+  "coa_marks": {
+   "diff": "textures/dock/coa_marks_diff.jpg",
+   "alpha": "textures/dock/coa_marks_alpha.png",
+   "double": true,
+   "decal": true,
+   "roughness": 0.95,
+   "stain_k": 0,
+   "credit": "Matt Messina's photo of 3 Nov 2026, docs/look/matt_3nov_coa_ledge_barnacles_eyebolts.jpg, cut at 1:1 by tools/assets/coa_marks.py",
+   "from": "each cell's box in textures/dock/coa_marks.json; colours are the photo's own"
+  },
+  "car_paint": {
+   "color": 16777215,
+   "roughness": 0.38,
+   "metalness": 0.15,
+   "credit": "plain paint: no scan; each panel's colour is its vertex tint, sampled from docs/look/photo_aerial_town_*.jpg (site 1 item 30)"
   }
  },
  "town_pier": {

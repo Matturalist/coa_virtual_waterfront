@@ -1,0 +1,802 @@
+{
+ "_doc": "The coast band (tools/coast_band.py): the ground within 20 ft of MHW at 1 m from the 2021 lidar, in TILE m tiles at (i*TILE, j*TILE), PNG height mm as the level's, alpha 0 where there is no ground return (the level's ground stands).",
+ "tile_m": 250.0,
+ "dx": 1.0,
+ "n": 251,
+ "mhw_navd": 1.524,
+ "band_m": 6.096,
+ "source": "USGS 3DEP ME_MidCoast_1_2021 lidar, class 2 ground (Entwine, AWS; public domain)",
+ "strips": {
+  "ferry_to_otter_point": {
+   "what": "Mount Desert Island, the ferry terminal to Otter Point: Bar Harbor, the Shore Path, Compass Harbor, Great Head, Sand Beach, Thunder Hole, Otter Cliffs (Matt, 5 Nov)",
+   "box": [
+    -2300.0,
+    -300.0,
+    2600.0,
+    10500.0
+   ],
+   "on": [
+    0.0,
+    5000.0
+   ],
+   "cut": [
+    [
+     -3000.0,
+     7900.0,
+     620.0,
+     11000.0
+    ]
+   ],
+   "flown_gps_time": [
+    304980303.4653735,
+    305915998.88307446,
+    305916479.34095955
+   ]
+  }
+ },
+ "tiles": [
+  {
+   "file": "-10_-1.png",
+   "i": -10,
+   "j": -1,
+   "cells": 29226,
+   "band": 27858
+  },
+  {
+   "file": "-10_0.png",
+   "i": -10,
+   "j": 0,
+   "cells": 2403,
+   "band": 1861
+  },
+  {
+   "file": "-9_-1.png",
+   "i": -9,
+   "j": -1,
+   "cells": 3859,
+   "band": 3859
+  },
+  {
+   "file": "-9_0.png",
+   "i": -9,
+   "j": 0,
+   "cells": 20107,
+   "band": 19070
+  },
+  {
+   "file": "-8_0.png",
+   "i": -8,
+   "j": 0,
+   "cells": 2890,
+   "band": 2869
+  },
+  {
+   "file": "-8_1.png",
+   "i": -8,
+   "j": 1,
+   "cells": 9406,
+   "band": 8674
+  },
+  {
+   "file": "-7_1.png",
+   "i": -7,
+   "j": 1,
+   "cells": 9827,
+   "band": 9299
+  },
+  {
+   "file": "-7_2.png",
+   "i": -7,
+   "j": 2,
+   "cells": 5344,
+   "band": 4807
+  },
+  {
+   "file": "-6_2.png",
+   "i": -6,
+   "j": 2,
+   "cells": 9484,
+   "band": 8993
+  },
+  {
+   "file": "-6_3.png",
+   "i": -6,
+   "j": 3,
+   "cells": 10823,
+   "band": 10225
+  },
+  {
+   "file": "-6_4.png",
+   "i": -6,
+   "j": 4,
+   "cells": 314,
+   "band": 211
+  },
+  {
+   "file": "-5_3.png",
+   "i": -5,
+   "j": 3,
+   "cells": 17054,
+   "band": 16984
+  },
+  {
+   "file": "-5_4.png",
+   "i": -5,
+   "j": 4,
+   "cells": 19976,
+   "band": 18947
+  },
+  {
+   "file": "-4_2.png",
+   "i": -4,
+   "j": 2,
+   "cells": 29409,
+   "band": 29409
+  },
+  {
+   "file": "-4_3.png",
+   "i": -4,
+   "j": 3,
+   "cells": 35915,
+   "band": 35707
+  },
+  {
+   "file": "-4_4.png",
+   "i": -4,
+   "j": 4,
+   "cells": 3428,
+   "band": 3119
+  },
+  {
+   "file": "-3_2.png",
+   "i": -3,
+   "j": 2,
+   "cells": 16158,
+   "band": 16158
+  },
+  {
+   "file": "-3_3.png",
+   "i": -3,
+   "j": 3,
+   "cells": 33446,
+   "band": 33217
+  },
+  {
+   "file": "-3_4.png",
+   "i": -3,
+   "j": 4,
+   "cells": 2241,
+   "band": 1926
+  },
+  {
+   "file": "-2_3.png",
+   "i": -2,
+   "j": 3,
+   "cells": 13058,
+   "band": 12824
+  },
+  {
+   "file": "-2_4.png",
+   "i": -2,
+   "j": 4,
+   "cells": 2775,
+   "band": 2443
+  },
+  {
+   "file": "-1_3.png",
+   "i": -1,
+   "j": 3,
+   "cells": 3676,
+   "band": 3676
+  },
+  {
+   "file": "-1_4.png",
+   "i": -1,
+   "j": 4,
+   "cells": 22144,
+   "band": 21385
+  },
+  {
+   "file": "-1_5.png",
+   "i": -1,
+   "j": 5,
+   "cells": 5672,
+   "band": 5254
+  },
+  {
+   "file": "-1_7.png",
+   "i": -1,
+   "j": 7,
+   "cells": 2393,
+   "band": 2114
+  },
+  {
+   "file": "-1_8.png",
+   "i": -1,
+   "j": 8,
+   "cells": 3385,
+   "band": 2332
+  },
+  {
+   "file": "0_4.png",
+   "i": 0,
+   "j": 4,
+   "cells": 3253,
+   "band": 3253
+  },
+  {
+   "file": "0_5.png",
+   "i": 0,
+   "j": 5,
+   "cells": 33792,
+   "band": 33297
+  },
+  {
+   "file": "0_6.png",
+   "i": 0,
+   "j": 6,
+   "cells": 14909,
+   "band": 13900
+  },
+  {
+   "file": "0_7.png",
+   "i": 0,
+   "j": 7,
+   "cells": 16580,
+   "band": 15066
+  },
+  {
+   "file": "0_8.png",
+   "i": 0,
+   "j": 8,
+   "cells": 40582,
+   "band": 40154
+  },
+  {
+   "file": "0_9.png",
+   "i": 0,
+   "j": 9,
+   "cells": 17570,
+   "band": 16290
+  },
+  {
+   "file": "1_5.png",
+   "i": 1,
+   "j": 5,
+   "cells": 959,
+   "band": 959
+  },
+  {
+   "file": "1_6.png",
+   "i": 1,
+   "j": 6,
+   "cells": 9752,
+   "band": 9752
+  },
+  {
+   "file": "1_7.png",
+   "i": 1,
+   "j": 7,
+   "cells": 21892,
+   "band": 21106
+  },
+  {
+   "file": "1_8.png",
+   "i": 1,
+   "j": 8,
+   "cells": 7038,
+   "band": 7038
+  },
+  {
+   "file": "1_9.png",
+   "i": 1,
+   "j": 9,
+   "cells": 36041,
+   "band": 34437
+  },
+  {
+   "file": "1_10.png",
+   "i": 1,
+   "j": 10,
+   "cells": 18441,
+   "band": 17570
+  },
+  {
+   "file": "1_40.png",
+   "i": 1,
+   "j": 40,
+   "cells": 514,
+   "band": 514
+  },
+  {
+   "file": "1_41.png",
+   "i": 1,
+   "j": 41,
+   "cells": 747,
+   "band": 747
+  },
+  {
+   "file": "2_8.png",
+   "i": 2,
+   "j": 8,
+   "cells": 2704,
+   "band": 2704
+  },
+  {
+   "file": "2_9.png",
+   "i": 2,
+   "j": 9,
+   "cells": 13224,
+   "band": 12868
+  },
+  {
+   "file": "2_10.png",
+   "i": 2,
+   "j": 10,
+   "cells": 10474,
+   "band": 10032
+  },
+  {
+   "file": "2_11.png",
+   "i": 2,
+   "j": 11,
+   "cells": 4490,
+   "band": 4265
+  },
+  {
+   "file": "2_36.png",
+   "i": 2,
+   "j": 36,
+   "cells": 4383,
+   "band": 4258
+  },
+  {
+   "file": "2_37.png",
+   "i": 2,
+   "j": 37,
+   "cells": 2822,
+   "band": 2299
+  },
+  {
+   "file": "2_38.png",
+   "i": 2,
+   "j": 38,
+   "cells": 2682,
+   "band": 2475
+  },
+  {
+   "file": "2_39.png",
+   "i": 2,
+   "j": 39,
+   "cells": 133,
+   "band": 110
+  },
+  {
+   "file": "2_40.png",
+   "i": 2,
+   "j": 40,
+   "cells": 4186,
+   "band": 3902
+  },
+  {
+   "file": "2_41.png",
+   "i": 2,
+   "j": 41,
+   "cells": 11950,
+   "band": 11428
+  },
+  {
+   "file": "3_11.png",
+   "i": 3,
+   "j": 11,
+   "cells": 6728,
+   "band": 6562
+  },
+  {
+   "file": "3_12.png",
+   "i": 3,
+   "j": 12,
+   "cells": 1206,
+   "band": 1182
+  },
+  {
+   "file": "3_34.png",
+   "i": 3,
+   "j": 34,
+   "cells": 5771,
+   "band": 5629
+  },
+  {
+   "file": "3_35.png",
+   "i": 3,
+   "j": 35,
+   "cells": 13318,
+   "band": 12736
+  },
+  {
+   "file": "3_36.png",
+   "i": 3,
+   "j": 36,
+   "cells": 7670,
+   "band": 7235
+  },
+  {
+   "file": "3_37.png",
+   "i": 3,
+   "j": 37,
+   "cells": 7071,
+   "band": 6988
+  },
+  {
+   "file": "3_38.png",
+   "i": 3,
+   "j": 38,
+   "cells": 6224,
+   "band": 6124
+  },
+  {
+   "file": "3_39.png",
+   "i": 3,
+   "j": 39,
+   "cells": 3823,
+   "band": 3597
+  },
+  {
+   "file": "3_40.png",
+   "i": 3,
+   "j": 40,
+   "cells": 8593,
+   "band": 8131
+  },
+  {
+   "file": "3_41.png",
+   "i": 3,
+   "j": 41,
+   "cells": 8805,
+   "band": 8722
+  },
+  {
+   "file": "4_12.png",
+   "i": 4,
+   "j": 12,
+   "cells": 888,
+   "band": 852
+  },
+  {
+   "file": "4_13.png",
+   "i": 4,
+   "j": 13,
+   "cells": 2059,
+   "band": 1802
+  },
+  {
+   "file": "4_14.png",
+   "i": 4,
+   "j": 14,
+   "cells": 9626,
+   "band": 9146
+  },
+  {
+   "file": "4_15.png",
+   "i": 4,
+   "j": 15,
+   "cells": 16150,
+   "band": 14956
+  },
+  {
+   "file": "4_17.png",
+   "i": 4,
+   "j": 17,
+   "cells": 165,
+   "band": 89
+  },
+  {
+   "file": "4_18.png",
+   "i": 4,
+   "j": 18,
+   "cells": 3589,
+   "band": 2958
+  },
+  {
+   "file": "4_30.png",
+   "i": 4,
+   "j": 30,
+   "cells": 3298,
+   "band": 2947
+  },
+  {
+   "file": "4_31.png",
+   "i": 4,
+   "j": 31,
+   "cells": 193,
+   "band": 115
+  },
+  {
+   "file": "4_32.png",
+   "i": 4,
+   "j": 32,
+   "cells": 4545,
+   "band": 4270
+  },
+  {
+   "file": "4_33.png",
+   "i": 4,
+   "j": 33,
+   "cells": 7232,
+   "band": 6796
+  },
+  {
+   "file": "4_34.png",
+   "i": 4,
+   "j": 34,
+   "cells": 4735,
+   "band": 4564
+  },
+  {
+   "file": "5_14.png",
+   "i": 5,
+   "j": 14,
+   "cells": 2796,
+   "band": 2796
+  },
+  {
+   "file": "5_15.png",
+   "i": 5,
+   "j": 15,
+   "cells": 930,
+   "band": 857
+  },
+  {
+   "file": "5_16.png",
+   "i": 5,
+   "j": 16,
+   "cells": 4862,
+   "band": 4383
+  },
+  {
+   "file": "5_17.png",
+   "i": 5,
+   "j": 17,
+   "cells": 16537,
+   "band": 15987
+  },
+  {
+   "file": "5_18.png",
+   "i": 5,
+   "j": 18,
+   "cells": 22621,
+   "band": 22259
+  },
+  {
+   "file": "5_19.png",
+   "i": 5,
+   "j": 19,
+   "cells": 11590,
+   "band": 10767
+  },
+  {
+   "file": "5_20.png",
+   "i": 5,
+   "j": 20,
+   "cells": 4894,
+   "band": 4676
+  },
+  {
+   "file": "5_21.png",
+   "i": 5,
+   "j": 21,
+   "cells": 3544,
+   "band": 3183
+  },
+  {
+   "file": "5_30.png",
+   "i": 5,
+   "j": 30,
+   "cells": 28423,
+   "band": 27323
+  },
+  {
+   "file": "5_31.png",
+   "i": 5,
+   "j": 31,
+   "cells": 32405,
+   "band": 31908
+  },
+  {
+   "file": "6_21.png",
+   "i": 6,
+   "j": 21,
+   "cells": 2560,
+   "band": 2537
+  },
+  {
+   "file": "6_22.png",
+   "i": 6,
+   "j": 22,
+   "cells": 2422,
+   "band": 2384
+  },
+  {
+   "file": "6_23.png",
+   "i": 6,
+   "j": 23,
+   "cells": 6319,
+   "band": 5924
+  },
+  {
+   "file": "6_25.png",
+   "i": 6,
+   "j": 25,
+   "cells": 3946,
+   "band": 3487
+  },
+  {
+   "file": "6_30.png",
+   "i": 6,
+   "j": 30,
+   "cells": 2504,
+   "band": 2146
+  },
+  {
+   "file": "6_31.png",
+   "i": 6,
+   "j": 31,
+   "cells": 11868,
+   "band": 11297
+  },
+  {
+   "file": "6_32.png",
+   "i": 6,
+   "j": 32,
+   "cells": 5315,
+   "band": 5113
+  },
+  {
+   "file": "6_33.png",
+   "i": 6,
+   "j": 33,
+   "cells": 1424,
+   "band": 1424
+  },
+  {
+   "file": "7_23.png",
+   "i": 7,
+   "j": 23,
+   "cells": 14686,
+   "band": 14113
+  },
+  {
+   "file": "7_24.png",
+   "i": 7,
+   "j": 24,
+   "cells": 6361,
+   "band": 5749
+  },
+  {
+   "file": "7_25.png",
+   "i": 7,
+   "j": 25,
+   "cells": 20625,
+   "band": 20037
+  },
+  {
+   "file": "7_26.png",
+   "i": 7,
+   "j": 26,
+   "cells": 6928,
+   "band": 6343
+  },
+  {
+   "file": "7_27.png",
+   "i": 7,
+   "j": 27,
+   "cells": 4629,
+   "band": 4104
+  },
+  {
+   "file": "7_28.png",
+   "i": 7,
+   "j": 28,
+   "cells": 5933,
+   "band": 5722
+  },
+  {
+   "file": "7_29.png",
+   "i": 7,
+   "j": 29,
+   "cells": 10401,
+   "band": 9868
+  },
+  {
+   "file": "7_30.png",
+   "i": 7,
+   "j": 30,
+   "cells": 13488,
+   "band": 12575
+  },
+  {
+   "file": "7_32.png",
+   "i": 7,
+   "j": 32,
+   "cells": 5658,
+   "band": 4882
+  },
+  {
+   "file": "7_33.png",
+   "i": 7,
+   "j": 33,
+   "cells": 1742,
+   "band": 1742
+  },
+  {
+   "file": "8_24.png",
+   "i": 8,
+   "j": 24,
+   "cells": 2377,
+   "band": 2313
+  },
+  {
+   "file": "8_25.png",
+   "i": 8,
+   "j": 25,
+   "cells": 157,
+   "band": 157
+  },
+  {
+   "file": "8_27.png",
+   "i": 8,
+   "j": 27,
+   "cells": 1959,
+   "band": 1950
+  },
+  {
+   "file": "8_28.png",
+   "i": 8,
+   "j": 28,
+   "cells": 3037,
+   "band": 3037
+  },
+  {
+   "file": "8_30.png",
+   "i": 8,
+   "j": 30,
+   "cells": 974,
+   "band": 925
+  },
+  {
+   "file": "8_31.png",
+   "i": 8,
+   "j": 31,
+   "cells": 1456,
+   "band": 1276
+  },
+  {
+   "file": "8_32.png",
+   "i": 8,
+   "j": 32,
+   "cells": 867,
+   "band": 867
+  }
+ ],
+ "classes": {
+  "encoding": "v = R*65536 + G*256 + B (opaque); shore = v & 31 (level habitat ids), geo = (v >> 5) & 31 (level geology ids), slope = (v >> 10) & 127 (deg), rough = v >> 17 (cm, std of the ground about its 3x3 mean at 1 m, to 127); where the height tile has alpha 0 there is no lidar ground"
+ },
+ "class_cells": {
+  "ledge (rocky intertidal)": 505808,
+  "gravel / cobble beach": 153020,
+  "sand beach / spit / dune": 61538,
+  "mixed sand-gravel beach": 44016,
+  "mussel bar / coarse flat": 38658,
+  "man-made shore / riprap": 31930,
+  "mud flat": 31702,
+  "high salt marsh": 27742,
+  "boulder beach / ramp": 25466,
+  "mixed forest": 20229,
+  "developed, open / low": 19756,
+  "evergreen forest": 13204,
+  "developed, dense": 4951,
+  "woody wetland": 3057,
+  "water / unclassified": 185,
+  "barren": 173
+ }
+}

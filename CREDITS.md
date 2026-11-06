@@ -8,12 +8,19 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 |---|---|---|---|---|
 | bald_eagle | Falcon Wings_of_ Freedom | iRahulRajput (https://sketchfab.com/rt699448) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/falcon-wings-of--freedom-b715083fd43d44c99813baa0fa709864 |
 | barharbor_town_pier |  | src/docks.js (baked by tools/assets/dock_bake.mjs) | CC0 geometry; Poly Haven CC0 textures (textures/dock) | models/dock/docks/barharbor_town_pier.json |
+| bitt_double |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
 | black_spruce_a | Realistic HD Black spruce (19/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-1938-3232c3022f2947b7999de0941ede5653 |
 | black_spruce_b | Realistic HD Black spruce (20/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-2038-6d5a1c8af0c14b329e9ed22b8f3bcbb1 |
 | black_spruce_c | Realistic HD Black spruce (3/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-338-913330de66304d4cbf359f0d3e182c61 |
 | black_spruce_d | Realistic HD Black spruce (5/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-538-8ebbff34d0be40498308eeca5b6ddb2f |
 | black_spruce_e | Realistic HD Black spruce (1/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-138-352ae5c742bb4c2da7f76c9a6ed276ce |
 | black_spruce_f | Realistic HD Black spruce (31/38) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-black-spruce-3138-5223fb9947e345d9994147fe3cfae1a4 |
+| chock_ss_6 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| cleat_herreshoff_8 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| cleat_ss_10 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| cleat_ss_12 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| cleat_ss_6 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| cleat_ss_8 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
 | dinghy_skiff |  | tools/assets/vessels/build.py (skiff.py; procedural) | CC0 |  |
 | dinghy_skiff_b |  | tools/assets/vessels/build.py (skiff.py; procedural) | CC0 |  |
 | dinghy_skiff_c |  | tools/assets/vessels/build.py (skiff.py; procedural) | CC0 |  |
@@ -21,8 +28,13 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | dock_bollard_yellow |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
 | dock_box |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
 | dock_bumper_1m |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
-| dock_cleat |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
-| dock_fender |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
+| dock_cleat |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| dock_cleat_12 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| dock_cleat_15 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| dock_cleat_18 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| dock_cleat_6 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| dock_cleat_8 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| dock_fender |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
 | dock_gangway |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
 | dock_hose_coil |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
 | dock_hose_red |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
@@ -32,21 +44,29 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | dock_line_run |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
 | dock_pile_steel |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
 | dock_piling |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
+| fender_f1 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| fender_f3 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| fender_f6 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| fender_f8 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
 | friendship_v |  | tools/assets/vessels/build.py (procedural, from published particulars, deck plan and photographs) | CC0 |  |
 | grady_white_325 | Dual-console sport boat, Grady-White Freedom 325 pattern | tools/assets/vessels/build.py (grady.py; procedural) | CC0 |  |
 | harbor_porpoise | Model 75A - Harbor Porpoise | DigitalLife3D (https://sketchfab.com/DigitalLife3D) | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) | https://sketchfab.com/3d-models/model-75a-harbor-porpoise-eb02e57f17d741329a66844a3a8d2094 |
 | harbor_seal | Spotted Harbor Seal | c4rn4g3 (https://sketchfab.com/c4rn4g3) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/spotted-harbor-seal-eff1b6181eca4a8aaca2cb0a19a1df38 |
+| hardshell_buoy_orange |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
 | hemlock_a | Realistic HD Mountain hemlock (2/43) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-mountain-hemlock-243-e4568ab8ec224d10b6a1ab8fbba3ea5c |
 | hemlock_b | Realistic HD Mountain hemlock (9/43) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-mountain-hemlock-943-5358386395144248ae6b3ea69977b531 |
 | hemlock_c | Realistic HD Mountain hemlock (11/43) | PlantCatalog (https://sketchfab.com/PlantCatalog) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | https://sketchfab.com/3d-models/realistic-hd-mountain-hemlock-1143-a9d68ad840af43e1bf7157c3e4200e0a |
 | herring_gull |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
+| highflyer |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
 | humpback | Model 102A - Juvenile Humpback Whale | DigitalLife3D (https://sketchfab.com/DigitalLife3D) | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) | https://sketchfab.com/3d-models/model-102a-juvenile-humpback-whale-c1a4b0acee8c457ea23a32b029c7ac06 |
 | lamp_cobra |  | procedural stand-in (tools/assets/lampgen.py) | CC0 |  |
 | lamp_colonial |  | procedural stand-in (tools/assets/lampgen.py) | CC0 |  |
 | le_lyrial |  | tools/assets/vessels/build.py (procedural, from published particulars, deck plan and photographs) | CC0 |  |
 | lewis_french_sailcloth |  | tools/assets/vessels/lewis_french.py | CC0 |  |
 | lifebuoy |  | Poly Haven | CC0-1.0 | https://polyhaven.com/a/lifebuoy |
-| lobster_buoy |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
+| lobster_buoy |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| lobster_buoy_7x16 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| lobster_buoy_acorn |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
 | lobster_buoy_lv |  | procedural (tools/assets/dock_dressing.py) | CC0 |  |
 | lobster_calvin_beal |  | tools/assets/vessels/build.py (lobster.py, lob_hull.py, lob_top.py; procedural) | CC0 |  |
 | lobster_crate |  | procedural stand-in (tools/assets/dockgen.py) | CC0 |  |
@@ -60,6 +80,9 @@ Models were reduced, re-tiled and re-textured for real-time use; tiers and impos
 | margaret_todd_sailcloth |  | tools/assets/vessels/mt.py | CC0 |  |
 | mary_day |  | tools/assets/vessels/build.py (mary_day.py; procedural) | CC0 |  |
 | mary_day_sailcloth |  | tools/assets/vessels/mary_day.py | CC0 |  |
+| mooring_ball |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| nylon_cleat_4 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
+| nylon_cleat_6 |  | FITTINGS recipe (src/fittings.js, tools/assets/fittings/bake.mjs) | CC0 | sizes: polyformus.com F-series table (4 Nov 2026); cleat proportions: the 316 open-base pattern (Attwood / Sea-Dog / Schaefer) |
 | ocean_buoy |  | Poly Haven | CC0-1.0 | https://polyhaven.com/a/ocean_buoy |
 | osprey |  | tools/assets/vessels/osprey.py, osprey_top.py, osprey_lines.py, osprey_rails.py, osprey_fore.py, osprey_aft.py, osprey_roof.py, osprey_tender.py via build.py (from Wesmac's and Matt's photos of her, docs/osprey.md) | CC0 |  |
 | osprey_wheelhouse |  | tools/assets/vessels/osprey_wh.py via build.py (procedural, from Matt's wheelhouse photos, 30 Oct 2026) | CC0 |  |
