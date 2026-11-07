@@ -2840,9 +2840,9 @@
     "vr": {
      "file": "vessels/friendship_v_vr",
      "tris": 192162,
-     "bytes": 10530440,
+     "bytes": 10516636,
      "materials": 20,
-     "draw_calls": 35,
+     "draw_calls": 24,
      "note": "VR only (LOD.vr): the hd geometry, static parts baked one mesh per material, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
@@ -8823,7 +8823,16 @@
      "tris": 106770,
      "bytes": 5178188,
      "tex_mb": 15.2,
-     "materials": 19
+     "materials": 19,
+     "draw_calls": 62
+    },
+    "vr": {
+     "file": "vessels/osprey_wheelhouse_vr",
+     "tris": 108247,
+     "bytes": 5438924,
+     "materials": 19,
+     "draw_calls": 23,
+     "note": "VR only (LOD.vr): the hd geometry, static parts baked one mesh per material, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -9022,7 +9031,8 @@
      "tris": 177601,
      "bytes": 9450608,
      "tex_mb": 8.3,
-     "materials": 7
+     "materials": 7,
+     "draw_calls": 213
     },
     "mid": {
      "file": "vessels/osprey_mid",
@@ -9037,6 +9047,14 @@
      "bytes": 291688,
      "tex_mb": 0,
      "materials": 4
+    },
+    "vr": {
+     "file": "vessels/osprey_vr",
+     "tris": 179856,
+     "bytes": 9505512,
+     "materials": 7,
+     "draw_calls": 17,
+     "note": "VR only (LOD.vr): the hd geometry, static parts baked one mesh per material, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
