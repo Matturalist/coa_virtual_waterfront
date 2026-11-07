@@ -861,18 +861,18 @@
    "files": {
     "hd": {
      "file": "fittings/dock_cleat_hd",
-     "tris": 1678,
-     "bytes": 95720
+     "tris": 2638,
+     "bytes": 126472
     },
     "mid": {
      "file": "fittings/dock_cleat_mid",
-     "tris": 558,
-     "bytes": 32468
+     "tris": 966,
+     "bytes": 46752
     },
     "low": {
      "file": "fittings/dock_cleat_low",
-     "tris": 200,
-     "bytes": 10308
+     "tris": 400,
+     "bytes": 17960
     }
    },
    "tiers": {
@@ -908,18 +908,18 @@
    "files": {
     "hd": {
      "file": "fittings/dock_fender_hd",
-     "tris": 2352,
-     "bytes": 136280
+     "tris": 3056,
+     "bytes": 159608
     },
     "mid": {
      "file": "fittings/dock_fender_mid",
-     "tris": 864,
-     "bytes": 51096
+     "tris": 1296,
+     "bytes": 63988
     },
     "low": {
      "file": "fittings/dock_fender_low",
-     "tris": 480,
-     "bytes": 25208
+     "tris": 672,
+     "bytes": 29268
     }
    },
    "tiers": {
@@ -16088,18 +16088,18 @@
    "files": {
     "hd": {
      "file": "fittings/fender_f1_hd",
-     "tris": 2352,
-     "bytes": 136280
+     "tris": 3056,
+     "bytes": 159604
     },
     "mid": {
      "file": "fittings/fender_f1_mid",
-     "tris": 864,
-     "bytes": 51100
+     "tris": 1296,
+     "bytes": 63992
     },
     "low": {
      "file": "fittings/fender_f1_low",
-     "tris": 480,
-     "bytes": 25212
+     "tris": 672,
+     "bytes": 29268
     }
    },
    "tiers": {
@@ -16135,18 +16135,18 @@
    "files": {
     "hd": {
      "file": "fittings/fender_f3_hd",
-     "tris": 2352,
-     "bytes": 136280
+     "tris": 3056,
+     "bytes": 159608
     },
     "mid": {
      "file": "fittings/fender_f3_mid",
-     "tris": 864,
-     "bytes": 51100
+     "tris": 1296,
+     "bytes": 63992
     },
     "low": {
      "file": "fittings/fender_f3_low",
-     "tris": 480,
-     "bytes": 25212
+     "tris": 672,
+     "bytes": 29268
     }
    },
    "tiers": {
@@ -16182,18 +16182,18 @@
    "files": {
     "hd": {
      "file": "fittings/fender_f6_hd",
-     "tris": 2352,
-     "bytes": 136276
+     "tris": 3056,
+     "bytes": 159600
     },
     "mid": {
      "file": "fittings/fender_f6_mid",
-     "tris": 864,
-     "bytes": 51092
+     "tris": 1296,
+     "bytes": 63984
     },
     "low": {
      "file": "fittings/fender_f6_low",
-     "tris": 480,
-     "bytes": 25212
+     "tris": 672,
+     "bytes": 29268
     }
    },
    "tiers": {
@@ -16229,18 +16229,18 @@
    "files": {
     "hd": {
      "file": "fittings/fender_f8_hd",
-     "tris": 2352,
-     "bytes": 136280
+     "tris": 3056,
+     "bytes": 159604
     },
     "mid": {
      "file": "fittings/fender_f8_mid",
-     "tris": 864,
-     "bytes": 51096
+     "tris": 1296,
+     "bytes": 63988
     },
     "low": {
      "file": "fittings/fender_f8_low",
-     "tris": 480,
-     "bytes": 25208
+     "tris": 672,
+     "bytes": 29264
     }
    },
    "tiers": {
@@ -16318,18 +16318,18 @@
    "files": {
     "hd": {
      "file": "fittings/dock_cleat_6_hd",
-     "tris": 1678,
-     "bytes": 95720
+     "tris": 2638,
+     "bytes": 126476
     },
     "mid": {
      "file": "fittings/dock_cleat_6_mid",
-     "tris": 558,
-     "bytes": 32472
+     "tris": 966,
+     "bytes": 46752
     },
     "low": {
      "file": "fittings/dock_cleat_6_low",
-     "tris": 200,
-     "bytes": 10312
+     "tris": 400,
+     "bytes": 17964
     }
    },
    "tiers": {
@@ -16360,18 +16360,18 @@
    "files": {
     "hd": {
      "file": "fittings/dock_cleat_8_hd",
-     "tris": 1678,
-     "bytes": 95720
+     "tris": 2638,
+     "bytes": 126476
     },
     "mid": {
      "file": "fittings/dock_cleat_8_mid",
-     "tris": 558,
-     "bytes": 32468
+     "tris": 966,
+     "bytes": 46752
     },
     "low": {
      "file": "fittings/dock_cleat_8_low",
-     "tris": 200,
-     "bytes": 10304
+     "tris": 400,
+     "bytes": 17964
     }
    },
    "tiers": {
@@ -16402,18 +16402,18 @@
    "files": {
     "hd": {
      "file": "fittings/dock_cleat_12_hd",
-     "tris": 1678,
-     "bytes": 95720
+     "tris": 2638,
+     "bytes": 126472
     },
     "mid": {
      "file": "fittings/dock_cleat_12_mid",
-     "tris": 558,
-     "bytes": 32472
+     "tris": 966,
+     "bytes": 46748
     },
     "low": {
      "file": "fittings/dock_cleat_12_low",
-     "tris": 200,
-     "bytes": 10308
+     "tris": 400,
+     "bytes": 17956
     }
    },
    "tiers": {
@@ -16444,18 +16444,18 @@
    "files": {
     "hd": {
      "file": "fittings/dock_cleat_15_hd",
-     "tris": 1678,
-     "bytes": 95716
+     "tris": 2638,
+     "bytes": 126468
     },
     "mid": {
      "file": "fittings/dock_cleat_15_mid",
-     "tris": 558,
-     "bytes": 32464
+     "tris": 966,
+     "bytes": 46748
     },
     "low": {
      "file": "fittings/dock_cleat_15_low",
-     "tris": 200,
-     "bytes": 10304
+     "tris": 400,
+     "bytes": 17960
     }
    },
    "tiers": {
@@ -16486,18 +16486,18 @@
    "files": {
     "hd": {
      "file": "fittings/dock_cleat_18_hd",
-     "tris": 1678,
-     "bytes": 95712
+     "tris": 2638,
+     "bytes": 126468
     },
     "mid": {
      "file": "fittings/dock_cleat_18_mid",
-     "tris": 558,
-     "bytes": 32464
+     "tris": 966,
+     "bytes": 46748
     },
     "low": {
      "file": "fittings/dock_cleat_18_low",
-     "tris": 200,
-     "bytes": 10300
+     "tris": 400,
+     "bytes": 17960
     }
    },
    "tiers": {

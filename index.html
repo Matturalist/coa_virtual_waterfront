@@ -13717,14 +13717,19 @@ function makeNav(opt) {
     redraw(); return true; } };
 
   /* ---------- helm screens: the same pictures, on the screens at the wheel ---------- */
-  const helm = {};
+  const helm = {}, helmOwners = {};
+  const aboard = k => { const id = own().id || '', L = helmOwners[k] || HELM_BOATS[k]; return !L || L.includes(id); };
   /* each helm screen can be switched off and on (Matt, 2 Nov: "each should be toggle-able"): a dark screen wakes on a click; a lit one goes
      dark from its OFF soft key (or, for a screen without keys, a click). N.helmPower(kind, on) is the same from Display; remembered. */
   const helmOff = {}; try { Object.assign(helmOff, JSON.parse(localStorage.getItem('zp-helm-off') || '{}')); } catch (e) {}
   const helmPow = (k, on) => { helmOff[k] = !on; try { localStorage.setItem('zp-helm-off', JSON.stringify(helmOff)); } catch (e) {} tHelm = 0; };
   N.helmPower = (kind, on) => { if (on == null) return !helmOff[kind]; helmPow(kind, !!on); return !!on; };
   /* kinds: 'chart' (full), 'radsnd' (radar beside the sounder), 'combo' (chart with radar and sounder down the side), 'vhf' */
-  N.helmCanvas = function (kind) {
+  /* whose helm each screen is on: the helm camera draws a screen only aboard her. The Publisher can say so (helmCanvas(kind, boatId));
+     until then the screens app.js makes are the Osprey's (chart, radsnd, vhf, engine) and the Zodiac pod's (combo, and a vhf). */
+  const HELM_BOATS = { chart: ['osprey'], radsnd: ['osprey'], engine: ['osprey'], combo: ['zodiac'], vhf: ['osprey', 'zodiac'] };
+  N.helmCanvas = function (kind, boat) {
+    if (boat) { const L = helmOwners[kind] || (helmOwners[kind] = []); if (!L.includes(boat)) L.push(boat); }
     if (helm[kind]) return helm[kind];
     const c = document.createElement('canvas'); c.width = kind === 'vhf' ? 300 : kind === 'engine' ? 320 : 640; c.height = kind === 'vhf' ? 112 : kind === 'engine' ? 200 : 448; const tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4;
     return helm[kind] = { c, x: c.getContext('2d'), tex };
@@ -13732,7 +13737,7 @@ function makeNav(opt) {
   /* draw a canvas into a box, cropping to cover it (no stretch); when the chart was sized for this box nothing is cropped */
   const cover = (x, src, sw, sh, dx, dy, dw, dh) => { const k = Math.max(dw / sw, dh / sh), cw = dw / k, ch = dh / k; x.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, dx, dy, dw, dh); };
   function drawHelm() {
-    for (const k in helm) { const h = helm[k], W = h.c.width, H = h.c.height, x = h.x;
+    for (const k in helm) { if (!aboard(k)) continue; const h = helm[k], W = h.c.width, H = h.c.height, x = h.x;
       if (helmOff[k]) { if (!h.dark) { x.fillStyle = '#000'; x.fillRect(0, 0, W, H); h.keys = []; h.tex.needsUpdate = true; h.dark = true; } continue; } h.dark = false; x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
       if (k === 'chart') { const sx = 0, sy = 46, sw = KEYX() - 8, sh = CHt - 46 - 24, k2 = Math.max(W / sw, (H - 22) / sh), cw = W / k2, ch = (H - 22) / k2; x.drawImage(cv, sx + (sw - cw) / 2, sy + (sh - ch) / 2, cw, ch, 0, 22, W, H - 22); }   /* the plotter's own data bar, keys and position strip cropped off: the NavNet frame replaces them */
       else if (k === 'radsnd') { x.drawImage(scv, 0, 0, SW, SH, 0, 0, W / 2, H); x.drawImage(rcv, 0, 0, RW, RW, W / 2, (H - W / 2) / 2, W / 2, W / 2); }   /* as on the Osprey: sounder left, radar right */
@@ -13860,7 +13865,11 @@ function makeNav(opt) {
     /* the track: a point every 10 m or 5 s */
     trackT += dt; const lp = C.track[C.track.length - 1]; if (!lp || Math.hypot(lp[0] - oE, lp[1] - oN) > 10 || trackT > 5 && Math.hypot(lp[0] - oE, lp[1] - oN) > 1) { C.track.push([oE, oN]); trackT = 0; if (C.track.length > 4000) C.track.splice(0, 1000); }
     if (C.track.length > 1 && Math.hypot(C.track[C.track.length - 2][0] - oE, C.track[C.track.length - 2][1] - oN) > 400) C.track.length = 0;   /* moved (teleported) */
-    const want = id => (N.open && show[id]) || helmView;
+    /* Matt's F readout, 5 Nov, Friendship V helm camera: instruments 3.4 ms. The helm camera made every instrument "wanted", so the radar
+       swept and redrew every frame for a boat with no radar screen. Now an instrument runs for the helm only if a lit helm screen
+       shows it (the Osprey's chart / radsnd / combo / vhf canvases), and is drawn for it only just before that screen is drawn. */
+    const lit = k => helm[k] && !helmOff[k] && aboard(k), hn = helmView ? { chart: lit('chart') || lit('combo'), radar: lit('radsnd') || lit('combo'), sounder: lit('radsnd') || lit('combo'), vhf: lit('vhf') } : {};
+    const shown = id => N.open && show[id], want = id => shown(id) || !!hn[id];
     vhfStep(dt); binocStep(dt); logStep(dt);
     if ((N._slT = (N._slT || 0) - dt) <= 0) { N._slT = 0.5; slLamp(opt.searchlight ? opt.searchlight() : null); const th = (own().id || '') + ''; if (pane.dataset.theme !== th) pane.dataset.theme = th; }
     tFirst -= dt; if (tFirst <= 0 && typeof FIRST !== 'undefined') { tFirst = 0.5;
@@ -13881,15 +13890,15 @@ function makeNav(opt) {
       const v = chartView(), sig = Math.round(v.oE * v.s * 2) + ',' + Math.round(v.oN * v.s * 2) + ',' + Math.round(v.rot * 286) + ',' + v.s.toFixed(5) + ',' + Math.round((own().sog || 0) * 10) + ',' + Math.round(C.cE * v.s * 2) + ',' + Math.round(C.cN * v.s * 2) + ',' + (C.swaps || 0) + ',' + (C.menu ? 1 : 0) + ',' + (C.wp ? C.wp.join() : '') + ',' + (C.mob ? 1 : 0) + ',' + CW + 'x' + CHt;
       if (moving || sig !== chartSig || chartAge > 1) { chartSig = sig; chartAge = 0; drawChart(dt); }
       tChart = N.open && show.chart ? (moving ? 0 : 1 / 6) : 0.15; }
-    if (want('radar')) drawRadar();
-    if (want('sounder') && (SD.wx !== sdDrawn || (sdAge += dt) > 0.5)) { sdDrawn = SD.wx; sdAge = 0; drawSounder(); }   /* only when a ping has added a column */
-    if (helmView) { tVhfLcd -= dt; if (tVhfLcd <= 0) { tVhfLcd = 0.25; drawVHF(); } }   /* the old LCD is only the Osprey's overhead radio now; the window draws its own panel */
+    if (shown('radar')) drawRadar();
+    if (shown('sounder') && (SD.wx !== sdDrawn || (sdAge += dt) > 0.5)) { sdDrawn = SD.wx; sdAge = 0; drawSounder(); }   /* only when a ping has added a column */
+    if (hn.vhf) { tVhfLcd -= dt; if (tVhfLcd <= 0) { tVhfLcd = 0.25; drawVHF(); } }   /* the old LCD is only the Osprey's overhead radio now; the window draws its own panel */
     if (N.open && show.vhf) { tFace -= dt; faceAcc += dt; if (tFace <= 0 || VFACE.FF.pressT > 0 || VFACE.FF.dHold > 0) { tFace = 0.1; VFACE.draw(faceAcc); faceAcc = 0; } }
     /* the Helm tab shows only while the vessel has a helm (Boats' VESSELS: docs/vessels.md) */
     if ((N._brT = (N._brT || 0) - dt) <= 0) { N._brT = 0.5; const has = !!hkind(hm()), tb = tabs.querySelector('button[data-id=bridge]'); if (tb) tb.style.display = has ? '' : 'none'; if (!has && cards.bridge && cards.bridge.parentNode) { cards.bridge.remove(); } else if (has && show.bridge && N.open && !cards.bridge.parentNode) layout(); }
     if (N.open && show.bridge && hkind(hm())) drawBridge(dt);
     tAis -= dt; if (tAis <= 0) { tAis = 1; if (N.open && show.ais) drawAIS(); else { /* the warnings still sound */ for (const a of aisTargets()) if (a.danger && !warned.has(a.key)) { warned.add(a.key); opt.toast && opt.toast('AIS: ' + a.name + ' closing, CPA ' + (a.cpa / NM).toFixed(2) + ' nm'); } } }
-    if (helmView) { tHelm -= dt; if (tHelm <= 0) { tHelm = 0.15; if (!(N.open && show.chart)) { /* the chart is only for the helm screen: draw it at that screen's shape */ const hc = helm.chart ? helm.chart.c : helm.combo ? { width: helm.combo.c.height, height: helm.combo.c.height } : null; if (hc) cv._resize(hc.width, hc.height); tChart = 0; } drawHelm(); } }
+    if (helmView && Object.keys(helm).some(aboard)) { tHelm -= dt; if (tHelm <= 0) { tHelm = 0.15; if (hn.radar && !shown('radar')) drawRadar(); if (hn.sounder && !shown('sounder')) drawSounder(); if (hn.chart && !shown('chart')) { /* the chart is only for the helm screen: draw it at that screen's shape */ const hc = helm.chart ? helm.chart.c : helm.combo ? { width: helm.combo.c.height, height: helm.combo.c.height } : null; if (hc) cv._resize(hc.width, hc.height); tChart = 0; } drawHelm(); } }
   };
   N.depth = () => SD.depthShow;
   N._fillAll = () => fillBase(1e9);   /* tests: finish the chart raster now */
@@ -25450,24 +25459,33 @@ const FITTINGS = (() => {
     F.sweep(g, path, (i) => o.flat ? roundRect(rad[i] * 2.1, rad[i] * 1.5, rad[i] * 0.5, k) : ellipse(rad[i] * 1.05, rad[i] * 0.85, k), { up: [0, 1, 0], caps: 'both' }); };
   def('horn_cleat', { L: 10 * IN, pattern: 'open', finish: 'ss', holes: 4, mat: 'ss316', bolted: true },
     (g, p, seed, wear, tier) => { const d = cleatDims(jit(p.L, seed, 1, 0.015), p.pattern), k = tierK(tier, 16, 8, 5), f = FIN[p.finish] || FIN.ss, L = d.L; g.material(f.mat); wearTint(g, f.tint, wear, seed);
-      const fastener = (kind, x, z, dia) => { if (tier > 1) return; screw(g, kind, [1, 0, 0, x, 0, 1, 0, p.pattern === 'open' ? d.footH : p.pattern === 'herreshoff' ? 0.035 * L : p.pattern === 'closed' && !(p.finish === 'nylon' || p.finish === 'black') ? 0.195 * L - 0.012 * L : 0.06 * L, 0, 0, 1, z], dia, seed + Math.round(x * 1000 + z * 7), f.fast); wearTint(g, f.tint, wear, seed); };
+      const fastener = (kind, x, z, dia) => { if (tier > 1) return; screw(g, kind, [1, 0, 0, x, 0, 1, 0, p.pattern === 'open' ? d.footH : p.pattern === 'herreshoff' ? 0.035 * L : p.pattern === 'closed' && !(p.finish === 'nylon' || p.finish === 'black') ? 0.2 * L - 0.02 * L : 0.06 * L, 0, 0, 1, z], dia, seed + Math.round(x * 1000 + z * 7), f.fast); wearTint(g, f.tint, wear, seed); };
       if (p.pattern === 'closed') {
         const nylon = p.finish === 'nylon' || p.finish === 'black';
         if (!nylon) {
-          /* the Whitecap galvanised dock cleat (S-1522P photo, guildmarine.com): a single round bar for the horns, fattest at the middle, tapering to
-             rounded tips, no rise; two bolt holes straight down through the top of the body; under the body a short pedestal that necks in from the
-             bar and flares to an oval foot on the deck. 10 in: 1-15/16 in tall overall. */
-          const rBody = 0.064 * L, rTip = 0.036 * L, yAxis = 0.195 * L - rBody, hPed = yAxis - rBody;   /* bar centre and the pedestal's height */
-          const nb = tierK(tier, 34, 18, 10), bar = [], brad = []; for (let i = 0; i <= nb; i++) { let t = i / nb; t = 0.5 + Math.sign(t - 0.5) * 0.5 * Math.pow(Math.abs(t - 0.5) * 2, 0.7);   /* rings crowd toward the tips, where the rounding is */
-            const a = Math.abs(t - 0.5) * 2, tipA = 1 - rTip / (L / 2) * 1.0, tipR = a > tipA ? Math.sqrt(Math.max(0.0004, 1 - ((a - tipA) / (1 - tipA)) ** 2)) : 1;   /* a hemispherical end of the tip's own radius */
-            bar.push([(t - 0.5) * L, yAxis, 0]); brad.push(tipR * (rTip + (rBody - rTip) * Math.pow(Math.max(0, 1 - a * a), 1.3))); }
-          F.sweep(g, bar, (i) => circle(brad[i], k), { up: [0, 1, 0], caps: 'both' });
-          /* the pedestal: from the bar's underside (an oval the bar's width, 0.3 L long) flaring to the foot (0.44 L x 0.22 L), its edge rounded over */
-          const np_ = tierK(tier, 10, 6, 4), ped = [], psec = []; for (let i = 0; i <= np_; i++) { const t = i / np_, flare = Math.pow(t, 2.2);   /* t 0 at the bar, 1 at the deck: the waist stays narrow and sweeps out to the foot */
-            ped.push([0, hPed + rBody * 0.35 - (hPed + rBody * 0.35) * t, 0]); psec.push([0.045 * L + (0.1 * L - 0.045 * L) * flare, 0.14 * L + (0.21 * L - 0.14 * L) * flare]); }
-          F.sweep(g, ped.slice().reverse(), (i) => ellipse(psec[np_ - i][0], psec[np_ - i][1], k), { up: [0, 0, 1], caps: 'both' });
-          /* the two holes, down through the top of the bar: a dark counterbore each; the bolt heads sit in them when fastened */
-          for (const sx of [-1, 1]) { const x = sx * 0.12 * L, yTop = yAxis + Math.sqrt(Math.max(0, rBody * rBody - 0)) ; g.tint(0.1, 0.1, 0.1); g.push([1, 0, 0, x, 0, 1, 0, 0, 0, 0, 1, 0]); F.lathe(g, [[0.022 * L, yTop - 0.012 * L], [0.022 * L, yTop + 0.0004]], k, {}); g.pop(); wearTint(g, f.tint, wear, seed); if (tier <= 1 && p.bolted !== false) fastener('hex', x, 0, 0.0085); } }   /* 7/16 in hex bolts, 5/8 in across flats */
+          /* the Whitecap galvanised dock cleat, built from its photo (S-1522P): one body lofted tip to tip. Flat on top; a wide flattened
+             oval at the middle (where the two bolt holes go straight down) tapering to round, blunt-rounded tips; the underside rises toward
+             the tips. Under the middle a pedestal necks in from the body and sweeps out, concave, to a long rounded-rectangle foot. */
+          const H = 0.2 * L;                                                 /* overall height: 1-15/16 in on the 10 in cleat */
+          const wC = 0.09 * L, wT = 0.031 * L, hC = 0.056 * L, hT = 0.031 * L;   /* half-width (z) and half-height (y) at the middle and the tips */
+          const superEll = (rx, ry, n, kk) => { const o = []; for (let j = 0; j < kk; j++) { const t = j / kk * Math.PI * 2, c = Math.cos(t), sn = Math.sin(t); o.push([rx * Math.sign(c) * Math.pow(Math.abs(c), 2 / n), ry * Math.sign(sn) * Math.pow(Math.abs(sn), 2 / n)]); } return o; };
+          const nb = tierK(tier, 40, 20, 12), body = [], bsec = [], kb = tierK(tier, 20, 12, 8);
+          for (let i = 0; i <= nb; i++) { let t = i / nb; t = 0.5 + Math.sign(t - 0.5) * 0.5 * Math.pow(Math.abs(t - 0.5) * 2, 0.75);   /* rings crowd toward the tips */
+            const a = Math.abs(t - 0.5) * 2, ease = Math.pow(1 - a * a, 1.1);
+            const tipA = 0.9, tipS = a > tipA ? Math.sqrt(Math.max(0.08, 1 - ((a - tipA) / (1 - tipA)) ** 2)) : 1;   /* blunt rounded end */
+            const w = (wT + (wC - wT) * ease) * tipS, h = (hT + (hC - hT) * ease) * tipS, lift = 0.012 * L * a * a * a, yTop = H + lift - hT * (1 - tipS);
+            body.push([(t - 0.5) * L, yTop - h, 0]); bsec.push([w, h, 2 + 4 * Math.pow(ease, 3)]); }   /* flat-topped (n 6) at the middle where the holes are, round (n 2) along the horns */
+          F.sweep(g, body, (i) => superEll(bsec[i][1], bsec[i][0], bsec[i][2], kb), { up: [0, 1, 0], caps: 'both' });   /* section axes for an x path are (y, z) */
+          /* the pedestal: starts inside the body, necks to a waist and sweeps out to the foot; plan an oval long in x */
+          const yFoot = 0.03 * L, np_ = tierK(tier, 12, 7, 4), ped = [], psec = [];
+          for (let i = 0; i <= np_; i++) { const t = i / np_, y = (H - hC * 1.3) - (H - hC * 1.3 - yFoot) * t, flare = Math.pow(t, 2.6);   /* the neck starts inside the body; concave sweep to the foot */
+            ped.push([0, y, 0]); psec.push([0.095 * L + (0.16 * L - 0.095 * L) * flare, 0.05 * L + (0.1 * L - 0.05 * L) * flare]); }
+          F.sweep(g, ped.slice().reverse(), (i) => ellipse(psec[np_ - i][0], psec[np_ - i][1], kb), { up: [0, 0, 1], caps: 'both' });
+          /* the foot: a rounded rectangle 0.36 L x 0.23 L, its top edge rounded over */
+          const nf = tierK(tier, 5, 3, 2), foot = [], fsec = []; for (let i = 0; i <= nf; i++) { const t = i / nf, a = t * Math.PI / 2, y = yFoot * Math.sin(a), inset = yFoot * (1 - Math.cos(a)) * 0.9; foot.push([0, y, 0]); fsec.push([0.34 * L - 2 * inset, 0.21 * L - 2 * inset]); }
+          F.sweep(g, foot, (i) => roundRect(fsec[i][0], fsec[i][1], Math.max(0.001, 0.07 * L - (0.34 * L - fsec[i][0]) / 2), kb), { up: [0, 0, 1], caps: 'both' });
+          /* the two bolt holes straight down through the flat top at +-0.1 L: a dark counterbore each; hex bolts sit in them when fastened */
+          for (const sx of [-1, 1]) { const x = sx * 0.1 * L; g.tint(0.1, 0.1, 0.1); g.push([1, 0, 0, x, 0, 1, 0, 0, 0, 0, 1, 0]); F.lathe(g, [[0.024 * L, H - 0.02 * L], [0.024 * L, H + 0.0002]], kb, {}); g.pop(); wearTint(g, f.tint, wear, seed); if (tier <= 1 && p.bolted !== false) fastener('hex', x, 0, 0.011); } }   /* 7/16 in hex bolts */
         else {
           /* moulded nylon (patterns A, B, E): a solid oval base the body rises from, flat-topped horns, countersunk screws */
           const pr = 0.045 * L, pn = tierK(tier, 5, 3, 2), pad = [], psec = []; for (let i = 0; i <= pn; i++) { const t = i / pn, a = t * Math.PI / 2, y = pr * Math.sin(a), inset = pr * (1 - Math.cos(a)) * 0.7; pad.push([0, y, 0]); psec.push([0.3 * L - 2 * inset, 0.62 * L - 2 * inset]); }
@@ -25497,8 +25515,8 @@ const FITTINGS = (() => {
         horns(g, d, k, tier, {}); for (const sx of [-1, 1]) fastener('hex', sx * 0.21 * L, 0, 0.0079); }
       g.tint(1, 1, 1); },
     (p) => { const d = cleatDims(p.L, p.pattern), rAt = x => { const a = Math.min(1, Math.abs(x) / (d.L / 2)), tipR = a > 0.92 ? Math.sqrt(Math.max(0.02, 1 - ((a - 0.92) / 0.08) ** 2)) : 1; return tipR * (p.pattern === 'herreshoff' ? 0.72 : 1) * (d.rTip + (d.rRoot - d.rTip) * Math.pow(1 - a * a, 0.75)); }, yAt = x => { const a = Math.min(1, Math.abs(x) / (d.L / 2)); return d.hAxis + d.rise * (p.pattern === 'herreshoff' ? 1.6 : (p.finish === 'nylon' || p.finish === 'black') && p.pattern === 'closed' ? 0.4 : 1) * a * a * a; };
-      const open = p.pattern === 'open', galvC = p.pattern === 'closed' && !(p.finish === 'nylon' || p.finish === 'black'), baseHalfX = open ? d.bolt + 0.1 * d.L : p.pattern === 'herreshoff' ? 0.18 * d.L : galvC ? 0.16 * d.L : 0.25 * d.L, baseHalfZ = open ? 0.17 * d.L : galvC ? 0.08 * d.L : 0.14 * d.L, baseY = open ? d.footH + 0.004 : galvC ? 0.02 * d.L : 0.065 * d.L;
-      const hornC = galvC ? { axisY: 0.131 * d.L, rRoot: 0.064 * d.L, rTip: 0.036 * d.L, rise: 0, tipX: d.L / 2, rAt: x => { const a = Math.min(1, Math.abs(x) / (d.L / 2)); return 0.036 * d.L + 0.028 * d.L * Math.pow(Math.max(0, 1 - a * a), 1.3); }, yAt: () => 0.131 * d.L, rx: 1, ry: 1 } : { axisY: d.hAxis, rRoot: d.rRoot, rTip: d.rTip, rise: d.rise, tipX: d.L / 2, rAt, yAt, rx: 1.05, ry: 0.85 };
+      const open = p.pattern === 'open', galvC = p.pattern === 'closed' && !(p.finish === 'nylon' || p.finish === 'black'), baseHalfX = open ? d.bolt + 0.1 * d.L : p.pattern === 'herreshoff' ? 0.18 * d.L : galvC ? 0.18 * d.L : 0.25 * d.L, baseHalfZ = open ? 0.17 * d.L : galvC ? 0.115 * d.L : 0.14 * d.L, baseY = open ? d.footH + 0.004 : galvC ? 0.03 * d.L : 0.065 * d.L;
+      const hornC = galvC ? { axisY: 0.144 * d.L, rRoot: 0.056 * d.L, rTip: 0.031 * d.L, rise: 0.012 * d.L, tipX: d.L / 2, rAt: x => { const a = Math.min(1, Math.abs(x) / (d.L / 2)); return 0.031 * d.L + 0.025 * d.L * Math.pow(Math.max(0, 1 - a * a), 1.1); }, yAt: x => { const a = Math.min(1, Math.abs(x) / (d.L / 2)), h = 0.031 * d.L + 0.025 * d.L * Math.pow(Math.max(0, 1 - a * a), 1.1); return 0.2 * d.L + 0.012 * d.L * a * a * a - h; }, rx: 1.4, ry: 1 } : { axisY: d.hAxis, rRoot: d.rRoot, rTip: d.rTip, rise: d.rise, tipX: d.L / 2, rAt, yAt, rx: 1.05, ry: 0.85 };
       return { kind: 'horn_cleat', pattern: p.pattern, L: d.L, horn: hornC, base: { halfX: baseHalfX, halfZ: baseHalfZ, y: baseY }, legX: d.bolt, under: { y: d.hAxis - d.rRoot * 0.85 - 0.003 } }; },
     'horn cleat: pattern closed (nylon / the galvanised dock cleat) | open (316 open-base) | herreshoff | hollow; L overall (m); finish ss | galv | nylon | bronze | black; holes 2 | 4');
 
@@ -25544,9 +25562,19 @@ const FITTINGS = (() => {
       /* drawn as one sweep but two materials: the ropehold cones are drawn first (both ends), then the body, each its own sweep over its stretch of the trace */
       const seg = (t0, t1) => { const m = Math.max(2, Math.round(n * (t1 - t0))), pp = [], rr = []; for (let i = 0; i <= m; i++) { const t = t0 + (t1 - t0) * i / m; pp.push([0, -L * t, 0]); rr.push(Math.max(0.004, D / 2 * tracedR(F.traced.polyform_f, t))); } F.sweep(g, pp, (i) => circle(rr[i], k), { up: [0, 0, 1], caps: 'both' }); };
       seg(0, ropeholdT); seg(1 - ropeholdT, 1);
-      /* the twin eye: a flat lug on each cone's tip with a hole through it (the hole: a dark disc each side), the lug's long axis across the fender */
-      const lugR = Math.max(0.012, 0.06 * D), lugT = Math.max(0.008, 0.04 * D); for (const [y0, dir] of [[0, 1], [-L, -1]]) { g.push([1, 0, 0, 0, 0, 1, 0, y0, 0, 0, 1, 0]); F.sweep(g, [[0, 0, -lugT / 2], [0, 0, lugT / 2]], () => ellipse(lugR * 1.3, lugR, 12).map(q => [q[0], q[1] + dir * lugR * 0.6]), { up: [0, 1, 0], caps: 'both' });
-        g.tint(0.12, 0.12, 0.12); for (const z of [-lugT / 2 - 0.0003, lugT / 2 + 0.0003]) F.sweep(g, [[0, dir * lugR * 0.7, z], [0, dir * lugR * 0.7, z + (z < 0 ? -0.0003 : 0.0003)]], () => circle(lugR * 0.38, 10), { up: [0, 1, 0], caps: 'both' }); g.tint(1, 1, 1); wearTint(g, p.finish, wear, seed + 1); g.pop(); }
+      /* the eye: Polyform moulds a rounded boss across each cone's tip with the rope hole through it. Built once (in the top's frame) and
+         drawn again rotated 180 deg about x for the bottom, so the two ends are identical. Boss: a horizontal rounded bar, its hole a real
+         tube (inward-facing), a short neck blending it into the cone tip. */
+      const bossR = Math.max(0.010, 0.055 * D), bossL = Math.max(0.028, 0.16 * D), holeR = bossR * 0.42, tipR = Math.max(0.004, D / 2 * tracedR(F.traced.polyform_f, 0)), kk = tierK(tier, 16, 10, 6);
+      const eye = () => {
+        /* neck: cone tip up into the boss */
+        F.sweep(g, [[0, -0.002, 0], [0, bossR * 0.9, 0]], (i) => circle(i === 0 ? tipR : tipR * 0.92, kk), { up: [0, 0, 1] });
+        /* boss: a rounded bar along x at y = bossR, its ends domed; section round-rect so the hole has flat cheeks */
+        const nb = 10, bp = [], bs = []; for (let i = 0; i <= nb; i++) { const t = i / nb, x = (t - 0.5) * bossL, e = Math.abs(t - 0.5) * 2, dome = e > 0.7 ? Math.sqrt(Math.max(0.05, 1 - ((e - 0.7) / 0.3) ** 2)) : 1; bp.push([x, bossR, 0]); bs.push(dome); }
+        F.sweep(g, bp, (i) => roundRect(bossR * 2 * bs[i], bossR * 2.2 * bs[i], bossR * 0.7 * bs[i], kk), { up: [0, 1, 0], caps: 'both' });
+        /* the hole through it along x: a tube with its normals facing in, dark */
+        g.tint(0.15, 0.15, 0.15); const hp = [[-bossL * 0.5 - 0.0005, bossR, 0], [bossL * 0.5 + 0.0005, bossR, 0]]; F.sweep(g, hp, () => circle(holeR, kk).reverse(), { up: [0, 1, 0] }); g.tint(1, 1, 1); wearTint(g, p.finish, wear, seed + 1); };
+      eye(); g.push([1, 0, 0, 0, 0, -1, 0, -L, 0, 0, -1, 0]); eye(); g.pop();
       g.material(p.colour); wearTint(g, p.finish, wear, seed); seg(ropeholdT, 1 - ropeholdT);
       if (tier <= 1) { g.material('galv'); g.tint(0.9, 0.9, 0.9); F.sweep(g, [[D * 0.3, -L * 0.13, 0], [D * 0.34, -L * 0.11, 0]], () => circle(0.03 * D, 8), { up: [0, 1, 0] }); }   /* the valve, let into the top shoulder */
       g.tint(1, 1, 1); },
@@ -31572,6 +31600,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
   let walkPhase = 0, walkedAt = 0;   /* 0 outside drawFrame: every call walks. 1 the frame's first render is about to. 2 walked: only walk again if __sceneEdits moved */
   { const walk = scene.updateMatrixWorld; scene.updateMatrixWorld = function (force) { if (walkPhase === 2 && !force && window.__sceneEdits === walkedAt) return; if (walkPhase === 1) walkPhase = 2; walkedAt = window.__sceneEdits; walk.call(this, force); }; }
   function drawFrame() {
+    if (XR && XR.on) { XR.draw(); return; }
     fitNear(); walkPhase = 1;
     if (!farOn) { renderer.render(scene, camera); walkPhase = 0; return; }
     if (!passCull) passCull = cullLists();
@@ -32064,6 +32093,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     const y = st.helmYaw || 0, sp = 1.2 * U * dt, fx = Math.sin(y), fz = Math.cos(y);   /* body frame: +z ahead; the right hand is -x */
     act.walkEye.x += (fx * f - fz * r) * sp; act.walkEye.z += (fz * f + fx * r) * sp; walkClamp(act, act.walkEye); }
   function controlsFromKeys(dt) {
+    if (XR && XR.on) XR.input(dt);   /* the VR controllers press the same keys */
     bigWalkFrame(dt); const W = walking();
     const up = keys.has('KeyW') || (!W && keys.has('ArrowUp')), dn = keys.has('KeyS') || (!W && keys.has('ArrowDown'));
     if (act.big) { if (!act.V || (NAV && NAV.bridge && NAV.bridge.has && NAV.bridge.has())) return;   /* the Helm window takes the keys while it is open */
@@ -32394,7 +32424,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       camera.position.set(30 * U - 18, (SEA_M + 1.1) * U + 17, 103 * U);
       camera.lookAt(boatPos); const dd = camera.position.distanceTo(boatPos); camera.fov = clamp(2 * Math.atan(60 / dd) * 180 / Math.PI * (st.dist / 95), 4, 60); camera.updateProjectionMatrix();
     }
-    if (typeof LOD !== 'undefined') LOD.detail = DISP.forest * (bz ? bz.mag : 1);   /* the forest tiers hand over at 10x the distance through the glasses */
+    if (typeof LOD !== 'undefined') LOD.detail = DISP.forest * (bz ? bz.mag : 1) * (XR && XR.on ? XR.detail : 1);   /* the forest tiers hand over at 10x the distance through the glasses */
     { const fov = 50 / (bz ? bz.mag : 1); if (st.cam !== 3 && Math.abs(camera.fov - fov) > 1e-6) { camera.fov = fov; camera.updateProjectionMatrix(); } }   /* 10x through the binoculars */
     /* camera shake: a hit (a slam, a wave taken hard, a clunk in the gearbox) kicks a stiff, damped spring on the camera's aim, so
        it jolts and settles in a few tenths of a second rather than jittering. And in a strong wind the chase camera is buffeted
@@ -33308,8 +33338,9 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
      'SwiftShader' or 'llvmpipe' here, and runs a few frames a second whatever the sim does) */
   function gpuName() { if (st.gpuName) return st.gpuName; let n = '?'; try { const gl = renderer.getContext(), e = gl.getExtension('WEBGL_debug_renderer_info'); n = e ? gl.getParameter(e.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } catch (e2) {}
     n = String(n).replace(/^ANGLE \(|\)$/g, ''); const sw = /swiftshader|llvmpipe|software|basic render/i.test(n); st.gpuName = (sw ? '⚠ SOFTWARE GRAPHICS: ' : 'GPU: ') + n.slice(0, 70); return st.gpuName; }
+  var rafId = 0;
   function frame() {
-    requestAnimationFrame(frame); resFrame(); const pt0 = PERF.rec ? performance.now() : 0; if (PERF.rec) PERF.tick(pt0);
+    if (!(XR && XR.on)) { rafId = requestAnimationFrame(frame); resFrame(); } const pt0 = PERF.rec ? performance.now() : 0; if (PERF.rec) PERF.tick(pt0);
     try { frameBody(); if (PERF.rec) PERF.cpu.push(performance.now() - pt0); }
     catch (e) {
       const m = String((e && e.message) || e);
@@ -33706,6 +33737,102 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
   }
   canvas.focus();
   window.__zodiac = { lines: () => typeof DOCKLINES !== 'undefined' ? DOCKLINES : null, W, WIND, kelvin: () => kelvin, wild: () => wild, marine: () => marine, traffic: () => traffic, nav: () => NAV, atmos, wetfx, RES, rebuildPhysics: w => rebuildPhysics(w), bmTests, setBM: o => { bm = Object.assign(bm, o); }, buildCustom, getCustom: () => ({ CB, CBo, CE }), SURF, startRollTest, startTrial, rollTheory, WL, wlState: () => ({ worker: !!wlWorker, main: wlMain, busy: wlBusy, on: WL.on, ready: WL.ready }), lab, rec, probes, enterTank, leaveTank, setWave, tow, startCheck, startSweep, startReplay, ZD, OD, PROF, renderer, field, ocean, spray, B, S, P, sim, SEA, scene, camera, keys, st, importer, orbit, sfx, O, OS, DS, dz, VES, getAct: () => act, switchVessel };
+  /* ---------- VR: the Quest browser through WebXR (Matt, 6 Nov: "Let's do the 'enter VR' thing. The camera should be confined to
+     the helm view for these boats, but you should be able to walk around the decks") ----------
+     A button, Enter VR, shows only where the browser has a headset (the Quest browser; GitHub Pages, since the claude.ai frame
+     can't enter VR). In VR: you stand at the helm of the boat you're driving; the left stick walks you about her deck (clamped to
+     the deck, or to the walkable floor on the big boats), the left stick's click brings you back to the helm, the grips turn you
+     30 degrees. The right stick is throttle (up/down) and steering (left/right) exactly like W S A D; A shifts up, B shifts down,
+     the right trigger is Space (start/stop). Left X: steady horizon on/off (on: the boat rolls and pitches round you while your
+     view stays level, the kinder way for a stomach; off: you ride every roll). Left Y: throttle to idle.
+     The headset's pose is in metres and the scene in tenths of a metre, so the rig carries a scale of U: a step of 1 m in the room is
+     1 m on deck. While in VR: one render pass (the far pass's layer 1 is in the XR cameras' layers), no mirror reflections (a
+     second view of the scene per eye costs too much on a Quest), shadows at most 'low', the detail tiers handed over at 0.6 of
+     their distances (LOD.detail), the eye buffers at 0.85 of the headset's resolution with fixed foveation. All restored on Exit VR.
+     Not yet: the screen overlays (HUD, toasts, panels) don't show in a headset; the Osprey's helm screens do, being in her model. */
+  var XR = (() => {
+    const X = { on: false, steady: true, walk: new THREE.Vector3(), snap: 0, detail: 0.6, scale: 0.85, held: new Set(), prev: {}, saved: null, camWas: 1, box: null, boxFor: null, headYaw: 0, session: null };
+    if (!navigator.xr || !renderer.xr) return X;
+    renderer.xr.enabled = true;   /* three only replaces the camera while a session is presenting */
+    const rig = new THREE.Object3D(); rig.matrixAutoUpdate = false;
+    const Y = new THREE.Vector3(0, 1, 0), v1 = new THREE.Vector3(), sc = new THREE.Vector3(U, U, U), qb = new THREE.Quaternion(), qs = new THREE.Quaternion(), eu = new THREE.Euler();
+    /* every render that isn't the headset's own view (the ocean's FFT passes, reflections, probes, render targets) runs as a plain render */
+    const r0 = renderer.render.bind(renderer);
+    renderer.render = function (sc2, cam) {
+      if (X.on && (cam !== camera || renderer.getRenderTarget() !== null)) { renderer.xr.enabled = false; try { return r0(sc2, cam); } finally { renderer.xr.enabled = true; } }
+      return r0(sc2, cam); };
+    /* the head's pose is applied under the rig at the helm; afterwards the game's camera carries the head's place in the world (scale 1),
+       so everything that reads camera.position next frame (wave patches, LOD, near plane) sees where your eyes are */
+    const gc = renderer.xr.getCamera.bind(renderer.xr);
+    renderer.xr.getCamera = function (cam) {
+      if (cam !== camera) return gc(cam);
+      placeRig(); cam.parent = rig; let out; try { out = gc(cam); } finally { cam.parent = null; }
+      eu.setFromQuaternion(cam.quaternion, 'YXZ'); X.headYaw = eu.y;   /* the head in the rig's frame, before it becomes world */
+      cam.matrixWorld.decompose(cam.position, cam.quaternion, v1); cam.scale.set(1, 1, 1); cam.updateMatrix();
+      return out; };
+    function deckBox() {   /* boat-local floor bounds for the boats without a walk polygon: their model's box, a little inside */
+      if (X.boxFor === act) return X.box; const R = act.root; R.updateMatrixWorld(true); const inv = R.matrixWorld.clone().invert(), b = new THREE.Box3(), t = new THREE.Box3();
+      R.traverse(o => { if (o.isMesh && o.visible && o.geometry) { if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); t.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld).applyMatrix4(inv); b.union(t); } });
+      X.boxFor = act; X.box = b.isEmpty() ? null : { cx: (b.min.x + b.max.x) / 2, cz: (b.min.z + b.max.z) / 2, hx: (b.max.x - b.min.x) / 2 * 0.72, hz: (b.max.z - b.min.z) / 2 * 0.85 };
+      return X.box; }
+    function clampWalk() {
+      const h = act.helm, w = X.walk;
+      if (act.walkPoly) { const e = v1.copy(h).add(w); walkClamp(act, e); w.copy(e).sub(h); w.y = 0; return; }
+      const b = deckBox(); if (!b) { w.set(0, 0, 0); return; }
+      w.x = clamp(h.x + w.x, b.cx - b.hx, b.cx + b.hx) - h.x; w.z = clamp(h.z + w.z, b.cz - b.hz, b.cz + b.hz) - h.z; w.y = 0; }
+    function placeRig() {
+      const R = act.root; R.updateMatrixWorld();
+      v1.copy(act.helm).add(X.walk).applyMatrix4(R.matrixWorld);
+      qb.setFromRotationMatrix(R.matrixWorld);
+      if (X.steady) { eu.setFromQuaternion(qb, 'YXZ'); eu.set(0, eu.y, 0, 'YXZ'); qb.setFromEuler(eu); }
+      qb.multiply(qs.setFromAxisAngle(Y, Math.PI + X.snap));   /* the room's -z (where you faced at the start) = her bow (+z) */
+      rig.matrix.compose(v1, qb, sc); rig.matrixWorld.copy(rig.matrix); }
+    const press = code => window.dispatchEvent(new KeyboardEvent('keydown', { code, key: '' }));
+    function hold(want) { for (const c of ['KeyW', 'KeyS', 'KeyA', 'KeyD']) { if (want.has(c) && !X.held.has(c)) { X.held.add(c); keys.add(c); } else if (!want.has(c) && X.held.has(c)) { X.held.delete(c); keys.delete(c); } } }
+    function edge(id, on) { const was = X.prev[id]; X.prev[id] = on; return on && !was; }
+    X.input = function (dt) {   /* the Touch controllers, each frame, before the boat reads its keys */
+      const s = X.session; if (!s) return; const want = new Set();
+      for (const src of s.inputSources) { const gp = src.gamepad; if (!gp) continue; const a = gp.axes, b = gp.buttons, hand = src.handedness;
+        const sx = a.length >= 4 ? a[2] : a[0] || 0, sy = a.length >= 4 ? a[3] : a[1] || 0, bt = i => !!(b[i] && b[i].pressed);
+        if (hand === 'right') {
+          if (sy < -0.5) want.add('KeyW'); else if (sy > 0.5) want.add('KeyS');
+          if (sx < -0.5) want.add('KeyA'); else if (sx > 0.5) want.add('KeyD');
+          if (edge('rA', bt(4))) press('KeyE'); if (edge('rB', bt(5))) press('KeyQ'); if (edge('rT', bt(0))) press('Space');
+          if (edge('rG', bt(1))) X.snap -= Math.PI / 6;
+        } else if (hand === 'left') {
+          const m = Math.hypot(sx, sy); if (m > 0.15) { const yb = Math.PI + X.snap + X.headYaw, k = 1.2 * U * dt * Math.min(1, (m - 0.15) / 0.75) / m;
+            X.walk.x += (-Math.sin(yb) * -sy + Math.cos(yb) * sx) * k; X.walk.z += (-Math.cos(yb) * -sy - Math.sin(yb) * sx) * k; clampWalk(); }
+          if (edge('lS', bt(3))) X.walk.set(0, 0, 0);
+          if (edge('lX', bt(4))) X.steady = !X.steady;
+          if (edge('lY', bt(5))) press('KeyX');
+          if (edge('lG', bt(1))) X.snap += Math.PI / 6; } }
+      hold(want); };
+    X.draw = function () {   /* one pass; near and far in metres (the headset's view space), the fog's distances with them */
+      const n0 = camera.near, f0 = camera.far, fog = scene.fog, fn = fog && fog.near, ff = fog && fog.far, fd = fog && fog.density;
+      camera.near = 0.12; camera.far = 30000; if (fog) { if (fog.isFogExp2) fog.density = fd * U; else { fog.near = fn / U; fog.far = ff / U; } }
+      walkPhase = 1; try { renderer.render(scene, camera); } finally { walkPhase = 0; camera.near = n0; camera.far = f0; if (fog) { if (fog.isFogExp2) fog.density = fd; else { fog.near = fn; fog.far = ff; } } } };
+    async function start(s) {
+      X.saved = { reflections: DISP.reflections, shadows: DISP.shadows }; DISP.reflections = 0; DISP.shadows = Math.min(+DISP.shadows || 0, 1); applyDisplay();
+      X.camWas = st.cam; setCam(1); X.walk.set(0, 0, 0); X.snap = 0; X.boxFor = null;
+      renderer.xr.setReferenceSpaceType('local'); renderer.xr.setFramebufferScaleFactor(X.scale);
+      await renderer.xr.setSession(s); X.session = s; X.on = true; btn.textContent = 'Exit VR';
+      try { const bl = s.renderState.baseLayer; if (bl && 'fixedFoveation' in bl) bl.fixedFoveation = 1; } catch (e) {}
+      cancelAnimationFrame(rafId); renderer.setAnimationLoop(() => frame());
+      s.addEventListener('end', () => {
+        X.on = false; X.session = null; renderer.setAnimationLoop(null); hold(new Set());
+        if (X.saved) { DISP.reflections = X.saved.reflections; DISP.shadows = X.saved.shadows; X.saved = null; applyDisplay(); }
+        setCam(X.camWas); btn.textContent = 'Enter VR'; resize(); rafId = requestAnimationFrame(frame); }, { once: true }); }
+    const btn = document.createElement('button'); btn.id = 'xrBtn'; btn.textContent = 'Enter VR'; btn.hidden = true;
+    btn.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:60;padding:10px 16px;font:600 15px system-ui,sans-serif;border-radius:6px;border:1px solid #fff8;background:#14232bdd;color:#fff;cursor:pointer';
+    document.body.appendChild(btn);
+    navigator.xr.isSessionSupported('immersive-vr').then(ok => { btn.hidden = !ok; }).catch(() => {});
+    btn.addEventListener('click', async () => {
+      if (X.session) { X.session.end(); return; }
+      try { const s = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor'] }); await start(s); }
+      catch (e) { toast('VR did not start: ' + ((e && e.message) || e)); } });
+    return X;
+  })();
+
   frame();
 })().catch(e => { console.error('BOOT FAIL', e && e.stack || e); const el = document.getElementById('bootStep'); if (el) el.textContent = 'Something went wrong while starting: ' + (e && e.message || e); });
 
