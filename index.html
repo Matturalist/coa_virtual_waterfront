@@ -33884,20 +33884,28 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
           renderer.render(scene, camera); passCull.near.forEach((m, i) => { m.visible = vn[i]; }); }
         else { X.proj = [0.12, 30000]; walkPhase = 1; renderer.render(scene, camera); }
       } finally { walkPhase = 0; X.proj = null; renderer.autoClear = ac; scene.background = bg; if (fog) { if (fog.isFogExp2) fog.density = fd; else { fog.near = fn; fog.far = ff; } } } };
-    /* quality: start from the level this headset last held, then every 2 s step down a level when it runs under 52 fps, up one when it
-       has run over 68 for 6 s. The best first (detail tiers handed over at 1.2x their distance, full shadows, no foveation). */
+    /* quality: start from the level this headset last held, then step down a level after 3 s under 52 fps (or two long frames inside 10 s), up one when it
+       has run over 68 for 20 s. The best first (detail tiers handed over at 1.2x their distance, full shadows, no foveation). */
     X.LV = [{ d: 1.25, sh: 2, fov: 0, tr: 1, tm: 1 }, { d: 1.0, sh: 2, fov: 0.25, tr: 1, tm: 1 }, { d: 0.85, sh: 1, fov: 0.5, tr: 1, tm: 1 },
             { d: 0.7, sh: 1, fov: 0.75, tr: 1, tm: 1 }, { d: 0.6, sh: 0, fov: 1, tr: 1, tm: 1 }, { d: 0.45, sh: 0, fov: 1, tr: 0, tm: 1 }, { d: 0.35, sh: 0, fov: 1, tr: 0, tm: 0 }];
     X.twoPass = true; X.ft = 1 / 72; X.lvT = 0; X.hiT = 0;
     try { const r = localStorage.getItem('vw-xr-level'), v = r === null ? NaN : +r; X.lv = v >= 0 && v < X.LV.length ? v : 2; } catch (e) { X.lv = 2; }   /* nothing saved = level 2, not 0 (+null is 0) */
-    function setLevel(i) { X.lv = Math.max(0, Math.min(X.LV.length - 1, i)); const L = X.LV[X.lv]; X.detail = L.d;
-      DISP.shadows = Math.min(L.sh, +X.saved.shadows || 0); DISP.traffic = X.saved.traffic ? L.tr : 0; DISP.treeModels = X.saved.treeModels ? L.tm : 0; applyDisplay();
+    /* Matt, 7 Nov, in the headset: slow, the boat vanishing and coming back, long waits turning his head. Changing shadows, traffic or tree
+       models rebuilds every shader (seconds on a Quest), and that stall read as slow, which stepped the level, which rebuilt again. So those
+       three are set once, on entering VR, from the level this headset settled at last time; in the session only the detail distances and the
+       foveation move, which cost nothing to change. */
+    function setLevel(i, entering) { X.lv = Math.max(0, Math.min(X.LV.length - 1, i)); const L = X.LV[X.lv]; X.detail = L.d;
+      if (entering) { DISP.shadows = Math.min(L.sh, +X.saved.shadows || 0); DISP.traffic = X.saved.traffic ? L.tr : 0; DISP.treeModels = X.saved.treeModels ? L.tm : 0; applyDisplay(); }
       try { const bl = X.session && X.session.renderState.baseLayer; if (bl && 'fixedFoveation' in bl) bl.fixedFoveation = L.fov; } catch (e) {}
       try { localStorage.setItem('vw-xr-level', String(X.lv)); } catch (e) {} }
-    X.adapt = function (dt) { if (!(dt > 0)) return; if (dt >= 0.5) { if (X.lv < X.LV.length - 1) setLevel(X.lv + 1); X.lvT = 0; X.hiT = 0; return; }   /* a half-second frame: lighter at once */ X.ft += (dt - X.ft) * 0.05; const fps = 1 / X.ft; X.lvT += dt;
+    X.adapt = function (dt) { if (!(dt > 0)) return; const now = performance.now();
+      if (dt >= 0.5) {   /* a long frame: a model or texture arriving is one; two inside 10 s is the headset struggling */
+        X.hitches = (X.hitches || []).filter(t => now - t < 10000); X.hitches.push(now);
+        if (X.hitches.length >= 2 && X.lvT > 3 && X.lv < X.LV.length - 1) { setLevel(X.lv + 1); X.lvT = 0; X.hiT = 0; X.hitches = []; } return; }
+      X.ft += (dt - X.ft) * 0.05; const fps = 1 / X.ft; X.lvT += dt;
       if (fps > 68) X.hiT += dt; else X.hiT = 0;
-      if (X.lvT > 2 && fps < 52 && X.lv < X.LV.length - 1) { setLevel(X.lv + 1); X.lvT = 0; X.hiT = 0; }
-      else if (X.hiT > 6 && X.lv > 0) { setLevel(X.lv - 1); X.lvT = 0; X.hiT = 0; } };
+      if (X.lvT > 3 && fps < 52 && X.lv < X.LV.length - 1) { setLevel(X.lv + 1); X.lvT = 0; X.hiT = 0; }
+      else if (X.hiT > 20 && X.lv > 0) { setLevel(X.lv - 1); X.lvT = 0; X.hiT = 0; } };
     async function start(s) {
       X.saved = { reflections: DISP.reflections, shadows: DISP.shadows, traffic: DISP.traffic, treeModels: DISP.treeModels }; DISP.reflections = 0;
       /* the sky is drawn on layer 1 only (the far pass's): three's left eye sees layer 1 and its right eye layer 2, so in a headset the sky
@@ -33907,7 +33915,9 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       X.camWas = st.cam; setCam(1); X.walk.set(0, 0, 0); X.snap = 0; X.boxFor = null;
       renderer.xr.setReferenceSpaceType('local'); renderer.xr.setFramebufferScaleFactor(X.scale);
       await renderer.xr.setSession(s); X.session = s; X.on = true; btn.textContent = 'Exit VR';
-      setLevel(X.lv);
+      setLevel(X.lv, true);
+      /* build every shader in view now, while the headset shows its loading dots, not one by one as you turn your head */
+      try { renderer.compile(scene, camera); } catch (e) {}
       cancelAnimationFrame(rafId); renderer.setAnimationLoop(() => frame());
       s.addEventListener('end', () => {
         X.on = false; X.session = null; renderer.setAnimationLoop(null); hold(new Set()); X_hold.left = X_hold.right = null; for (const h in handMesh) handMesh[h].visible = false; wrist.visible = false;
