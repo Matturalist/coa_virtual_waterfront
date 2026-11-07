@@ -32295,6 +32295,22 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
   }
   function bigLampFrame(ent) { if (!ent.lampMats) return; const k = 1 + 5 * nightK(); for (const q of ent.lampMats) q.m.emissiveIntensity = q.e * k; }
   const JETN = ['jet_po', 'jet_pi', 'jet_si', 'jet_so'], D2R = Math.PI / 180;
+  /* a big boat's bridge controls, found once per model tier by name (docs/vessel-models.md, Friendship V's bridge):
+     lever_thr_<jet>[_station] (local x, 0.5 rad per unit of throttle, 0..1), lever_bkt_<jet>[_station] (local x, -0.6 rad per unit
+     of bucket, 0 ahead .. 1 astern), helm_tiller[_station] (local y, 0.6 rad per unit of nozzle, -1..1, all jets), helm_joystick[_station]
+     (local x and z, 0.35 rad per unit; drives V.ctl.joy(surge, sway, yaw) when Boats provides it). get/set read and write the jets. */
+  function bridgeCtls(tier, ent) {
+    if (tier.ctls && tier.ctlsFor === ent.V) return tier.ctls; const out = [], V = ent.V, J = V && V.ctl && V.ctl.jets; tier.ctlsFor = V; tier.ctls = out; if (!J) return out;
+    const cl = (v, a, b) => Math.max(a, Math.min(b, v));
+    for (const name in tier.nodes) { const n = tier.nodes[name]; let m;
+      if ((m = /^lever_(thr|bkt)_(\d)(_\w+)?$/.exec(name)) && J[+m[2]]) { const j = J[+m[2]];
+        out.push(m[1] === 'thr' ? { node: n, ax: 'x', k: 0.5, min: 0, max: 1, get: () => j.thr || 0, set: v => { j.thr = cl(v, 0, 1); } }
+          : { node: n, ax: 'x', k: -0.6, min: 0, max: 1, get: () => cl(j.bktCmd != null ? j.bktCmd : j.bkt || 0, 0, 1), set: v => { j.bktCmd = cl(v, 0, 1); } }); }
+      else if (/^helm_tiller(_\w+)?$/.test(name)) out.push({ node: n, ax: 'y', k: 0.6, min: -1, max: 1, get: () => J.reduce((a, j) => a + (j.nozCmd || 0), 0) / J.length, set: v => { for (const j of J) j.nozCmd = cl(v, -1, 1); } });
+      else if (/^helm_joystick(_\w+)?$/.test(name)) { const js = ent.joy || (ent.joy = { x: 0, z: 0, yaw: 0 }), send = () => { if (V.ctl.joy) V.ctl.joy(-js.x, js.z, js.yaw); };
+        out.push({ node: n, ax: 'x', k: 0.35, min: -1, max: 1, joy: true, get: () => js.x, set: v => { js.x = cl(v, -1, 1); send(); } },
+                 { node: n, ax: 'z', k: 0.35, min: -1, max: 1, joy: true, get: () => js.z, set: v => { js.z = cl(v, -1, 1); send(); } }); } }
+    return out; }
   function bigFrame(dt) {   /* once a frame: the moving parts, the HUD's numbers, and dropping far bodies */
     const at = act.b && act.b.rb ? act.b.rb.translation() : null;
     for (const ent of BIGV) { if (!ent.b) continue;
@@ -32309,8 +32325,10 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       if (tl.jets) { let rpm = 0, run = false; tl.jets.forEach((j, i) => { rpm += j.rpm || 0; run = run || !!j.run; const nz = N[JETN[i] + '_nozzle'], bk = N[JETN[i] + '_bucket'];
           if (nz && B[nz.name]) nz.rotation.y = B[nz.name].y - (j.noz || 0) * D2R; if (bk) bk.rotation.x = 1.05 * (1 - Math.min(1, Math.max(0, j.bkt || 0)));
           /* her bridge (Assets, 30 Oct): a throttle and a bucket lever per jet, rotating about local x */
-          const lt = N['lever_thr_' + i], lb = N['lever_bkt_' + i]; if (lt && B[lt.name]) lt.rotation.x = B[lt.name].x + 0.5 * (j.thr || 0); if (lb && B[lb.name]) lb.rotation.x = B[lb.name].x - 0.6 * Math.min(1, Math.max(0, j.bktCmd != null ? j.bktCmd : j.bkt || 0)); });
-        { const ht = N.helm_tiller; if (ht && B[ht.name]) ht.rotation.y = B[ht.name].y + 0.6 * tl.jets.reduce((a2, j) => a2 + (j.nozCmd || 0), 0) / tl.jets.length; }
+          });
+        /* every station's levers, tiller and joystick (the centre console's and, once Assets builds them, the wing stations':
+           the same names with a suffix, lever_thr_0_port ...); each one also grabbable in VR (XR.grab) */
+        for (const c of bridgeCtls(tier, ent)) { const b0 = B[c.node.name]; if (b0) c.node.rotation[c.ax] = b0[c.ax] + c.k * c.get(); }
         ent.S.rpm = rpm / tl.jets.length; ent.S.running = run; }
       if (tl.shafts) { let rpm = 0; tl.shafts.forEach((s2, i) => { rpm += Math.abs(s2.rpm || 0); const pr = N[i ? 'prop_s' : 'prop_p']; if (pr) pr.rotation.z += (i ? -1 : 1) * (s2.rpm || 0) / 60 * 2 * Math.PI * dt; });
         (tl.rudders || []).forEach((a2, i) => { const r = N[i ? 'rudder_s' : 'rudder_p']; if (r && B[r.name]) r.rotation.y = B[r.name].y - (a2 || 0) * D2R; });
@@ -33741,8 +33759,8 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
      the helm view for these boats, but you should be able to walk around the decks") ----------
      A button, Enter VR, shows only where the browser has a headset (the Quest browser; GitHub Pages, since the claude.ai frame
      can't enter VR). In VR: you stand at the helm of the boat you're driving; the left stick walks you about her deck (clamped to
-     the deck, or to the walkable floor on the big boats), the left stick's click brings you back to the helm, the grips turn you
-     30 degrees. The right stick is throttle (up/down) and steering (left/right) exactly like W S A D; A shifts up, B shifts down,
+     the deck, or to the walkable floor on the big boats), the left stick's click brings you back to the helm, a grip turns you
+     30 degrees, or, within reach of a lever, tiller or joystick on a big boat's bridge, takes hold of it (you move it with your hand). The right stick is throttle (up/down) and steering (left/right) exactly like W S A D; A shifts up, B shifts down,
      the right trigger is Space (start/stop). Left X: steady horizon on/off (on: the boat rolls and pitches round you while your
      view stays level, the kinder way for a stomach; off: you ride every roll). Left Y: throttle to idle.
      The headset's pose is in metres and the scene in tenths of a metre, so the rig carries a scale of U: a step of 1 m in the room is
@@ -33787,25 +33805,42 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       if (X.steady) { eu.setFromQuaternion(qb, 'YXZ'); eu.set(0, eu.y, 0, 'YXZ'); qb.setFromEuler(eu); }
       qb.multiply(qs.setFromAxisAngle(Y, Math.PI + X.snap));   /* the room's -z (where you faced at the start) = her bow (+z) */
       rig.matrix.compose(v1, qb, sc); rig.matrixWorld.copy(rig.matrix); }
+    /* hands: the controllers' grip poses (room metres) under the rig, a small marker drawn at each; a grip pressed within 25 cm of a
+       bridge control's pivot takes hold of it, and the lever follows the hand round its axis until the grip lets go */
+    const grips = [0, 1].map(i => { const g = renderer.xr.getControllerGrip(i); g.addEventListener('connected', e => { g.userData.hand = e.data && e.data.handedness; }); g.addEventListener('disconnected', () => { g.userData.hand = null; }); return g; });
+    const handMesh = {}; ['left', 'right'].forEach(h => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.035 * U, 12, 8), new THREE.MeshStandardMaterial({ color: h === 'left' ? 0xd8a070 : 0xd09868, roughness: 0.8 })); m.matrixAutoUpdate = false; m.visible = false; scene.add(m); handMesh[h] = m; });
+    const hw = { left: new THREE.Vector3(), right: new THREE.Vector3() }, X_hold = {};
+    const hAx = new THREE.Vector3(), hU = new THREE.Vector3(), hP = new THREE.Vector3(), hC = new THREE.Vector3();
+    function handsFrame() { placeRig(); for (const g of grips) { const h = g.userData.hand; if (!h || !handMesh[h]) continue;
+        const M = handMesh[h]; M.matrix.multiplyMatrices(rig.matrixWorld, g.matrix); M.matrixWorld.copy(M.matrix); M.visible = true; hw[h].setFromMatrixPosition(M.matrix); } }
+    function ctlsHere() { const t = act.big && act.tiers && act.tiers[0]; return t ? bridgeCtls(t, act) : []; }
+    function axisOf(c) { c.node.parent.updateMatrixWorld(); hAx.set(c.ax === 'x' ? 1 : 0, c.ax === 'y' ? 1 : 0, c.ax === 'z' ? 1 : 0).transformDirection(c.node.parent.matrixWorld); c.node.getWorldPosition(hP); return hAx; }
+    function planeVec(out, hand) { out.copy(hand).sub(hP); out.addScaledVector(hAx, -out.dot(hAx)); return out; }
+    function grabTry(h, gp) { let best = null, bd = 0.25 * U; for (const c of ctlsHere()) { c.node.getWorldPosition(hC); const d = hC.distanceTo(hw[h]); if (d < bd) { bd = d; best = c; } }
+      if (!best) return false; const same = ctlsHere().filter(c => c.node === best.node);   /* a joystick is two controls on one node: hold both */
+      X_hold[h] = same.map(c => { axisOf(c); return { c, u0: planeVec(new THREE.Vector3(), hw[h]), v0: c.get() }; });
+      try { gp && gp.hapticActuators && gp.hapticActuators[0] && gp.hapticActuators[0].pulse(0.4, 25); } catch (e) {} return true; }
+    function holdFrame(h) { for (const H of X_hold[h] || []) { axisOf(H.c); const u = planeVec(hU, hw[h]); if (u.lengthSq() < 1e-6 || H.u0.lengthSq() < 1e-6) continue;
+        const a = Math.atan2(hC.crossVectors(H.u0, u).dot(hAx), H.u0.dot(u)); H.c.set(H.v0 + a / H.c.k); } }
     const press = code => window.dispatchEvent(new KeyboardEvent('keydown', { code, key: '' }));
     function hold(want) { for (const c of ['KeyW', 'KeyS', 'KeyA', 'KeyD']) { if (want.has(c) && !X.held.has(c)) { X.held.add(c); keys.add(c); } else if (!want.has(c) && X.held.has(c)) { X.held.delete(c); keys.delete(c); } } }
     function edge(id, on) { const was = X.prev[id]; X.prev[id] = on; return on && !was; }
     X.input = function (dt) {   /* the Touch controllers, each frame, before the boat reads its keys */
-      const s = X.session; if (!s) return; const want = new Set();
+      const s = X.session; if (!s) return; const want = new Set(); handsFrame();
       for (const src of s.inputSources) { const gp = src.gamepad; if (!gp) continue; const a = gp.axes, b = gp.buttons, hand = src.handedness;
         const sx = a.length >= 4 ? a[2] : a[0] || 0, sy = a.length >= 4 ? a[3] : a[1] || 0, bt = i => !!(b[i] && b[i].pressed);
         if (hand === 'right') {
           if (sy < -0.5) want.add('KeyW'); else if (sy > 0.5) want.add('KeyS');
           if (sx < -0.5) want.add('KeyA'); else if (sx > 0.5) want.add('KeyD');
           if (edge('rA', bt(4))) press('KeyE'); if (edge('rB', bt(5))) press('KeyQ'); if (edge('rT', bt(0))) press('Space');
-          if (edge('rG', bt(1))) X.snap -= Math.PI / 6;
+          if (edge('rG', bt(1)) && !grabTry('right', gp)) X.snap -= Math.PI / 6; if (!bt(1)) X_hold.right = null; else holdFrame('right');
         } else if (hand === 'left') {
           const m = Math.hypot(sx, sy); if (m > 0.15) { const yb = Math.PI + X.snap + X.headYaw, k = 1.2 * U * dt * Math.min(1, (m - 0.15) / 0.75) / m;
             X.walk.x += (-Math.sin(yb) * -sy + Math.cos(yb) * sx) * k; X.walk.z += (-Math.cos(yb) * -sy - Math.sin(yb) * sx) * k; clampWalk(); }
           if (edge('lS', bt(3))) X.walk.set(0, 0, 0);
           if (edge('lX', bt(4))) X.steady = !X.steady;
           if (edge('lY', bt(5))) press('KeyX');
-          if (edge('lG', bt(1))) X.snap += Math.PI / 6; } }
+          if (edge('lG', bt(1)) && !grabTry('left', gp)) X.snap += Math.PI / 6; if (!bt(1)) X_hold.left = null; else holdFrame('left'); } }
       hold(want); };
     X.draw = function () {   /* one pass; near and far in metres (the headset's view space), the fog's distances with them */
       const n0 = camera.near, f0 = camera.far, fog = scene.fog, fn = fog && fog.near, ff = fog && fog.far, fd = fog && fog.density;
@@ -33819,7 +33854,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       try { const bl = s.renderState.baseLayer; if (bl && 'fixedFoveation' in bl) bl.fixedFoveation = 1; } catch (e) {}
       cancelAnimationFrame(rafId); renderer.setAnimationLoop(() => frame());
       s.addEventListener('end', () => {
-        X.on = false; X.session = null; renderer.setAnimationLoop(null); hold(new Set());
+        X.on = false; X.session = null; renderer.setAnimationLoop(null); hold(new Set()); X_hold.left = X_hold.right = null; for (const h in handMesh) handMesh[h].visible = false;
         if (X.saved) { DISP.reflections = X.saved.reflections; DISP.shadows = X.saved.shadows; X.saved = null; applyDisplay(); }
         setCam(X.camWas); btn.textContent = 'Enter VR'; resize(); rafId = requestAnimationFrame(frame); }, { once: true }); }
     const btn = document.createElement('button'); btn.id = 'xrBtn'; btn.textContent = 'Enter VR'; btn.hidden = true;
