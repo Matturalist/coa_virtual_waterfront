@@ -158,7 +158,8 @@
      "tris": 45414,
      "bytes": 1913888,
      "tex_mb": 5.3,
-     "materials": 6
+     "materials": 6,
+     "draw_calls": 8
     },
     "mid": {
      "file": "vessels/sloop_mid",
@@ -173,6 +174,14 @@
      "bytes": 51832,
      "tex_mb": 0,
      "materials": 2
+    },
+    "vr": {
+     "file": "vessels/sloop_vr",
+     "tris": 3856,
+     "bytes": 238892,
+     "materials": 4,
+     "draw_calls": 6,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "default_tier": "mid",
@@ -266,7 +275,8 @@
      "tris": 43002,
      "bytes": 2053896,
      "tex_mb": 12.3,
-     "materials": 6
+     "materials": 6,
+     "draw_calls": 6
     },
     "mid": {
      "file": "vessels/grady_mid",
@@ -281,6 +291,14 @@
      "bytes": 42764,
      "tex_mb": 0,
      "materials": 1
+    },
+    "vr": {
+     "file": "vessels/grady_vr",
+     "tris": 5176,
+     "bytes": 304808,
+     "materials": 3,
+     "draw_calls": 3,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "default_tier": "mid",
@@ -339,7 +357,8 @@
      "tris": 37862,
      "bytes": 1887080,
      "tex_mb": 12.3,
-     "materials": 6
+     "materials": 6,
+     "draw_calls": 6
     },
     "mid": {
      "file": "vessels/towboat_mid",
@@ -354,6 +373,14 @@
      "bytes": 37096,
      "tex_mb": 0,
      "materials": 1
+    },
+    "vr": {
+     "file": "vessels/towboat_vr",
+     "tris": 4362,
+     "bytes": 316508,
+     "materials": 3,
+     "draw_calls": 3,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "default_tier": "mid",
@@ -1262,7 +1289,8 @@
      "tris": 19180,
      "bytes": 874912,
      "tex_mb": 2.3,
-     "materials": 5
+     "materials": 5,
+     "draw_calls": 5
     },
     "mid": {
      "file": "vessels/dinghy_skiff_mid",
@@ -1277,6 +1305,14 @@
      "bytes": 15288,
      "tex_mb": 0,
      "materials": 1
+    },
+    "vr": {
+     "file": "vessels/dinghy_skiff_vr",
+     "tris": 2883,
+     "bytes": 154128,
+     "materials": 2,
+     "draw_calls": 2,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "tex_doc": "tex_mb: GPU memory of the tier's textures with mips (width x height x 4 x 4/3); materials: draw calls when lod.js draws the tier (MODELS.bake merges by material)"
@@ -1321,7 +1357,8 @@
      "tris": 14498,
      "bytes": 600504,
      "tex_mb": 2.3,
-     "materials": 5
+     "materials": 5,
+     "draw_calls": 5
     },
     "mid": {
      "file": "vessels/dinghy_skiff_b_mid",
@@ -1336,6 +1373,14 @@
      "bytes": 15768,
      "tex_mb": 0,
      "materials": 1
+    },
+    "vr": {
+     "file": "vessels/dinghy_skiff_b_vr",
+     "tris": 1580,
+     "bytes": 104956,
+     "materials": 2,
+     "draw_calls": 2,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "tex_doc": "tex_mb: GPU memory of the tier's textures with mips (width x height x 4 x 4/3); materials: draw calls when lod.js draws the tier (MODELS.bake merges by material)"
@@ -1380,7 +1425,8 @@
      "tris": 13600,
      "bytes": 604480,
      "tex_mb": 2.3,
-     "materials": 5
+     "materials": 5,
+     "draw_calls": 5
     },
     "mid": {
      "file": "vessels/dinghy_skiff_c_mid",
@@ -1395,6 +1441,14 @@
      "bytes": 18744,
      "tex_mb": 0,
      "materials": 1
+    },
+    "vr": {
+     "file": "vessels/dinghy_skiff_c_vr",
+     "tris": 1696,
+     "bytes": 111948,
+     "materials": 2,
+     "draw_calls": 2,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "tex_doc": "tex_mb: GPU memory of the tier's textures with mips (width x height x 4 x 4/3); materials: draw calls when lod.js draws the tier (MODELS.bake merges by material)"
@@ -2840,9 +2894,9 @@
     "vr": {
      "file": "vessels/friendship_v_vr",
      "tris": 192162,
-     "bytes": 10516636,
+     "bytes": 12089628,
      "materials": 20,
-     "draw_calls": 24,
+     "draw_calls": 20,
      "note": "VR only (LOD.vr): the hd geometry, static parts baked one mesh per material, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
@@ -5674,7 +5728,8 @@
      "tris": 39264,
      "bytes": 2470392,
      "tex_mb": 23.7,
-     "materials": 12
+     "materials": 12,
+     "draw_calls": 15
     },
     "mid": {
      "file": "vessels/le_lyrial_mid",
@@ -5689,6 +5744,14 @@
      "bytes": 190056,
      "tex_mb": 0.8,
      "materials": 9
+    },
+    "vr": {
+     "file": "vessels/le_lyrial_vr",
+     "tris": 10038,
+     "bytes": 975984,
+     "materials": 8,
+     "draw_calls": 8,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -8829,9 +8892,9 @@
     "vr": {
      "file": "vessels/osprey_wheelhouse_vr",
      "tris": 108247,
-     "bytes": 5438924,
-     "materials": 19,
-     "draw_calls": 23,
+     "bytes": 5124136,
+     "materials": 16,
+     "draw_calls": 16,
      "note": "VR only (LOD.vr): the hd geometry, static parts baked one mesh per material, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
@@ -9051,9 +9114,9 @@
     "vr": {
      "file": "vessels/osprey_vr",
      "tris": 179856,
-     "bytes": 9505512,
-     "materials": 7,
-     "draw_calls": 17,
+     "bytes": 10360160,
+     "materials": 6,
+     "draw_calls": 9,
      "note": "VR only (LOD.vr): the hd geometry, static parts baked one mesh per material, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
@@ -12061,7 +12124,8 @@
      "tris": 40577,
      "bytes": 2485152,
      "tex_mb": 9,
-     "materials": 14
+     "materials": 14,
+     "draw_calls": 20
     },
     "mid": {
      "file": "vessels/lobster_calvin_beal_mid",
@@ -12076,6 +12140,14 @@
      "bytes": 95832,
      "tex_mb": 0,
      "materials": 5
+    },
+    "vr": {
+     "file": "vessels/lobster_calvin_beal_vr",
+     "tris": 5165,
+     "bytes": 592892,
+     "materials": 11,
+     "draw_calls": 11,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -12177,7 +12249,8 @@
      "tris": 43231,
      "bytes": 2604252,
      "tex_mb": 9,
-     "materials": 14
+     "materials": 14,
+     "draw_calls": 20
     },
     "mid": {
      "file": "vessels/lobster_libby_young_mid",
@@ -12192,6 +12265,14 @@
      "bytes": 93912,
      "tex_mb": 0,
      "materials": 5
+    },
+    "vr": {
+     "file": "vessels/lobster_libby_young_vr",
+     "tris": 6015,
+     "bytes": 616832,
+     "materials": 11,
+     "draw_calls": 11,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -12293,7 +12374,8 @@
      "tris": 40838,
      "bytes": 2540076,
      "tex_mb": 9,
-     "materials": 14
+     "materials": 14,
+     "draw_calls": 19
     },
     "mid": {
      "file": "vessels/lobster_lincoln_mid",
@@ -12308,6 +12390,14 @@
      "bytes": 120992,
      "tex_mb": 0,
      "materials": 5
+    },
+    "vr": {
+     "file": "vessels/lobster_lincoln_vr",
+     "tris": 5511,
+     "bytes": 618536,
+     "materials": 11,
+     "draw_calls": 11,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -12405,7 +12495,8 @@
      "tris": 39665,
      "bytes": 2455200,
      "tex_mb": 9,
-     "materials": 14
+     "materials": 14,
+     "draw_calls": 19
     },
     "mid": {
      "file": "vessels/lobster_holland_mid",
@@ -12420,6 +12511,14 @@
      "bytes": 94592,
      "tex_mb": 0,
      "materials": 5
+    },
+    "vr": {
+     "file": "vessels/lobster_holland_vr",
+     "tris": 5071,
+     "bytes": 607280,
+     "materials": 11,
+     "draw_calls": 11,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -12509,7 +12608,8 @@
      "tris": 43536,
      "bytes": 2627036,
      "tex_mb": 9,
-     "materials": 14
+     "materials": 14,
+     "draw_calls": 20
     },
     "mid": {
      "file": "vessels/lobster_osmond_mid",
@@ -12524,6 +12624,14 @@
      "bytes": 97728,
      "tex_mb": 0,
      "materials": 5
+    },
+    "vr": {
+     "file": "vessels/lobster_osmond_vr",
+     "tris": 5997,
+     "bytes": 608284,
+     "materials": 11,
+     "draw_calls": 11,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -12621,7 +12729,8 @@
      "tris": 41009,
      "bytes": 2646056,
      "tex_mb": 9,
-     "materials": 14
+     "materials": 14,
+     "draw_calls": 20
     },
     "mid": {
      "file": "vessels/lobster_wesmac_mid",
@@ -12636,6 +12745,14 @@
      "bytes": 134008,
      "tex_mb": 0,
      "materials": 5
+    },
+    "vr": {
+     "file": "vessels/lobster_wesmac_vr",
+     "tris": 5520,
+     "bytes": 677840,
+     "materials": 11,
+     "draw_calls": 11,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -12728,7 +12845,8 @@
      "tris": 57704,
      "bytes": 2762584,
      "tex_mb": 4.7,
-     "materials": 6
+     "materials": 6,
+     "draw_calls": 6
     },
     "mid": {
      "file": "vessels/margaret_todd_mid",
@@ -12743,6 +12861,14 @@
      "bytes": 42668,
      "tex_mb": 0,
      "materials": 1
+    },
+    "vr": {
+     "file": "vessels/margaret_todd_vr",
+     "tris": 3856,
+     "bytes": 232176,
+     "materials": 3,
+     "draw_calls": 3,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -13858,7 +13984,8 @@
      "tris": 50398,
      "bytes": 2554256,
      "tex_mb": 10,
-     "materials": 6
+     "materials": 6,
+     "draw_calls": 9
     },
     "mid": {
      "file": "vessels/mary_day_mid",
@@ -13873,6 +14000,14 @@
      "bytes": 38316,
      "tex_mb": 0,
      "materials": 1
+    },
+    "vr": {
+     "file": "vessels/mary_day_vr",
+     "tris": 3912,
+     "bytes": 309904,
+     "materials": 3,
+     "draw_calls": 4,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -14689,7 +14824,8 @@
      "tris": 55708,
      "bytes": 2742352,
      "tex_mb": 10,
-     "materials": 6
+     "materials": 6,
+     "draw_calls": 9
     },
     "mid": {
      "file": "vessels/lewis_french_mid",
@@ -14704,6 +14840,14 @@
      "bytes": 50040,
      "tex_mb": 0,
      "materials": 1
+    },
+    "vr": {
+     "file": "vessels/lewis_french_vr",
+     "tris": 4222,
+     "bytes": 302444,
+     "materials": 3,
+     "draw_calls": 4,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
@@ -15490,7 +15634,8 @@
      "tris": 45414,
      "bytes": 1913888,
      "tex_mb": 5.3,
-     "materials": 6
+     "materials": 6,
+     "draw_calls": 8
     },
     "mid": {
      "file": "vessels/sloop_mid",
@@ -15505,6 +15650,14 @@
      "bytes": 51832,
      "tex_mb": 0,
      "materials": 2
+    },
+    "vr": {
+     "file": "vessels/sloop_vr",
+     "tris": 3856,
+     "bytes": 238892,
+     "materials": 4,
+     "draw_calls": 6,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "default_tier": "mid",
@@ -15573,7 +15726,8 @@
      "tris": 45414,
      "bytes": 1913888,
      "tex_mb": 5.3,
-     "materials": 6
+     "materials": 6,
+     "draw_calls": 8
     },
     "mid": {
      "file": "vessels/sloop_mid",
@@ -15588,6 +15742,14 @@
      "bytes": 51832,
      "tex_mb": 0,
      "materials": 2
+    },
+    "vr": {
+     "file": "vessels/sloop_vr",
+     "tris": 3856,
+     "bytes": 238892,
+     "materials": 4,
+     "draw_calls": 6,
+     "note": "VR only (LOD.vr): the mid geometry (traffic: seen from another deck), static parts baked one mesh per material, plain finishes folded, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "default_tier": "mid",

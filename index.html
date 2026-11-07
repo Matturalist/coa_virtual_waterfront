@@ -33860,7 +33860,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       const t = performance.now(); if (t - wristT < 500) return; wristT = t; const fps = Math.round(1 / X.ft);
       wctx.clearRect(0, 0, 256, 96); wctx.fillStyle = 'rgba(14,23,28,0.8)'; wctx.fillRect(0, 0, 256, 96);
       wctx.fillStyle = fps >= 52 ? '#5cc287' : fps >= 40 ? '#e0a84a' : '#e46a60'; wctx.font = '600 40px system-ui,sans-serif'; wctx.fillText(fps + ' fps', 12, 46);
-      wctx.fillStyle = '#e2ebee'; wctx.font = '22px system-ui,sans-serif'; wctx.fillText('quality ' + (X.LV.length - X.lv) + '/' + X.LV.length + (X.steady ? ' · level horizon' : ''), 12, 82); wtex.needsUpdate = true; }
+      wctx.fillStyle = '#e2ebee'; wctx.font = '22px system-ui,sans-serif'; wctx.fillText('quality ' + (X.LV.length - X.lv) + '/' + X.LV.length + (X.horizon ? '' : ' · near 3 km'), 12, 82); wtex.needsUpdate = true; }
     const hw = { left: new THREE.Vector3(), right: new THREE.Vector3() }, X_hold = {};
     const hAx = new THREE.Vector3(), hU = new THREE.Vector3(), hP = new THREE.Vector3(), hC = new THREE.Vector3();
     function handsFrame() { placeRig(); for (const g of grips) { const h = g.userData.hand; if (!h || !handMesh[h]) continue;
@@ -33885,6 +33885,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
         if (hand === 'right') {
           if (sy < -0.5) want.add('KeyW'); else if (sy > 0.5) want.add('KeyS');
           if (sx < -0.5) want.add('KeyA'); else if (sx > 0.5) want.add('KeyD');
+          if (edge('rS', bt(3))) { X.horizon = !X.horizon; try { localStorage.setItem('vw-xr-horizon', X.horizon ? '1' : '0'); } catch (e) {} }   /* right stick click: far horizon on/off */
           if (edge('rA', bt(4))) press('KeyE'); if (edge('rB', bt(5))) press('KeyQ'); if (edge('rT', bt(0))) press('Space');
           if (edge('rG', bt(1)) && !grabTry('right', gp)) X.snap -= Math.PI / 6; if (!bt(1)) X_hold.right = null; else holdFrame('right');
         } else if (hand === 'left') {
@@ -33901,7 +33902,18 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       camera.near = 0.12; camera.far = 30000; if (fog) { if (fog.isFogExp2) fog.density = fd * U; else { fog.near = fn / U; fog.far = ff / U; } }
       const SM = renderer.shadowMap, sm = SM.autoUpdate, nu = SM.needsUpdate, ac = renderer.autoClear, bg = scene.background;
       try {
-        if (X.twoPass) { if (!passCull) passCull = cullLists(); X.proj = [200, 300000];
+        if (!X.horizon) {   /* Matt, 7 Nov: "it's all still super slow". Near horizon (the VR default): the far pass draws the sky alone, the
+             near pass the world to 3 km with the fog closed in by then, so the islands and hills past it fade into haze instead of being drawn
+             twice an eye. Right stick click brings the far horizon back. */
+          const sky = atmosRef && atmosRef.sky, par = sky && sky.parent;
+          if (sky && par) { if (!X.skyScene) X.skyScene = new THREE.Scene(); X.skyScene.background = bg; X.proj = [200, 300000]; walkPhase = 1;
+            X.skyScene.add(sky); try { renderer.render(X.skyScene, camera); } finally { par.add(sky); }
+            renderer.autoClear = false; renderer.clearDepth(); scene.background = null; }
+          if (fog) { if (fog.isFogExp2) fog.density = Math.max(fd * U, 0.0007); else { fog.near = Math.min(fn / U, 1200); fog.far = Math.min(ff / U, 2800); } }
+          X.proj = [Math.max(0.05, X.nearM || 0.1), 3000]; walkPhase = 1; if (!passCull) passCull = cullLists();
+          const vn = passCull.near.map(m => m.visible); for (const m of passCull.near) m.visible = false;
+          renderer.render(scene, camera); passCull.near.forEach((m, i) => { m.visible = vn[i]; }); }
+        else if (X.twoPass) { if (!passCull) passCull = cullLists(); X.proj = [200, 300000];
           SM.autoUpdate = false; SM.needsUpdate = false; const vf = passCull.far.map(m => m.visible); for (const m of passCull.far) m.visible = false;
           walkPhase = 1; renderer.render(scene, camera); passCull.far.forEach((m, i) => { m.visible = vf[i]; }); SM.autoUpdate = sm; SM.needsUpdate = nu;
           renderer.autoClear = false; renderer.clearDepth(); scene.background = null; X.proj = [Math.max(0.05, X.nearM || 0.1), 2600];
@@ -33913,7 +33925,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
        has run over 68 for 20 s. The best first (detail tiers handed over at 1.2x their distance, full shadows, no foveation). */
     X.LV = [{ d: 1.25, sh: 2, fov: 0, tr: 1, tm: 1 }, { d: 1.0, sh: 2, fov: 0.25, tr: 1, tm: 1 }, { d: 0.85, sh: 1, fov: 0.5, tr: 1, tm: 1 },
             { d: 0.7, sh: 1, fov: 0.75, tr: 1, tm: 1 }, { d: 0.6, sh: 0, fov: 1, tr: 1, tm: 1 }, { d: 0.45, sh: 0, fov: 1, tr: 0, tm: 1 }, { d: 0.35, sh: 0, fov: 1, tr: 0, tm: 0 }];
-    X.twoPass = true; X.ft = 1 / 72; X.lvT = 0; X.hiT = 0;
+    X.twoPass = true; X.ft = 1 / 72; X.horizon = false; try { X.horizon = localStorage.getItem('vw-xr-horizon') === '1'; } catch (e) {} X.lvT = 0; X.hiT = 0;
     try { const r = localStorage.getItem('vw-xr-level'), v = r === null ? NaN : +r; X.lv = v >= 0 && v < X.LV.length ? v : 2; } catch (e) { X.lv = 2; }   /* nothing saved = level 2, not 0 (+null is 0) */
     /* Matt, 7 Nov, in the headset: slow, the boat vanishing and coming back, long waits turning his head. Changing shadows, traffic or tree
        models rebuilds every shader (seconds on a Quest), and that stall read as slow, which stepped the level, which rebuilt again. So those
@@ -33941,14 +33953,14 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       renderer.xr.setReferenceSpaceType('local'); renderer.xr.setFramebufferScaleFactor(X.scale);
       await renderer.xr.setSession(s); X.session = s; X.on = true; btn.textContent = 'Exit VR';
       setLevel(X.lv, true);
-      if (typeof LOD !== 'undefined') { LOD.vr = true; reloadBigTiers(); }
+      if (typeof LOD !== 'undefined') { LOD.vr = true; reloadBigTiers(); window.dispatchEvent(new CustomEvent('vw-vr', { detail: { on: true } })); }   /* modules with their own loaders (osprey.js, traffic.js) listen and reload from LOD.tierNames */
       /* build every shader in view now, while the headset shows its loading dots, not one by one as you turn your head */
       try { renderer.compile(scene, camera); } catch (e) {}
       cancelAnimationFrame(rafId); renderer.setAnimationLoop(() => frame());
       s.addEventListener('end', () => {
         X.on = false; X.session = null; renderer.setAnimationLoop(null); hold(new Set()); X_hold.left = X_hold.right = null; for (const h in handMesh) handMesh[h].visible = false; wrist.visible = false;
         if (X.saved) { Object.assign(DISP, X.saved); X.saved = null; applyDisplay(); }
-        if (typeof LOD !== 'undefined' && LOD.vr) { LOD.vr = false; reloadBigTiers(); }
+        if (typeof LOD !== 'undefined' && LOD.vr) { LOD.vr = false; reloadBigTiers(); window.dispatchEvent(new CustomEvent('vw-vr', { detail: { on: false } })); }
         { const sky = atmosRef && atmosRef.sky; if (sky && X.skyMask != null) sky.layers.mask = X.skyMask; }
         setCam(X.camWas); btn.textContent = 'Enter VR'; resize(); rafId = requestAnimationFrame(frame); }, { once: true }); }
     const btn = document.createElement('button'); btn.id = 'xrBtn'; btn.textContent = 'Enter VR'; btn.hidden = true;
