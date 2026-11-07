@@ -2958,9 +2958,9 @@ const MODELS = (() => {
       let g; try { if (!M._files.has(file)) M._files.set(file, fetchGLB(file).then(b => parseGLB(b, file))); g = await M._files.get(file); } catch (err) { M._files.delete(file); warn(e.id + ': ' + (err && err.message || err)); return null; }
       let scene = g.scene || (g.scenes && g.scenes[0]); if (!scene) { warn(e.id + ': empty file'); return null; }
       if (e.node) { scene.updateMatrixWorld(true); const src = scene.getObjectByName(e.node); if (!src) { warn(e.id + ': no node "' + e.node + '" in ' + file); return null; }
-        const part = src.clone(true); src.matrixWorld.decompose(part.position, part.quaternion, part.scale);   /* its place in the pack, with every parent's transform */
+        const part = cloneSkinned(src); src.matrixWorld.decompose(part.position, part.quaternion, part.scale);   /* its place in the pack, with every parent's transform */
         scene = new THREE.Group(); scene.add(part); }
-      else if ([...M.byId.values()].filter(x => x.file === file || (x.files && Object.values(x.files).some(f => f.file === file))).length > 1) scene = scene.clone(true);   /* a file two entries share whole: each gets its own copy */
+      else if ([...M.byId.values()].filter(x => x.file === file || (x.files && Object.values(x.files).some(f => f.file === file))).length > 1) scene = cloneSkinned(scene);   /* a file two entries share whole: each gets its own copy */
       /* hide: nodes of a shared file this entry leaves out (sloop.py: one hull, with her sails set, or covered, or neither) */
       if (e.hide) for (const h of e.hide) { const o = scene.getObjectByName(h); if (o && o.parent) o.parent.remove(o); }
       /* orientation: wrap the file's scene so the rotation is a transform of the template, not an edit of the file's nodes */
@@ -2984,7 +2984,7 @@ const MODELS = (() => {
           metalnessMap: pbr && m.metalnessMap ? rmap : null, envMapIntensity: pbr && e.env_intensity != null ? e.env_intensity : 1,
           roughness: m.roughness != null ? m.roughness : 0.7, metalness: pbr ? (m.metalness || 0) : 0, emissive: m.emissive ? m.emissive.clone() : 0x000000, emissiveMap: fresh(m.emissiveMap),
           transparent: !!m.transparent && !(m.alphaTest > 0), opacity: m.opacity, alphaTest: m.alphaTest || 0,
-          depthWrite: !(m.transparent && !(m.alphaTest > 0)),   /* glass writes no depth: the sea is transparent too and three sorts transparents by object distance, so glass drawn first hid the water behind it (Matt 6 Nov, in VR: 'the water tends to disappear through the windows') */
+          depthWrite: !(m.transparent && !(m.alphaTest > 0)), skinning: !!m.skinning,   /* skinning: the vr tiers' moving parts */   /* glass writes no depth: the sea is transparent too and three sorts transparents by object distance, so glass drawn first hid the water behind it (Matt 6 Nov, in VR: 'the water tends to disappear through the windows') */
           side: e.single_sided && e.single_sided.includes(m.name) ? THREE.FrontSide : THREE.DoubleSide });   /* single_sided: the entry's materials drawn from their front only (a windscreen dark from outside, clear from the helm) */
         if (m.normalScale && n.normalScale) n.normalScale.copy(m.normalScale); n.name = m.name; if (e.paint && e.paint[m.name]) { const c = e.paint[m.name]; n.color.setRGB(Math.pow(c[0] / 255, 2.2), Math.pow(c[1] / 255, 2.2), Math.pow(c[2] / 255, 2.2)); }   /* paint: this entry's colour for a material whose picture is neutral (sRGB) */ remade.set(m, n); if (m.aoMap && m.userData && m.userData.wear) wearOn(n, fresh(m.aoMap)); return M.patch(n); };
       scene.traverse(o => { if (o.isMesh) { o.castShadow = !(e.no_cast && !Array.isArray(o.material) && e.no_cast.includes(o.material.name)); /* no_cast: the entry's decals and printed faces, millimetres off what they sit on */ o.receiveShadow = true; o.material = Array.isArray(o.material) ? o.material.map(remake) : remake(o.material);
@@ -3024,11 +3024,22 @@ const MODELS = (() => {
   }
   M.fit = fitOf;
 
+  /* a copy of a tree whose skinned meshes follow the copy's own bones (Object3D.clone keeps them bound to the original's, so turning
+     a lever in the copy would move nothing). The vr tiers' moving parts are skinned (tools/assets/vessels/common.py skin_moving) */
+  function cloneSkinned(src) {
+    const c = src.clone(true); let any = false; src.traverse(o => { if (o.isSkinnedMesh) any = true; }); if (!any) return c;
+    const byName = {}; c.traverse(o => { if (o.name && !byName[o.name]) byName[o.name] = o; });
+    const a = [], b = []; src.traverse(o => a.push(o)); c.traverse(o => b.push(o));
+    a.forEach((o, i) => { if (!o.isSkinnedMesh) return; const m = b[i], sk = o.skeleton;
+      m.bind(new THREE.Skeleton(sk.bones.map(bn => byName[bn.name] || bn), sk.boneInverses.map(x => x.clone())), o.bindMatrix.clone()); });
+    return c; }
+  M.cloneSkinned = cloneSkinned;
+
   /* ---------- a placed copy: Group -> [fitted scene]; tinted; animations clipped if asked ---------- */
   M.instance = function (t, opt) {
     opt = opt || {}; const { k, off } = fitOf(t, opt);
     const g = new THREE.Group(); g.name = t.scene.name;
-    const inner = t.scene.clone(true); inner.position.copy(off).multiplyScalar(k); inner.scale.setScalar(k);
+    const inner = cloneSkinned(t.scene); inner.position.copy(off).multiplyScalar(k); inner.scale.setScalar(k);
     /* clone() shares geometry and materials; a tint needs its own materials */
     if (opt.tint) { const col = new THREE.Color(opt.tint[0], opt.tint[1], opt.tint[2]);
       inner.traverse(o => { if (!o.isMesh) return; o.material = Array.isArray(o.material) ? o.material.map(m => tinted(m, col)) : tinted(o.material, col); }); }
@@ -4948,6 +4959,15 @@ const LOD = (() => {
     L._q = q ? { x: q.x, y: q.y, z: q.z, w: q.w } : null;
   };
   L.k = d => (d == null ? L.detail : d) * L.screen;
+  /* VR (Matt 7 Nov, in the Quest: slow, and the boat flickering in and out as her tiers swapped). While L.vr (the Publisher sets it on
+     Enter VR and clears it on leaving), a model whose manifest entry has a `vr` file is drawn from that one file, with no tier swaps:
+     the hd geometry with everything that never moves baked into one mesh per material, its moving parts one skinned mesh per material
+     (their nodes keep their names), pictures at most 1024 (tools/assets/vessels/build.py --tiers vr). Friendship V: 98 draw calls to 35.
+       LOD.tierNames(entry)   -> the tiers to load for it now: ['vr'] in VR when it has one, else its hd/mid/low that exist
+       LOD.vrFile(entry)      -> its vr file entry ({ file, ... }) or null */
+  L.vr = false;
+  L.vrFile = e => (e && e.files && e.files.vr) || null;
+  L.tierNames = e => (L.vr && L.vrFile(e) ? ['vr'] : ['hd', 'mid', 'low'].filter(t => e && e.files && e.files[t]));
   L.pick = function (fars, d, prev, detail) {
     const k = L.k(detail), n = fars.length, hin = L.perceptual ? -L.lead : L.hyst, hout = L.perceptual ? L.hystOut : L.hyst, m = L.perceptual && L.masked ? 0 : 1;
     let a = n; for (let i = 0; i < n; i++) { let f = fars[i] * k;
@@ -32211,7 +32231,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
      tier's far (or cutoff_m) she isn't drawn. Each tier's moving nodes are animated (the low tiers have none). */
   async function loadBigModel(ent) {
     if (ent.tiers || ent.loading || typeof MODELS === 'undefined') return; ent.loading = true;
-    try { const e = MODELS.entry(ent.big.model); if (!e) return; const o = e.physics_origin_m || [0, 0, 0], fars = e.fars_m || {}, names = ['hd', 'mid', 'low'].filter(t => e.files && e.files[t]);
+    try { const e = MODELS.entry(ent.big.model); if (!e) return; const o = e.physics_origin_m || [0, 0, 0], fars = e.fars_m || {}, names = typeof LOD !== 'undefined' && LOD.tierNames ? LOD.tierNames(e) : ['hd', 'mid', 'low'].filter(t => e.files && e.files[t]);   /* ['vr'] alone in VR when she has one (Assets, 7 Nov) */
       const tiers = [];
       for (const name of names) { const t = await MODELS.get(ent.big.model, name); if (!t) continue; const g = MODELS.instance(t, { units: U });
         g.position.set(-o[0] * U, -o[1] * U, -o[2] * U); g.visible = false; ent.root.add(g); if (wetfx && wetfx.patchTree) wetfx.patchTree(g, 0.85);
@@ -32224,6 +32244,11 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       bigWalk(ent);
     } catch (err) { console.warn(ent.big.name + ' model', err); } finally { ent.loading = false; }
   }
+  /* entering or leaving VR: the big boats that have a vr file are drawn again from it (or from hd/mid/low again), so in VR each is one
+     light tier with no swaps (Matt, 7 Nov: slow, and her flickering as tiers changed). Friendship V: 98 draw calls a pass to 35. */
+  function reloadBigTiers() { if (typeof MODELS === 'undefined' || typeof LOD === 'undefined' || !LOD.vrFile) return;
+    for (const ent of BIGV) { if (!ent.tiers || ent.loading) continue; const e = MODELS.entry(ent.big.model); if (!LOD.vrFile(e)) continue;
+      for (const t of ent.tiers) ent.root.remove(t.g); ent.tiers = null; ent.model = null; loadBigModel(ent); } }
   /* her bridge (Instruments + Assets, 31 Oct; Matt: "move around the bridge … go to the port / starboard windows"): the hd tier's
      bridge_walk polygon (children p00…, in order) and helm_eye, turned into her body frame; the eye starts standing, 0.5 m forward
      of the helmsman's seat and 0.2 m up, and the arrow keys walk it, clamped to the polygon (no raycasts) */
@@ -33916,12 +33941,14 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       renderer.xr.setReferenceSpaceType('local'); renderer.xr.setFramebufferScaleFactor(X.scale);
       await renderer.xr.setSession(s); X.session = s; X.on = true; btn.textContent = 'Exit VR';
       setLevel(X.lv, true);
+      if (typeof LOD !== 'undefined') { LOD.vr = true; reloadBigTiers(); }
       /* build every shader in view now, while the headset shows its loading dots, not one by one as you turn your head */
       try { renderer.compile(scene, camera); } catch (e) {}
       cancelAnimationFrame(rafId); renderer.setAnimationLoop(() => frame());
       s.addEventListener('end', () => {
         X.on = false; X.session = null; renderer.setAnimationLoop(null); hold(new Set()); X_hold.left = X_hold.right = null; for (const h in handMesh) handMesh[h].visible = false; wrist.visible = false;
         if (X.saved) { Object.assign(DISP, X.saved); X.saved = null; applyDisplay(); }
+        if (typeof LOD !== 'undefined' && LOD.vr) { LOD.vr = false; reloadBigTiers(); }
         { const sky = atmosRef && atmosRef.sky; if (sky && X.skyMask != null) sky.layers.mask = X.skyMask; }
         setCam(X.camWas); btn.textContent = 'Enter VR'; resize(); rafId = requestAnimationFrame(frame); }, { once: true }); }
     const btn = document.createElement('button'); btn.id = 'xrBtn'; btn.textContent = 'Enter VR'; btn.hidden = true;

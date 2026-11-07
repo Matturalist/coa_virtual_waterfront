@@ -2817,10 +2817,11 @@
    "files": {
     "hd": {
      "file": "vessels/friendship_v_hd",
-     "tris": 186586,
-     "bytes": 11157600,
+     "tris": 192162,
+     "bytes": 11327516,
      "tex_mb": 55.5,
-     "materials": 26
+     "materials": 26,
+     "draw_calls": 98
     },
     "mid": {
      "file": "vessels/friendship_v_mid",
@@ -2835,6 +2836,14 @@
      "bytes": 371928,
      "tex_mb": 1.8,
      "materials": 13
+    },
+    "vr": {
+     "file": "vessels/friendship_v_vr",
+     "tris": 192162,
+     "bytes": 10530440,
+     "materials": 20,
+     "draw_calls": 35,
+     "note": "VR only (LOD.vr): the hd geometry, static parts baked one mesh per material, moving parts skinned to their named nodes, pictures at most 1024; drawn alone, no tier swaps"
     }
    },
    "rot": [
