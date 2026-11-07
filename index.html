@@ -2984,6 +2984,7 @@ const MODELS = (() => {
           metalnessMap: pbr && m.metalnessMap ? rmap : null, envMapIntensity: pbr && e.env_intensity != null ? e.env_intensity : 1,
           roughness: m.roughness != null ? m.roughness : 0.7, metalness: pbr ? (m.metalness || 0) : 0, emissive: m.emissive ? m.emissive.clone() : 0x000000, emissiveMap: fresh(m.emissiveMap),
           transparent: !!m.transparent && !(m.alphaTest > 0), opacity: m.opacity, alphaTest: m.alphaTest || 0,
+          depthWrite: !(m.transparent && !(m.alphaTest > 0)),   /* glass writes no depth: the sea is transparent too and three sorts transparents by object distance, so glass drawn first hid the water behind it (Matt 6 Nov, in VR: 'the water tends to disappear through the windows') */
           side: e.single_sided && e.single_sided.includes(m.name) ? THREE.FrontSide : THREE.DoubleSide });   /* single_sided: the entry's materials drawn from their front only (a windscreen dark from outside, clear from the helm) */
         if (m.normalScale && n.normalScale) n.normalScale.copy(m.normalScale); n.name = m.name; if (e.paint && e.paint[m.name]) { const c = e.paint[m.name]; n.color.setRGB(Math.pow(c[0] / 255, 2.2), Math.pow(c[1] / 255, 2.2), Math.pow(c[2] / 255, 2.2)); }   /* paint: this entry's colour for a material whose picture is neutral (sRGB) */ remade.set(m, n); if (m.aoMap && m.userData && m.userData.wear) wearOn(n, fresh(m.aoMap)); return M.patch(n); };
       scene.traverse(o => { if (o.isMesh) { o.castShadow = !(e.no_cast && !Array.isArray(o.material) && e.no_cast.includes(o.material.name)); /* no_cast: the entry's decals and printed faces, millimetres off what they sit on */ o.receiveShadow = true; o.material = Array.isArray(o.material) ? o.material.map(remake) : remake(o.material);
@@ -33784,7 +33785,11 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     const gc = renderer.xr.getCamera.bind(renderer.xr);
     renderer.xr.getCamera = function (cam) {
       if (cam !== camera) return gc(cam);
-      placeRig(); cam.parent = rig; let out; try { out = gc(cam); } finally { cam.parent = null; }
+      placeRig();
+      if (X.vr && X.proj) { const E = X.vr.cameras;   /* each pass's near and far (metres) on the eyes' projections, from this frame's own */
+        if (X.pFrame !== X.frameId) { X.P0 = E.map(c => c.projectionMatrix.clone()); X.pFrame = X.frameId; }
+        const [n, f] = X.proj; E.forEach((c, i) => { const e = c.projectionMatrix.copy(X.P0[i]).elements; e[10] = -(f + n) / (f - n); e[14] = -2 * f * n / (f - n); }); }
+      cam.parent = rig; let out; try { out = gc(cam); } finally { cam.parent = null; } X.vr = out;
       eu.setFromQuaternion(cam.quaternion, 'YXZ'); X.headYaw = eu.y;   /* the head in the rig's frame, before it becomes world */
       cam.matrixWorld.decompose(cam.position, cam.quaternion, v1); cam.scale.set(1, 1, 1); cam.updateMatrix();
       return out; };
@@ -33808,11 +33813,34 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     /* hands: the controllers' grip poses (room metres) under the rig, a small marker drawn at each; a grip pressed within 25 cm of a
        bridge control's pivot takes hold of it, and the lever follows the hand round its axis until the grip lets go */
     const grips = [0, 1].map(i => { const g = renderer.xr.getControllerGrip(i); g.addEventListener('connected', e => { g.userData.hand = e.data && e.data.handedness; }); g.addEventListener('disconnected', () => { g.userData.hand = null; }); return g; });
-    const handMesh = {}; ['left', 'right'].forEach(h => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.035 * U, 12, 8), new THREE.MeshStandardMaterial({ color: h === 'left' ? 0xd8a070 : 0xd09868, roughness: 0.8 })); m.matrixAutoUpdate = false; m.visible = false; scene.add(m); handMesh[h] = m; });
+    /* hands: the WebXR Input Profiles' generic-hand (models/hands/README.md; MIT), a skinned hand rooted on the grip pose whose index finger
+       follows the trigger; a small ball stands in until it loads. Each is a group placed by the rig times the grip, so it is in metres like the room */
+    const handMesh = {}, handTrig = {};
+    ['left', 'right'].forEach(h => { const G = new THREE.Group(); G.matrixAutoUpdate = false; G.visible = false; scene.add(G); handMesh[h] = G;
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), new THREE.MeshStandardMaterial({ color: 0xc89a78, roughness: 0.8 })); G.add(ball);
+      fetch('models/hands/generic_hand_' + h + '.glb.txt').then(r => { if (!r.ok) throw new Error(r.status); return r.text(); }).then(t => {
+        const bin = Uint8Array.from(atob(t.trim()), c => c.charCodeAt(0)).buffer;
+        new THREE.GLTFLoader().parse(bin, '', g => { const m = g.scene;
+          m.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = false; o.material = new THREE.MeshStandardMaterial({ color: 0xc89a78, roughness: 0.75, skinning: !!o.isSkinnedMesh }); } });
+          const v = m.getObjectByName('xr_standard_trigger_pressed_value'), mn = m.getObjectByName('xr_standard_trigger_pressed_min'), mx = m.getObjectByName('xr_standard_trigger_pressed_max');
+          if (v && mn && mx) handTrig[h] = { v, mn, mx };
+          G.remove(ball); G.add(m); }, e => console.warn('hand model', e)); }).catch(e => console.warn('hand model', e)); });
+    function trigPose(h, val) { const T = handTrig[h]; if (!T) return; T.v.quaternion.copy(T.mn.quaternion).slerp(T.mx.quaternion, val); T.v.position.lerpVectors(T.mn.position, T.mx.position, val); }
+    /* a small panel on the left wrist: frames a second and the quality level (look at your watch) */
+    const wc = document.createElement('canvas'); wc.width = 256; wc.height = 96; const wctx = wc.getContext('2d'), wtex = new THREE.CanvasTexture(wc);
+    const wrist = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.0375), new THREE.MeshBasicMaterial({ map: wtex, transparent: true, depthWrite: false, toneMapped: false }));
+    wrist.matrixAutoUpdate = false; wrist.visible = false; scene.add(wrist); let wristT = 0;
+    const wristOff = new THREE.Matrix4().compose(new THREE.Vector3(0, 0.04, 0.06), new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)), new THREE.Vector3(1, 1, 1));
+    function wristFrame(g) { wrist.matrix.multiplyMatrices(rig.matrixWorld, g.matrix).multiply(wristOff); wrist.matrixWorld.copy(wrist.matrix); wrist.visible = true;
+      const t = performance.now(); if (t - wristT < 500) return; wristT = t; const fps = Math.round(1 / X.ft);
+      wctx.clearRect(0, 0, 256, 96); wctx.fillStyle = 'rgba(14,23,28,0.8)'; wctx.fillRect(0, 0, 256, 96);
+      wctx.fillStyle = fps >= 52 ? '#5cc287' : fps >= 40 ? '#e0a84a' : '#e46a60'; wctx.font = '600 40px system-ui,sans-serif'; wctx.fillText(fps + ' fps', 12, 46);
+      wctx.fillStyle = '#e2ebee'; wctx.font = '22px system-ui,sans-serif'; wctx.fillText('quality ' + (X.LV.length - X.lv) + '/' + X.LV.length + (X.steady ? ' · level horizon' : ''), 12, 82); wtex.needsUpdate = true; }
     const hw = { left: new THREE.Vector3(), right: new THREE.Vector3() }, X_hold = {};
     const hAx = new THREE.Vector3(), hU = new THREE.Vector3(), hP = new THREE.Vector3(), hC = new THREE.Vector3();
     function handsFrame() { placeRig(); for (const g of grips) { const h = g.userData.hand; if (!h || !handMesh[h]) continue;
-        const M = handMesh[h]; M.matrix.multiplyMatrices(rig.matrixWorld, g.matrix); M.matrixWorld.copy(M.matrix); M.visible = true; hw[h].setFromMatrixPosition(M.matrix); } }
+        const M = handMesh[h]; M.matrix.multiplyMatrices(rig.matrixWorld, g.matrix); M.matrixWorld.copy(M.matrix); M.updateMatrixWorld(true); M.visible = true; hw[h].setFromMatrixPosition(M.matrix);
+        if (h === 'left') wristFrame(g); } }
     function ctlsHere() { const t = act.big && act.tiers && act.tiers[0]; return t ? bridgeCtls(t, act) : []; }
     function axisOf(c) { c.node.parent.updateMatrixWorld(); hAx.set(c.ax === 'x' ? 1 : 0, c.ax === 'y' ? 1 : 0, c.ax === 'z' ? 1 : 0).transformDirection(c.node.parent.matrixWorld); c.node.getWorldPosition(hP); return hAx; }
     function planeVec(out, hand) { out.copy(hand).sub(hP); out.addScaledVector(hAx, -out.dot(hAx)); return out; }
@@ -33826,9 +33854,9 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
     function hold(want) { for (const c of ['KeyW', 'KeyS', 'KeyA', 'KeyD']) { if (want.has(c) && !X.held.has(c)) { X.held.add(c); keys.add(c); } else if (!want.has(c) && X.held.has(c)) { X.held.delete(c); keys.delete(c); } } }
     function edge(id, on) { const was = X.prev[id]; X.prev[id] = on; return on && !was; }
     X.input = function (dt) {   /* the Touch controllers, each frame, before the boat reads its keys */
-      const s = X.session; if (!s) return; const want = new Set(); handsFrame();
+      const s = X.session; if (!s) return; const want = new Set(); { const t = performance.now(), d = (t - (X.tl || t)) / 1000; X.tl = t; X.adapt(d); } handsFrame();
       for (const src of s.inputSources) { const gp = src.gamepad; if (!gp) continue; const a = gp.axes, b = gp.buttons, hand = src.handedness;
-        const sx = a.length >= 4 ? a[2] : a[0] || 0, sy = a.length >= 4 ? a[3] : a[1] || 0, bt = i => !!(b[i] && b[i].pressed);
+        const sx = a.length >= 4 ? a[2] : a[0] || 0, sy = a.length >= 4 ? a[3] : a[1] || 0, bt = i => !!(b[i] && b[i].pressed); trigPose(hand, b[0] ? b[0].value || 0 : 0);
         if (hand === 'right') {
           if (sy < -0.5) want.add('KeyW'); else if (sy > 0.5) want.add('KeyS');
           if (sx < -0.5) want.add('KeyA'); else if (sx > 0.5) want.add('KeyD');
@@ -33842,20 +33870,49 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
           if (edge('lY', bt(5))) press('KeyX');
           if (edge('lG', bt(1)) && !grabTry('left', gp)) X.snap += Math.PI / 6; if (!bt(1)) X_hold.left = null; else holdFrame('left'); } }
       hold(want); };
-    X.draw = function () {   /* one pass; near and far in metres (the headset's view space), the fog's distances with them */
-      const n0 = camera.near, f0 = camera.far, fog = scene.fog, fn = fog && fog.near, ff = fog && fog.far, fd = fog && fog.density;
+    X.draw = function () {   /* two passes like the screen's (the far one 200 m .. 300 km, then the near one to 2.6 km on a cleared depth),
+         each with its own near and far on the eyes' projections: one pass from 12 cm to 30 km z-fought everywhere past a few hundred metres */
+      const fog = scene.fog, fn = fog && fog.near, ff = fog && fog.far, fd = fog && fog.density; X.frameId = (X.frameId || 0) + 1;
       camera.near = 0.12; camera.far = 30000; if (fog) { if (fog.isFogExp2) fog.density = fd * U; else { fog.near = fn / U; fog.far = ff / U; } }
-      walkPhase = 1; try { renderer.render(scene, camera); } finally { walkPhase = 0; camera.near = n0; camera.far = f0; if (fog) { if (fog.isFogExp2) fog.density = fd; else { fog.near = fn; fog.far = ff; } } } };
+      const SM = renderer.shadowMap, sm = SM.autoUpdate, nu = SM.needsUpdate, ac = renderer.autoClear, bg = scene.background;
+      try {
+        if (X.twoPass) { if (!passCull) passCull = cullLists(); X.proj = [200, 300000];
+          SM.autoUpdate = false; SM.needsUpdate = false; const vf = passCull.far.map(m => m.visible); for (const m of passCull.far) m.visible = false;
+          walkPhase = 1; renderer.render(scene, camera); passCull.far.forEach((m, i) => { m.visible = vf[i]; }); SM.autoUpdate = sm; SM.needsUpdate = nu;
+          renderer.autoClear = false; renderer.clearDepth(); scene.background = null; X.proj = [Math.max(0.05, X.nearM || 0.1), 2600];
+          const vn = passCull.near.map(m => m.visible); for (const m of passCull.near) m.visible = false;
+          renderer.render(scene, camera); passCull.near.forEach((m, i) => { m.visible = vn[i]; }); }
+        else { X.proj = [0.12, 30000]; walkPhase = 1; renderer.render(scene, camera); }
+      } finally { walkPhase = 0; X.proj = null; renderer.autoClear = ac; scene.background = bg; if (fog) { if (fog.isFogExp2) fog.density = fd; else { fog.near = fn; fog.far = ff; } } } };
+    /* quality: start from the level this headset last held, then every 2 s step down a level when it runs under 52 fps, up one when it
+       has run over 68 for 6 s. The best first (detail tiers handed over at 1.2x their distance, full shadows, no foveation). */
+    X.LV = [{ d: 1.25, sh: 2, fov: 0, tr: 1, tm: 1 }, { d: 1.0, sh: 2, fov: 0.25, tr: 1, tm: 1 }, { d: 0.85, sh: 1, fov: 0.5, tr: 1, tm: 1 },
+            { d: 0.7, sh: 1, fov: 0.75, tr: 1, tm: 1 }, { d: 0.6, sh: 0, fov: 1, tr: 1, tm: 1 }, { d: 0.45, sh: 0, fov: 1, tr: 0, tm: 1 }, { d: 0.35, sh: 0, fov: 1, tr: 0, tm: 0 }];
+    X.twoPass = true; X.ft = 1 / 72; X.lvT = 0; X.hiT = 0;
+    try { const r = localStorage.getItem('vw-xr-level'), v = r === null ? NaN : +r; X.lv = v >= 0 && v < X.LV.length ? v : 2; } catch (e) { X.lv = 2; }   /* nothing saved = level 2, not 0 (+null is 0) */
+    function setLevel(i) { X.lv = Math.max(0, Math.min(X.LV.length - 1, i)); const L = X.LV[X.lv]; X.detail = L.d;
+      DISP.shadows = Math.min(L.sh, +X.saved.shadows || 0); DISP.traffic = X.saved.traffic ? L.tr : 0; DISP.treeModels = X.saved.treeModels ? L.tm : 0; applyDisplay();
+      try { const bl = X.session && X.session.renderState.baseLayer; if (bl && 'fixedFoveation' in bl) bl.fixedFoveation = L.fov; } catch (e) {}
+      try { localStorage.setItem('vw-xr-level', String(X.lv)); } catch (e) {} }
+    X.adapt = function (dt) { if (!(dt > 0)) return; if (dt >= 0.5) { if (X.lv < X.LV.length - 1) setLevel(X.lv + 1); X.lvT = 0; X.hiT = 0; return; }   /* a half-second frame: lighter at once */ X.ft += (dt - X.ft) * 0.05; const fps = 1 / X.ft; X.lvT += dt;
+      if (fps > 68) X.hiT += dt; else X.hiT = 0;
+      if (X.lvT > 2 && fps < 52 && X.lv < X.LV.length - 1) { setLevel(X.lv + 1); X.lvT = 0; X.hiT = 0; }
+      else if (X.hiT > 6 && X.lv > 0) { setLevel(X.lv - 1); X.lvT = 0; X.hiT = 0; } };
     async function start(s) {
-      X.saved = { reflections: DISP.reflections, shadows: DISP.shadows }; DISP.reflections = 0; DISP.shadows = Math.min(+DISP.shadows || 0, 1); applyDisplay();
+      X.saved = { reflections: DISP.reflections, shadows: DISP.shadows, traffic: DISP.traffic, treeModels: DISP.treeModels }; DISP.reflections = 0;
+      /* the sky is drawn on layer 1 only (the far pass's): three's left eye sees layer 1 and its right eye layer 2, so in a headset the sky
+         showed in one eye and not the other (the flicker); both eyes see layer 0 */
+      const sky = atmosRef && atmosRef.sky; X.skyMask = sky ? sky.layers.mask : null; if (sky) sky.layers.enable(0);
+      X.scale = X.lv <= 1 ? 1 : X.lv <= 3 ? 0.9 : 0.8;
       X.camWas = st.cam; setCam(1); X.walk.set(0, 0, 0); X.snap = 0; X.boxFor = null;
       renderer.xr.setReferenceSpaceType('local'); renderer.xr.setFramebufferScaleFactor(X.scale);
       await renderer.xr.setSession(s); X.session = s; X.on = true; btn.textContent = 'Exit VR';
-      try { const bl = s.renderState.baseLayer; if (bl && 'fixedFoveation' in bl) bl.fixedFoveation = 1; } catch (e) {}
+      setLevel(X.lv);
       cancelAnimationFrame(rafId); renderer.setAnimationLoop(() => frame());
       s.addEventListener('end', () => {
-        X.on = false; X.session = null; renderer.setAnimationLoop(null); hold(new Set()); X_hold.left = X_hold.right = null; for (const h in handMesh) handMesh[h].visible = false;
-        if (X.saved) { DISP.reflections = X.saved.reflections; DISP.shadows = X.saved.shadows; X.saved = null; applyDisplay(); }
+        X.on = false; X.session = null; renderer.setAnimationLoop(null); hold(new Set()); X_hold.left = X_hold.right = null; for (const h in handMesh) handMesh[h].visible = false; wrist.visible = false;
+        if (X.saved) { Object.assign(DISP, X.saved); X.saved = null; applyDisplay(); }
+        { const sky = atmosRef && atmosRef.sky; if (sky && X.skyMask != null) sky.layers.mask = X.skyMask; }
         setCam(X.camWas); btn.textContent = 'Enter VR'; resize(); rafId = requestAnimationFrame(frame); }, { once: true }); }
     const btn = document.createElement('button'); btn.id = 'xrBtn'; btn.textContent = 'Enter VR'; btn.hidden = true;
     btn.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:60;padding:10px 16px;font:600 15px system-ui,sans-serif;border-radius:6px;border:1px solid #fff8;background:#14232bdd;color:#fff;cursor:pointer';
@@ -33867,6 +33924,7 @@ const HULL = {"A":0.01,"dx":0.08,"dz":0.125,"cols":[[-0.64,-0.072,0.0749,-0.0125
       catch (e) { toast('VR did not start: ' + ((e && e.message) || e)); } });
     return X;
   })();
+  if (window.__zodiac) window.__zodiac.xr = XR;   /* test/vr_smoke.js */
 
   frame();
 })().catch(e => { console.error('BOOT FAIL', e && e.stack || e); const el = document.getElementById('bootStep'); if (el) el.textContent = 'Something went wrong while starting: ' + (e && e.message || e); });
